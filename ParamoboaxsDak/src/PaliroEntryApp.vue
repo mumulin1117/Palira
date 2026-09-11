@@ -52,7 +52,7 @@ import {
   paliroSendConversationAudioMessage,
   paliroSendConversationMessage,
   paliroReportMember,
-  paliroRecordOpenedMatchMember,
+  paliroTakeAvailableMatchMember,
   paliroSpendBoxCoins,
   paliroToggleFollowMember,
   paliroToggleVideoCommentLike,
@@ -153,8 +153,10 @@ const languagePreference = ref('ko')
 const videoFeed = ref([])
 const activeVideoIndex = ref(0)
 const videoFeedScroll = ref(null)
+const videoFeedPlayback = ref({})
 const friendProfileVideoPlayback = ref({})
-const videoReturnState = ref({ videoID: '', index: 0 })
+const videoReturnState = ref({ videoID: '', index: 0, scrollTop: 0 })
+const isVideoFeedRestoring = ref(false)
 const selectedVideo = ref(null)
 const showVideoComments = ref(false)
 const showVideoActions = ref(false)
@@ -227,6 +229,7 @@ let browserVoiceStream = null
 let browserVoiceChunks = []
 let browserVoiceStopResolver = null
 let browserVoiceDiscarding = false
+let paliroVideoRestorePending = false
 
 function createDefaultProfile() {
   return {
@@ -249,6 +252,7 @@ function avatarForProfile(memberProfile) {
 const currentAvatar = computed(() => avatarForProfile(profile.value))
 const currentMemberProfile = computed(() => ({ ...createDefaultProfile(), ...(session.value?.profile ?? {}) }))
 const currentMemberAvatar = computed(() => avatarForProfile(currentMemberProfile.value))
+const currentMemberAvatarSource = computed(() => currentMemberAvatar.value.src)
 const birthdayIssue = computed(() => getBirthdayIssue(profile.value.birthday))
 const boxActionLimit = computed(() => PALIRO_DAILY_BOX_LIMIT + (boxState.value?.bonusActions ?? 0) + (boxState.value?.videoBonusActions ?? 0))
 const freeBoxActionsLeft = computed(() => Math.max(0, boxActionLimit.value - (boxState.value?.freeActionsUsed ?? 0)))
@@ -259,7 +263,6 @@ const isOpeningBox = computed(() => boxOpeningStage.value !== 'idle')
 const isCreatingBox = computed(() => makeBoxFlightStage.value !== 'idle')
 const isBoxActionLocked = computed(() => isOpeningBox.value || isCreatingBox.value)
 const friendRequestButtonLabel = computed(() => friendRequestStatus.value === 'pending' ? t('requestSent') : t('addFriend'))
-const availableMatchMembers = computed(() => paliroGetAvailableMatchMembers(session.value?.userID, languagePreference.value))
 const isMatchedFollowing = computed(() => socialState.value.following.some((member) => member.id === matchedFriend.value.id))
 const isMatchedFollower = computed(() => socialState.value.followers.some((member) => member.id === matchedFriend.value.id))
 const isMatchedMutualFriend = computed(() => isMatchedFollowing.value && isMatchedFollower.value)
@@ -339,10 +342,12 @@ onMounted(() => {
   applyLocale()
   void setupNativeIapBridge()
   window.addEventListener('popstate', syncRouteFromLocation)
+  document.addEventListener('visibilitychange', handleDocumentVisibilityChange)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('popstate', syncRouteFromLocation)
+  document.removeEventListener('visibilitychange', handleDocumentVisibilityChange)
   if (paliroBoxSelectionAlertTimer) window.clearTimeout(paliroBoxSelectionAlertTimer)
   paliroIapListener?.remove?.()
   clearOpeningTimers()
@@ -354,17 +359,25 @@ onBeforeUnmount(() => {
 
 function syncRouteFromLocation() {
   const nextRoute = window.location.hash.replace(/^#\//, '')
+  if (route.value === 'videos' && nextRoute !== 'videos') {
+    captureVideoFeedState()
+    clearVideoFeedPlayback()
+  }
   route.value = paliroRoutes.has(nextRoute) ? nextRoute : 'welcome'
   if (route.value === 'videos' && session.value) {
-    loadVideoFeed()
-    setupVideoFeedPlayback()
+    loadVideoFeed(videoReturnState.value.videoID)
+    paliroVideoRestorePending = Boolean(videoReturnState.value.videoID)
+    isVideoFeedRestoring.value = paliroVideoRestorePending
   }
   scheduleScrollReset()
 }
 
 function openRoute(nextRoute) {
   errorMessage.value = ''
-  if (route.value === 'videos' && nextRoute !== 'videos') clearVideoFeedPlayback()
+  if (route.value === 'videos' && nextRoute !== 'videos') {
+    captureVideoFeedState()
+    clearVideoFeedPlayback()
+  }
   route.value = nextRoute
   window.history.pushState({ route: nextRoute }, '', `#/${nextRoute}`)
   scheduleScrollReset()
@@ -389,6 +402,17 @@ function localizedTestOption(option) {
 
 function localizedGender(option) {
   return t(`gender${option}`)
+}
+
+function memberAvatarSource(member) {
+  if (member?.photoDataUrl) return member.photoDataUrl
+  const preset = avatars.find((avatar) => avatar.key === member?.avatar)
+  return preset?.src || member?.avatar || avatars[0].src
+}
+
+function commentAvatarSource(comment) {
+  if (comment?.authorAvatar) return memberAvatarSource({ avatar: comment.authorAvatar })
+  return comment?.authorName === currentMemberName.value ? currentMemberAvatarSource.value : ''
 }
 
 function applyLocale() {
@@ -590,18 +614,18 @@ function loadBoxState() {
 
 function loadMeState() {
   const userID = session.value?.userID
-  socialState.value = paliroGetSocialState(userID)
-  profileMeta.value = paliroGetSocialSummary(userID)
+  languagePreference.value = paliroGetLanguagePreference(userID)
+  socialState.value = paliroGetSocialState(userID, languagePreference.value)
+  profileMeta.value = paliroGetSocialSummary(userID, languagePreference.value)
   topicTestState.value = paliroGetTopicTestState(userID)
   blockedUsers.value = paliroGetBlockedUsers(userID)
-  languagePreference.value = paliroGetLanguagePreference(userID)
   pushNotificationsEnabled.value = paliroGetPushPreference(userID)
 }
 
 function loadMessageState() {
   const userID = session.value?.userID
-  conversations.value = paliroGetConversations(userID)
-  incomingFriendRequests.value = paliroGetIncomingFriendRequests(userID)
+  conversations.value = paliroGetConversations(userID, languagePreference.value)
+  incomingFriendRequests.value = paliroGetIncomingFriendRequests(userID, languagePreference.value)
 }
 
 function openMessages() {
@@ -635,9 +659,21 @@ function clearVideoFeedPlayback() {
   videoElements.forEach((element) => element.pause())
 }
 
+function captureVideoFeedState(preferredVideoID = activeVideo.value?.id) {
+  const matchedIndex = videoFeed.value.findIndex((video) => video.id === preferredVideoID)
+  videoReturnState.value = {
+    videoID: preferredVideoID || '',
+    index: matchedIndex >= 0 ? matchedIndex : activeVideoIndex.value,
+    scrollTop: videoFeedScroll.value?.scrollTop ?? 0,
+  }
+}
+
+function setVideoFeedPlayback(videoID, isPlaying) {
+  videoFeedPlayback.value = { ...videoFeedPlayback.value, [videoID]: isPlaying }
+}
+
 function setFriendProfileVideoElement(postID, element) {
   if (element) {
-    element.pause()
     friendProfileVideoElements.set(postID, element)
   } else {
     friendProfileVideoElements.delete(postID)
@@ -671,7 +707,9 @@ function playActiveVideo(index) {
     if (videoID !== activeID) element.pause()
   })
   const activeElement = videoElements.get(activeID)
-  activeElement?.play?.().catch(() => {})
+  if (!activeElement) return
+  setVideoFeedPlayback(activeID, true)
+  activeElement.play().catch(() => setVideoFeedPlayback(activeID, false))
 }
 
 function setupVideoFeedPlayback() {
@@ -695,30 +733,73 @@ function setupVideoFeedPlayback() {
   })
 }
 
-function openVideoFeed() {
-  loadMeState()
-  loadVideoFeed()
-  openRoute('videos')
-  setupVideoFeedPlayback()
+function positionVideoFeedViewport(root = videoFeedScroll.value) {
+  if (!root || route.value !== 'videos') return false
+  const matchedIndex = videoFeed.value.findIndex((video) => video.id === videoReturnState.value.videoID)
+  const index = matchedIndex >= 0
+    ? matchedIndex
+    : Math.min(videoReturnState.value.index, Math.max(0, videoFeed.value.length - 1))
+  activeVideoIndex.value = index
+  if (paliroVideoRestorePending) {
+    const slide = root.querySelector(`[data-video-index="${index}"]`)
+    root.scrollTo({
+      top: slide?.offsetTop ?? videoReturnState.value.scrollTop,
+      left: 0,
+      behavior: 'auto',
+    })
+    paliroVideoRestorePending = false
+  }
+  return true
 }
 
-function restoreVideoFeed() {
-  const preferredVideoID = videoReturnState.value.videoID
-  loadMeState()
-  loadVideoFeed(preferredVideoID)
-  openRoute('videos')
-  nextTick(() => {
-    const root = videoFeedScroll.value
-    const matchedIndex = videoFeed.value.findIndex((video) => video.id === preferredVideoID)
-    const index = matchedIndex >= 0 ? matchedIndex : Math.min(videoReturnState.value.index, Math.max(0, videoFeed.value.length - 1))
-    activeVideoIndex.value = index
-    root?.querySelector(`[data-video-index="${index}"]`)?.scrollIntoView({ block: 'start', behavior: 'auto' })
+function restoreVideoFeedViewport() {
+  requestAnimationFrame(() => {
+    if (!positionVideoFeedViewport()) return
+    isVideoFeedRestoring.value = false
     setupVideoFeedPlayback()
   })
 }
 
-function toggleVideoPlayback() {
-  const element = videoElements.get(activeVideo.value?.id)
+function handleRouteBeforeEnter(element) {
+  if (route.value !== 'videos' || !paliroVideoRestorePending) return
+  positionVideoFeedViewport(element.querySelector('.paliro-video-feed-scroll'))
+}
+
+function handleRouteAfterEnter() {
+  if (route.value === 'videos') restoreVideoFeedViewport()
+}
+
+function handleDocumentVisibilityChange() {
+  if (document.hidden) {
+    if (route.value === 'videos') captureVideoFeedState()
+    clearVideoFeedPlayback()
+    return
+  }
+  if (route.value === 'videos') {
+    paliroVideoRestorePending = true
+    restoreVideoFeedViewport()
+  }
+}
+
+function openVideoFeed() {
+  loadMeState()
+  loadVideoFeed(videoReturnState.value.videoID || activeVideo.value?.id)
+  paliroVideoRestorePending = Boolean(videoReturnState.value.videoID)
+  isVideoFeedRestoring.value = paliroVideoRestorePending
+  openRoute('videos')
+}
+
+function restoreVideoFeed({ refresh = false } = {}) {
+  const preferredVideoID = videoReturnState.value.videoID
+  loadMeState()
+  if (refresh || !videoFeed.value.length) loadVideoFeed(preferredVideoID)
+  paliroVideoRestorePending = true
+  isVideoFeedRestoring.value = true
+  openRoute('videos')
+}
+
+function toggleVideoPlayback(video = activeVideo.value) {
+  const element = videoElements.get(video?.id)
   if (!element) return
   if (element.paused) element.play().catch(() => {})
   else element.pause()
@@ -833,7 +914,9 @@ function blockSelectedVideoMember() {
 function openVideoMemberProfile(video) {
   if (isOwnVideo(video)) { openMe(); return }
   clearFriendProfileVideoPlayback()
-  videoReturnState.value = { videoID: video.id, index: activeVideoIndex.value }
+  const index = videoFeed.value.findIndex((item) => item.id === video.id)
+  if (index >= 0) activeVideoIndex.value = index
+  captureVideoFeedState(video.id)
   matchedFriend.value = video.member
   friendRequestStatus.value = paliroGetFriendRequestStatus(session.value?.userID, video.member.id)
   friendProfileOrigin.value = 'videos'
@@ -1360,6 +1443,9 @@ function selectLanguage(language) {
   const wasBoxSelectionRequiredNotice = homeNotice.value === t('boxSelectionRequired')
   languagePreference.value = paliroSetLanguagePreference(session.value?.userID, language)
   applyLocale()
+  loadMeState()
+  loadMessageState()
+  loadVideoFeed()
   if (wasBoxSelectedNotice) homeNotice.value = t('boxSelected')
   if (wasBoxSelectionRequiredNotice) homeNotice.value = t('boxSelectionRequired')
 }
@@ -1382,10 +1468,18 @@ function selectBox(index) {
   homeNotice.value = t('boxSelected')
 }
 
+function hasAvailableMatchMember() {
+  return paliroGetAvailableMatchMembers(session.value?.userID, languagePreference.value).length > 0
+}
+
 function requestBoxAction(action) {
   if (!session.value || isBoxActionLocked.value) return
   if (action === 'make') {
     openBoxComposer()
+    return
+  }
+  if (action === 'take' && !hasAvailableMatchMember()) {
+    homeNotice.value = t('noAvailableMatches')
     return
   }
   if (action === 'take' && selectedBox.value === null) {
@@ -1399,11 +1493,6 @@ function requestBoxAction(action) {
     }, 720)
     return
   }
-  if (action === 'take' && !availableMatchMembers.value.length) {
-    homeNotice.value = t('noAvailableMatches')
-    return
-  }
-
   if (freeBoxActionsLeft.value > 0) {
     const result = paliroUseFreeBoxAction(session.value.userID)
     if (result.type === 'success') {
@@ -1530,7 +1619,7 @@ function finishBoxAction(action) {
 function confirmCoinSpend() {
   const action = pendingBoxAction.value
   if (!action || !session.value || isBoxActionLocked.value) return
-  if (action === 'take' && !availableMatchMembers.value.length) {
+  if (action === 'take' && !hasAvailableMatchMember()) {
     dismissCoinPrompt()
     homeNotice.value = t('noAvailableMatches')
     return
@@ -1595,13 +1684,12 @@ function completeMakeBoxFlight() {
 
 function startTakeOneOpening() {
   if (isOpeningBox.value) return
-  const candidates = availableMatchMembers.value
-  if (!candidates.length) {
+  const member = paliroTakeAvailableMatchMember(session.value?.userID, languagePreference.value)
+  if (!member) {
     homeNotice.value = t('noAvailableMatches')
     return
   }
-  matchedFriend.value = candidates[Math.floor(Math.random() * candidates.length)]
-  paliroRecordOpenedMatchMember(session.value?.userID, matchedFriend.value.id)
+  matchedFriend.value = member
   friendRequestStatus.value = paliroGetFriendRequestStatus(session.value?.userID, matchedFriend.value.id)
   clearOpeningTimers()
   paliroOpeningPreviousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null
@@ -1743,18 +1831,25 @@ function closeReportUser() {
   paliroOpeningPreviousFocus = null
 }
 
-function finishFriendSafetyAction() {
+function finishFriendSafetyAction({ closeBox = false, noticeKey = 'boxReadyNotice' } = {}) {
   friendRequestStatus.value = 'none'
   loadMeState()
   loadMessageState()
   if (friendProfileOrigin.value === 'videos') {
-    restoreVideoFeed()
+    restoreVideoFeed({ refresh: true })
     return
   }
   if (friendProfileOrigin.value === 'box') {
+    clearOpeningTimers()
+    clearFriendProfileVideoPlayback()
+    if (closeBox) selectedBox.value = null
+    boxOpeningStage.value = closeBox ? 'idle' : 'result'
+    if (closeBox) {
+      homeNotice.value = t(noticeKey)
+      paliroOpeningPreviousFocus = null
+    }
     openRoute('home')
-    boxOpeningStage.value = 'result'
-    nextTick(focusMatchResultAction)
+    if (!closeBox) nextTick(focusMatchResultAction)
     return
   }
   selectedBox.value = null
@@ -1873,7 +1968,7 @@ function confirmBlockMatchedFriend() {
   blockedUsers.value = result.blockedUsers
   showFriendProfileBlockConfirm.value = false
   showFriendProfileActions.value = false
-  finishFriendSafetyAction()
+  finishFriendSafetyAction({ closeBox: true, noticeKey: 'memberBlockedNotice' })
 }
 
 function getPaliroIapPlugin() {
@@ -2067,7 +2162,7 @@ function finishTopicTest() {
   <main class="paliro-shell">
     <div class="paliro-stars" aria-hidden="true"></div>
 
-    <Transition name="paliro-route-fade" mode="out-in">
+    <Transition :name="isVideoFeedRestoring ? '' : 'paliro-route-fade'" mode="out-in" @before-enter="handleRouteBeforeEnter" @after-enter="handleRouteAfterEnter">
       <section v-if="route === 'welcome'" key="welcome" class="paliro-welcome paliro-view">
       <div class="paliro-status-spacer"></div>
       <div class="paliro-welcome-art" aria-hidden="true">
@@ -2283,15 +2378,19 @@ function finishTopicTest() {
           <article v-for="(video, index) in videoFeed" :key="video.id" :data-video-index="index" class="paliro-video-slide">
             <video
               :ref="(element) => setVideoElement(video.id, element)"
+              :poster="video.thumbnail"
               :src="videoSource(video.source)"
               autoplay
               loop
               muted
               playsinline
               preload="metadata"
-              @click="toggleVideoPlayback"
+              @click="toggleVideoPlayback(video)"
+              @pause="setVideoFeedPlayback(video.id, false)"
+              @play="setVideoFeedPlayback(video.id, true)"
             ></video>
             <div class="paliro-video-scrim" aria-hidden="true"></div>
+            <img v-if="videoFeedPlayback[video.id] === false" alt="" class="paliro-video-paused-indicator" src="/assets/paliro-video-play@2x.png" />
             <header class="paliro-video-header">
               <h1>{{ t('video') }}</h1>
               <button :aria-label="t('videoPublish')" type="button" @click="openVideoPublish"><img alt="" class="paliro-video-publish-icon" src="/assets/paliro-video-publish@2x.png" /></button>
@@ -2305,7 +2404,7 @@ function finishTopicTest() {
               <button :aria-label="`${video.member.name} ${t('profile')}`" class="paliro-video-author-action" type="button" @click="openVideoMemberProfile(video)"><img :alt="`${video.member.name} avatar`" :src="video.member.avatar" /><i v-if="!isOwnVideo(video)" :class="{ 'is-following': isFollowingVideoMember(video) }" aria-hidden="true" @click.stop="toggleVideoFollow(video)"><img v-if="isFollowingVideoMember(video)" alt="" src="/assets/paliro-video-following@2x.png" /><span v-else>+</span></i></button>
               <button :aria-label="t('likes')" :aria-pressed="video.liked" :class="{ 'is-liked': video.liked }" type="button" @click="toggleVideoLike(video)"><img alt="" :src="video.liked ? '/assets/paliro-video-like-active@2x.png' : '/assets/paliro-video-like@2x.png'" /><small>{{ video.likes }}</small></button>
               <button :aria-label="t('comments')" type="button" @click="openVideoComments(video)"><img alt="" src="/assets/paliro-video-comment@2x.png" /><small>{{ video.comments.length }}</small></button>
-              <button :aria-label="t('reportVideo')" class="paliro-video-report-action" type="button" @click="openVideoActions(video)"><img alt="" src="/assets/paliro-video-report@2x.png" /><small>{{ t('reportVideo') }}</small></button>
+              <button :aria-label="t('reportVideo')" class="paliro-video-report-action" type="button" @click="openVideoActions(video)"><img alt="" src="/assets/paliro-video-report@2x.png" /><small>{{ t('reportLabel') }}</small></button>
             </aside>
           </article>
         </main>
@@ -2328,7 +2427,7 @@ function finishTopicTest() {
           <h2>{{ t('conversations') }}</h2>
           <section v-if="filteredConversations.length" :aria-label="t('conversations')" class="paliro-conversation-list">
             <button v-for="conversation in filteredConversations" :key="conversation.member.id" type="button" @click="openConversation(conversation.member.id)">
-              <img :alt="`${conversation.member.name} avatar`" :src="conversation.member.avatar" />
+              <img :alt="`${conversation.member.name} avatar`" :src="memberAvatarSource(conversation.member)" />
               <span class="paliro-conversation-copy"><strong>{{ conversation.member.name }}</strong><small>{{ messagePreview(conversation.messages.at(-1)) }}</small></span>
               <span class="paliro-conversation-meta"><time>{{ formatConversationTime(conversation.messages.at(-1)?.sentAt) }}</time><i v-if="conversation.unreadCount">{{ conversation.unreadCount }}</i></span>
             </button>
@@ -2346,7 +2445,7 @@ function finishTopicTest() {
       <section v-else-if="route === 'conversation'" key="conversation" class="paliro-conversation-view paliro-view">
         <header class="paliro-me-secondary-nav">
           <button :aria-label="t('back')" class="paliro-back" type="button" @click="closeConversation">‹</button>
-          <div v-if="activeConversation" class="paliro-conversation-title"><img alt="" :src="activeConversation.member.avatar" /><h1>{{ activeConversation.member.name }}</h1></div>
+          <div v-if="activeConversation" class="paliro-conversation-title"><img alt="" :src="memberAvatarSource(activeConversation.member)" /><h1>{{ activeConversation.member.name }}</h1></div>
           <span aria-hidden="true"></span>
         </header>
         <main ref="conversationScroll" class="paliro-conversation-scroll" aria-live="polite">
@@ -2665,7 +2764,7 @@ function finishTopicTest() {
         </header>
         <div class="paliro-friend-profile-scroll">
           <section class="paliro-friend-profile-hero">
-            <img :alt="`${matchedFriend.nickname} avatar`" :src="matchedFriend.avatar" />
+            <img :alt="`${matchedFriend.nickname} profile background`" :src="matchedFriend.profileBackground || matchedFriend.avatar" />
             <button
               v-if="!isMatchedMutualFriend"
               :aria-label="friendRequestStatus === 'pending' ? t('requestSent') : t('addFriends')"
@@ -2677,7 +2776,7 @@ function finishTopicTest() {
             <p class="paliro-friend-profile-mood"><span aria-hidden="true">{{ moods.find((item) => item.label === matchedFriend.mood)?.icon ?? '·' }}</span>{{ localizedMood(matchedFriend.mood) }}</p>
           </section>
           <section class="paliro-friend-profile-body">
-            <div class="paliro-friend-profile-name"><h2>{{ matchedFriend.nickname }}</h2><span>{{ matchedFriend.age }}</span></div>
+            <div class="paliro-friend-profile-name"><h2>{{ matchedFriend.nickname }}</h2></div>
             <section :aria-label="`${matchedFriend.nickname} statistics`" class="paliro-friend-profile-stats">
               <div><strong>{{ matchedFriend.stats?.followers ?? 0 }}</strong><span>{{ t('followers') }}</span></div>
               <div><strong>{{ matchedFriend.stats?.following ?? 0 }}</strong><span>{{ t('following') }}</span></div>
@@ -2691,7 +2790,7 @@ function finishTopicTest() {
               <h3>{{ t('memberPosts') }}</h3>
               <div>
                 <article v-for="post in matchedMemberPosts" :key="post.id" :class="`is-${post.contentType}`">
-                  <div class="paliro-friend-profile-post-media"><img v-if="post.contentType === 'box'" :alt="post.title" :src="post.thumbnail" /><video v-else :ref="(element) => setFriendProfileVideoElement(post.id, element)" :aria-label="post.title" loop muted playsinline preload="metadata" :src="videoSource(post.source)" @click="toggleFriendProfileVideo(post)" @pause="setFriendProfileVideoPlayback(post.id, false)" @play="setFriendProfileVideoPlayback(post.id, true)"></video><span v-if="post.contentType === 'box'" aria-hidden="true">✦</span><button v-else :aria-label="post.title" :class="['paliro-friend-profile-post-play', { 'is-playing': friendProfileVideoPlayback[post.id] }]" type="button" @click="toggleFriendProfileVideo(post)"><span aria-hidden="true">{{ friendProfileVideoPlayback[post.id] ? 'Ⅱ' : '▶' }}</span></button></div>
+                  <div class="paliro-friend-profile-post-media"><img v-if="post.contentType === 'box'" :alt="post.title" :src="post.thumbnail" /><video v-else :ref="(element) => setFriendProfileVideoElement(post.id, element)" :aria-label="post.title" loop muted playsinline preload="metadata" :poster="post.thumbnail" :src="videoSource(post.source)" @click="toggleFriendProfileVideo(post)" @pause="setFriendProfileVideoPlayback(post.id, false)" @play="setFriendProfileVideoPlayback(post.id, true)"></video><span v-if="post.contentType === 'box'" aria-hidden="true">✦</span><button v-else :aria-label="post.title" :aria-pressed="Boolean(friendProfileVideoPlayback[post.id])" :class="['paliro-friend-profile-post-play', { 'is-playing': friendProfileVideoPlayback[post.id] }]" type="button" @click.stop="toggleFriendProfileVideo(post)"><span aria-hidden="true">{{ friendProfileVideoPlayback[post.id] ? 'Ⅱ' : '▶' }}</span></button></div>
                   <p>{{ post.title }}</p>
                   <small>{{ post.contentType === 'box' ? post.theme : `${post.likes} ${t('likes')}` }}</small>
                 </article>
@@ -2824,14 +2923,12 @@ function finishTopicTest() {
           <img :key="boxOpeningKey" :alt="t('openingBox')" class="paliro-opening-machine" src="/assets/paliro-open-box-machine.gif" />
         </section>
 
-        <section v-else ref="matchResultDialog" aria-describedby="paliro-match-copy" aria-labelledby="paliro-match-title" aria-modal="true" class="paliro-match-result" role="dialog" tabindex="-1" @keydown="trapMatchFocus">
+        <section v-else ref="matchResultDialog" :aria-label="matchedFriend.nickname" aria-describedby="paliro-match-copy" aria-modal="true" class="paliro-match-result" role="dialog" tabindex="-1" @keydown="trapMatchFocus">
           <div class="paliro-match-card">
             <img alt="" class="paliro-match-card-frame" src="/assets/paliro-match-card@2x.png" />
             <button :aria-label="t('reportUser')" class="paliro-match-report" type="button" @click="openReportUser('opening')"><img alt="" src="/assets/paliro-match-report@2x.png" /></button>
             <img :alt="`${matchedFriend.nickname} avatar`" class="paliro-match-avatar" :src="matchedFriend.avatar" />
             <div class="paliro-match-copy">
-              <p class="paliro-kicker">{{ t('sharedInterests') }}</p>
-              <h2 id="paliro-match-title">{{ t('meetMember') }} {{ matchedFriend.nickname }}</h2>
               <p id="paliro-match-copy">{{ matchedFriend.bio }}</p>
             </div>
             <button v-if="!isMatchedBlocked" ref="matchPrimaryButton" :aria-label="friendRequestButtonLabel" :aria-pressed="friendRequestStatus === 'pending'" :class="['paliro-match-add-friend', { 'is-pending': friendRequestStatus === 'pending' }]" :disabled="friendRequestStatus === 'pending'" type="button" @click="openFriendRequestModal">
@@ -2912,13 +3009,13 @@ function finishTopicTest() {
           <header><h2>{{ t('comments') }} <span>({{ selectedVideoComments.length }})</span></h2><button :aria-label="t('close')" type="button" @click="showVideoComments = false">×</button></header>
           <main>
             <article v-for="comment in selectedVideoComments" :key="comment.id">
-              <img v-if="comment.authorAvatar" :alt="`${comment.authorName} avatar`" :src="comment.authorAvatar" />
+              <img v-if="commentAvatarSource(comment)" :alt="`${comment.authorName} avatar`" :src="commentAvatarSource(comment)" />
               <span v-else aria-hidden="true">{{ comment.authorName.slice(0, 1) }}</span>
               <div class="paliro-video-comment-copy"><strong>{{ comment.authorName }}</strong><p>{{ comment.body }}</p></div>
               <button :aria-label="t('likes')" :aria-pressed="comment.liked" :class="{ 'is-liked': comment.liked }" class="paliro-video-comment-like" type="button" @click="toggleVideoCommentLike(comment)"><span aria-hidden="true">{{ comment.liked ? '♥' : '♡' }}</span><small>{{ comment.likes }}</small></button>
             </article>
           </main>
-          <form @submit.prevent="submitVideoComment"><img :alt="`${currentMemberName} avatar`" class="paliro-video-comment-composer-avatar" :src="currentMemberAvatar" /><input v-model="videoCommentDraft" :maxlength="180" :placeholder="t('addComment')" type="text" /><button :disabled="!videoCommentDraft.trim()" type="submit">{{ t('postComment') }}</button></form>
+          <form @submit.prevent="submitVideoComment"><img :alt="`${currentMemberName} avatar`" class="paliro-video-comment-composer-avatar" :src="currentMemberAvatarSource" /><input v-model="videoCommentDraft" :maxlength="180" :placeholder="t('addComment')" type="text" /><button :disabled="!videoCommentDraft.trim()" type="submit">{{ t('postComment') }}</button></form>
           <p v-if="videoCommentError" class="paliro-video-form-error" role="alert">{{ videoCommentError }}</p>
         </section>
       </div>
