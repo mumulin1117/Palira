@@ -1,0 +1,5 @@
+"CFBundleDisplayName" = "팔리로";
+"CFBundleName" = "팔리로";
+"NSCameraUsageDescription" = "팔리로는 상자, 프로필 또는 주제 비디오에 사진이나 비디오를 추가할 때만 카메라를 사용합니다.";
+"NSPhotoLibraryUsageDescription" = "팔리로는 상자, 프로필 또는 주제 비디오에 이미지나 비디오를 추가할 때만 사진 보관함을 사용합니다.";
+"NSMicrophoneUsageDescription" = "팔리로는 소리가 있는 주제 비디오를 녹화하거나 서로 친구인 사용자에게 음성 메시지를 보낼 때만 마이크를 사용합니다.";

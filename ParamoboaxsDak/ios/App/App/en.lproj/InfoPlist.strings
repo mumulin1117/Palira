@@ -1,0 +1,5 @@
+"CFBundleDisplayName" = "Paliro";
+"CFBundleName" = "Paliro";
+"NSCameraUsageDescription" = "Paliro uses the camera only when you choose to add a photo or video to a Box, profile, or topic video.";
+"NSPhotoLibraryUsageDescription" = "Paliro uses your photo library only when you choose an image or video for a Box, profile, or topic video.";
+"NSMicrophoneUsageDescription" = "Paliro uses the microphone only when you choose to record a topic video with sound or send a voice message to a mutual friend.";
