@@ -7,6 +7,7 @@ final class PaliroBridgeViewController: CAPBridgeViewController {
             bridge?.registerPluginType(PaliroIapPlugin.self)
             bridge?.registerPluginType(PaliroMediaPickerPlugin.self)
             bridge?.registerPluginType(PaliroVoiceRecorderPlugin.self)
+            bridge?.registerPluginType(PaliroCallPermissionsPlugin.self)
         }
     }
 }

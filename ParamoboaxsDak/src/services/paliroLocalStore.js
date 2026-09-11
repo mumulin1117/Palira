@@ -1096,8 +1096,12 @@ export function paliroGetFriendRequestStatus(userID, friendID) {
   return readJson(PALIRO_FRIEND_REQUESTS_KEY, {})[userID]?.[friendID]?.status ?? 'none'
 }
 
-export function paliroSendFriendRequest(userID, friendID, message = '') {
+export function paliroSendFriendRequest(userID, friendID, message = '', memberSnapshot = null) {
   if (!userID || !friendID) return { type: 'no-session' }
+  if (paliroGetBlockedUsers(userID).some((member) => member.id === friendID)) return { type: 'blocked' }
+  if (paliroCanChatWithMember(userID, friendID)) return { type: 'already-friends' }
+  const member = PALIRO_MOCK_MEMBER_BY_ID.get(friendID) ?? (memberSnapshot?.id === friendID ? memberSnapshot : null)
+  if (!member) return { type: 'invalid-member' }
 
   const requestsByUser = readJson(PALIRO_FRIEND_REQUESTS_KEY, {})
   const userRequests = requestsByUser[userID] ?? {}
@@ -1113,6 +1117,7 @@ export function paliroSendFriendRequest(userID, friendID, message = '') {
       message: String(message).trim().slice(0, 120),
       requestLimit: 1,
       requestedAt: new Date().toISOString(),
+      member: clonePaliroMember(member),
     },
   }
   writeJson(PALIRO_FRIEND_REQUESTS_KEY, requestsByUser)
@@ -1153,6 +1158,24 @@ function getConversationStateByUser(userID) {
   } else {
     conversationsByUser[userID] = savedConversations
   }
+  // Derive missing request rows from the persisted request, including requests sent before this UI existed.
+  const outgoingRequests = readJson(PALIRO_FRIEND_REQUESTS_KEY, {})[userID] ?? {}
+  const blockedIDs = new Set(paliroGetBlockedUsers(userID).map((member) => member.id))
+  for (const [memberID, request] of Object.entries(outgoingRequests)) {
+    if (!['pending', 'accepted'].includes(request.status) || blockedIDs.has(memberID)) continue
+    let conversation = conversationsByUser[userID].find((item) => item.member?.id === memberID)
+    const member = PALIRO_MOCK_MEMBER_BY_ID.get(memberID) ?? request.member ?? conversation?.member
+    if (!member || member.id !== memberID) continue
+    if (!conversation) {
+      conversation = { member: clonePaliroMember(member), unreadCount: 0, messages: [] }
+      conversationsByUser[userID].push(conversation)
+    }
+    const messageID = `paliro-request-message-${memberID}-${request.requestedAt}`
+    if (!conversation.messages.some((message) => message.id === messageID)) {
+      conversation.messages.push({ id: messageID, sender: 'self', type: 'friend-request', body: request.message || '', sentAt: request.requestedAt })
+      conversation.messages.sort((left, right) => String(left.sentAt ?? '').localeCompare(String(right.sentAt ?? '')))
+    }
+  }
   writeJson(PALIRO_MESSAGES_KEY, conversationsByUser)
   return { conversationsByUser, conversations: conversationsByUser[userID] }
 }
@@ -1165,10 +1188,26 @@ export function paliroGetIncomingFriendRequests(userID, language = '') {
     .map((request) => ({ ...request, member: clonePaliroMember(PALIRO_MOCK_MEMBER_BY_ID.get(request.member?.id) ?? request.member) }))
 }
 
+export function paliroCanChatWithMember(userID, memberID) {
+  if (!userID || !memberID) return false
+  const social = paliroGetSocialState(userID)
+  return social.followers.some((member) => member.id === memberID)
+    && social.following.some((member) => member.id === memberID)
+    && !paliroGetBlockedUsers(userID).some((member) => member.id === memberID)
+}
+
 export function paliroGetConversations(userID, language = '') {
   if (!userID) return []
   const { conversations } = getConversationStateByUser(userID)
-  return conversations.filter((conversation) => !language || conversation.member?.language === language).map(clonePaliroConversation).sort((left, right) => {
+  const requests = readJson(PALIRO_FRIEND_REQUESTS_KEY, {})[userID] ?? {}
+  const blockedIDs = new Set(paliroGetBlockedUsers(userID).map((member) => member.id))
+  return conversations.filter((conversation) => (!language || conversation.member?.language === language)
+    && !blockedIDs.has(conversation.member?.id)
+    && (paliroCanChatWithMember(userID, conversation.member?.id) || requests[conversation.member?.id]?.status === 'pending'))
+    .map((conversation) => {
+      const isLocked = !paliroCanChatWithMember(userID, conversation.member.id)
+      return { ...clonePaliroConversation(conversation), isLocked, unreadCount: isLocked ? 0 : conversation.unreadCount }
+    }).sort((left, right) => {
     const leftTime = left.messages.at(-1)?.sentAt ?? ''
     const rightTime = right.messages.at(-1)?.sentAt ?? ''
     return rightTime.localeCompare(leftTime)
@@ -1184,10 +1223,7 @@ export function paliroGetConversation(userID, memberID) {
 
 export function paliroGetOrCreateConversation(userID, member) {
   if (!userID || !member?.id) return null
-  const social = paliroGetSocialState(userID)
-  const isMutualFriend = social.followers.some((item) => item.id === member.id)
-    && social.following.some((item) => item.id === member.id)
-  if (!isMutualFriend) return null
+  if (!paliroCanChatWithMember(userID, member.id)) return null
 
   const { conversationsByUser, conversations } = getConversationStateByUser(userID)
   const existingConversation = conversations.find((conversation) => conversation.member.id === member.id)
@@ -1199,7 +1235,9 @@ export function paliroGetOrCreateConversation(userID, member) {
     messages: [{
       id: `paliro-message-friend-${crypto.randomUUID()}`,
       sender: 'friend',
-      body: 'Thanks for connecting through a shared topic Box. I am looking forward to exchanging ideas respectfully.',
+      body: member.language === 'ko'
+        ? '관심사 상자를 통해 연결되어 반가워요. 서로의 이야기를 나눠요.'
+        : 'Thanks for connecting through a shared topic Box. I am looking forward to exchanging ideas respectfully.',
       sentAt: new Date().toISOString(),
     }],
   }
@@ -1209,7 +1247,7 @@ export function paliroGetOrCreateConversation(userID, member) {
 }
 
 export function paliroMarkConversationRead(userID, memberID) {
-  if (!userID || !memberID) return null
+  if (!paliroCanChatWithMember(userID, memberID)) return null
   const { conversationsByUser, conversations } = getConversationStateByUser(userID)
   const nextConversations = conversations.map((conversation) => conversation.member.id === memberID
     ? { ...conversation, unreadCount: 0 }
@@ -1222,10 +1260,7 @@ export function paliroMarkConversationRead(userID, memberID) {
 export function paliroSendConversationMessage(userID, memberID, body) {
   const message = String(body ?? '').trim().slice(0, 280)
   if (!userID || !memberID || !message) return { type: 'invalid-message' }
-  const social = paliroGetSocialState(userID)
-  const isMutualFriend = social.followers.some((member) => member.id === memberID)
-    && social.following.some((member) => member.id === memberID)
-  if (!isMutualFriend) return { type: 'not-friends' }
+  if (!paliroCanChatWithMember(userID, memberID)) return { type: 'not-friends' }
 
   const { conversationsByUser, conversations } = getConversationStateByUser(userID)
   const index = conversations.findIndex((conversation) => conversation.member.id === memberID)
@@ -1240,14 +1275,11 @@ export function paliroSendConversationMessage(userID, memberID, body) {
 export function paliroSendConversationAudioMessage(userID, memberID, audio) {
   const source = String(audio?.source ?? '')
   const durationSeconds = Number(audio?.durationSeconds ?? 0)
-  if (!userID || !memberID || !source || !Number.isFinite(durationSeconds) || durationSeconds < 1) {
+  if (!userID || !memberID || !source || source.startsWith('blob:') || !Number.isFinite(durationSeconds) || durationSeconds < 1 || durationSeconds > 300) {
     return { type: 'invalid-audio' }
   }
 
-  const social = paliroGetSocialState(userID)
-  const isMutualFriend = social.followers.some((member) => member.id === memberID)
-    && social.following.some((member) => member.id === memberID)
-  if (!isMutualFriend) return { type: 'not-friends' }
+  if (!paliroCanChatWithMember(userID, memberID)) return { type: 'not-friends' }
 
   const { conversationsByUser, conversations } = getConversationStateByUser(userID)
   const index = conversations.findIndex((conversation) => conversation.member.id === memberID)
@@ -1286,6 +1318,13 @@ export function paliroAcceptIncomingFriendRequest(userID, requestID) {
 
   requestsByUser[userID] = requests.map((item) => item.id === requestID ? { ...item, status: 'accepted', respondedAt: new Date().toISOString() } : item)
   writeJson(PALIRO_INCOMING_FRIEND_REQUESTS_KEY, requestsByUser)
+
+  const outgoingRequests = readJson(PALIRO_FRIEND_REQUESTS_KEY, {})
+  const outgoing = outgoingRequests[userID]?.[request.member.id]
+  if (outgoing?.status === 'pending') {
+    outgoingRequests[userID][request.member.id] = { ...outgoing, status: 'accepted', respondedAt: new Date().toISOString() }
+    writeJson(PALIRO_FRIEND_REQUESTS_KEY, outgoingRequests)
+  }
 
   const { conversationsByUser, conversations } = getConversationStateByUser(userID)
   if (!conversations.some((conversation) => conversation.member.id === request.member.id)) {

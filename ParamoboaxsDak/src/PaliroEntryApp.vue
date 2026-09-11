@@ -1,5 +1,11 @@
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { Capacitor, registerPlugin } from '@capacitor/core'
+import { createPaliroVoiceSession, PALIRO_VOICE_MAX_SECONDS } from './services/paliroVoiceSession'
+import PaliroChatIcon from './components/PaliroChatIcon.vue'
+import PaliroVideoCall from './components/PaliroVideoCall.vue'
+import { paliroRequestCallPermissions } from './services/paliroVideoCall'
+import { paliroPrimaryTabs, paliroRouteTransition } from './services/paliroNavigation'
 import {
   PALIRO_BOX_ACTION_COST,
   PALIRO_COIN_PACKS,
@@ -9,6 +15,7 @@ import {
   paliroAddVideoComment,
   paliroAwardVideoBoxAction,
   paliroBlockMember,
+  paliroCanChatWithMember,
   paliroCompleteProfile,
   paliroCompleteTopicTest,
   paliroCreditCoinsFromIap,
@@ -108,6 +115,7 @@ const friendRequestStatus = ref('none')
 const showFriendRequestModal = ref(false)
 const friendRequestMessage = ref('')
 const friendRequestSending = ref(false)
+const friendRequestError = ref('')
 const friendRequestDialog = ref(null)
 const friendRequestTextarea = ref(null)
 const matchPrimaryButton = ref(null)
@@ -119,6 +127,13 @@ const reportError = ref('')
 const reportSubmitting = ref(false)
 const reportOrigin = ref('home')
 const profileReminder = ref('')
+const profileReminderConfirm = ref(null)
+watch(profileReminder, (value) => {
+  if (value) nextTick(() => profileReminderConfirm.value?.focus({ preventScroll: true }))
+})
+const videoCallMember = ref(null)
+const videoCallOrigin = ref('conversation')
+const videoCallStarting = ref(false)
 const friendProfileOrigin = ref('box')
 const showFriendProfileActions = ref(false)
 const showFriendProfileBlockConfirm = ref(false)
@@ -142,6 +157,13 @@ const activeConversation = ref(null)
 const messageSearch = ref('')
 const conversationDraft = ref('')
 const conversationScroll = ref(null)
+const conversationInput = ref(null)
+const conversationError = ref('')
+const conversationOrigin = ref('messages')
+const conversationReturnProfileOrigin = ref('box')
+const chatViewport = ref({ height: 0, top: 0, keyboard: false })
+const voicePlaybackProgress = ref(0)
+const voiceGestureCancelled = ref(false)
 const voiceRecording = ref({ state: 'idle', durationSeconds: 0, source: '', error: '' })
 const voiceRecordingBusy = ref(false)
 const playingVoiceMessageID = ref('')
@@ -157,6 +179,10 @@ const videoFeedPlayback = ref({})
 const friendProfileVideoPlayback = ref({})
 const videoReturnState = ref({ videoID: '', index: 0, scrollTop: 0 })
 const isVideoFeedRestoring = ref(false)
+const hasOpenedVideoFeed = ref(false)
+const skipVideoRouteAnimation = ref(false)
+const isPrimaryTabTransition = ref(false)
+const userPausedVideoID = ref('')
 const selectedVideo = ref(null)
 const showVideoComments = ref(false)
 const showVideoActions = ref(false)
@@ -175,6 +201,35 @@ const showVideoPublishReward = ref(false)
 const videoElements = new Map()
 const friendProfileVideoElements = new Map()
 let videoFeedObserver = null
+let videoPlaybackRevision = 0
+
+watch(route, (nextRoute, previousRoute) => {
+  if (previousRoute === 'video-call' && nextRoute !== 'video-call') videoCallMember.value = null
+  if (previousRoute === 'conversation' && nextRoute !== 'conversation') {
+    stopVoicePlayback()
+    void cancelVoiceRecording()
+    dismissConversationKeyboard()
+  }
+  if (nextRoute === 'conversation') nextTick(() => { updateChatViewport(); scrollConversationToEnd(false) })
+  const transition = paliroRouteTransition(previousRoute, nextRoute)
+  skipVideoRouteAnimation.value = transition.skipVideo
+  isPrimaryTabTransition.value = transition.primary
+  if (previousRoute === 'friend-profile') clearFriendProfileVideoPlayback()
+  if (nextRoute !== 'videos') return
+  hasOpenedVideoFeed.value = true
+  isVideoFeedRestoring.value = true
+  nextTick(restoreVideoFeedViewport)
+}, { flush: 'sync' })
+
+watch(session, (nextSession, previousSession) => {
+  if (nextSession?.userID === previousSession?.userID) return
+  clearVideoFeedPlayback()
+  hasOpenedVideoFeed.value = false
+  videoFeed.value = []
+  videoFeedPlayback.value = {}
+  userPausedVideoID.value = ''
+  videoReturnState.value = { videoID: '', index: 0, scrollTop: 0 }
+}, { flush: 'sync' })
 
 const avatars = [
   { key: 'violet', label: 'Violet', src: '/assets/paliro-avatar-violet@2x.png' },
@@ -218,17 +273,19 @@ const testQuestions = [
     },
   },
 ]
-const paliroRoutes = new Set(['welcome', 'login', 'signup', 'setup', 'edit-profile', 'privacy', 'terms', 'home', 'videos', 'messages', 'conversation', 'friend-requests', 'wallet', 'test', 'friend-profile', 'report-user', 'me', 'my-videos', 'blocked-users', 'language', 'settings', 'social-detail'])
+const paliroRoutes = new Set(['welcome', 'login', 'signup', 'setup', 'edit-profile', 'privacy', 'terms', 'home', 'videos', 'messages', 'conversation', 'video-call', 'friend-requests', 'wallet', 'test', 'friend-profile', 'report-user', 'me', 'my-videos', 'blocked-users', 'language', 'settings', 'social-detail'])
 let paliroIapListener
 let paliroOpeningPreviousFocus = null
 const paliroOpeningTimers = new Set()
 let voiceDurationTimer = null
 let activeVoiceAudio = null
-let browserVoiceRecorder = null
-let browserVoiceStream = null
-let browserVoiceChunks = []
-let browserVoiceStopResolver = null
-let browserVoiceDiscarding = false
+let voiceSession = null
+let voiceRevision = 0
+let voicePointer = null
+let voiceStartPromise = null
+let voiceSending = false
+const nativeVoiceRecorder = Capacitor.isNativePlatform() ? registerPlugin('PaliroVoiceRecorder') : null
+const nativeCallPermissions = Capacitor.isNativePlatform() ? registerPlugin('PaliroCallPermissions') : null
 let paliroVideoRestorePending = false
 
 function createDefaultProfile() {
@@ -265,7 +322,11 @@ const isBoxActionLocked = computed(() => isOpeningBox.value || isCreatingBox.val
 const friendRequestButtonLabel = computed(() => friendRequestStatus.value === 'pending' ? t('requestSent') : t('addFriend'))
 const isMatchedFollowing = computed(() => socialState.value.following.some((member) => member.id === matchedFriend.value.id))
 const isMatchedFollower = computed(() => socialState.value.followers.some((member) => member.id === matchedFriend.value.id))
-const isMatchedMutualFriend = computed(() => isMatchedFollowing.value && isMatchedFollower.value)
+const isMatchedMutualFriend = computed(() => {
+  void socialState.value
+  void blockedUsers.value
+  return paliroCanChatWithMember(session.value?.userID, matchedFriend.value.id)
+})
 const isMatchedBlocked = computed(() => blockedUsers.value.some((member) => member.id === matchedFriend.value.id))
 const matchedAbout = computed(() => matchedFriend.value.about || matchedFriend.value.bio)
 const matchedMemberPosts = computed(() => paliroGetMemberPosts(matchedFriend.value))
@@ -298,6 +359,11 @@ const filteredConversations = computed(() => {
     || messagePreview(conversation.messages.at(-1)).toLocaleLowerCase().includes(query))
 })
 const unreadConversationCount = computed(() => conversations.value.reduce((total, conversation) => total + (conversation.unreadCount ?? 0), 0))
+const canSendConversation = computed(() => {
+  void socialState.value
+  void blockedUsers.value
+  return paliroCanChatWithMember(session.value?.userID, activeConversation.value?.member?.id)
+})
 const activePolicyCopy = computed(() => paliroGetLegalCopy(languagePreference.value, route.value === 'privacy' ? 'privacy' : 'terms'))
 const activeEulaCopy = computed(() => paliroGetLegalCopy(languagePreference.value, 'eula'))
 const walletCoinPacks = computed(() => PALIRO_COIN_PACKS.map((pack) => ({
@@ -343,11 +409,17 @@ onMounted(() => {
   void setupNativeIapBridge()
   window.addEventListener('popstate', syncRouteFromLocation)
   document.addEventListener('visibilitychange', handleDocumentVisibilityChange)
+  window.visualViewport?.addEventListener('resize', updateChatViewport)
+  window.visualViewport?.addEventListener('scroll', updateChatViewport)
+  window.addEventListener('resize', updateChatViewport)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('popstate', syncRouteFromLocation)
   document.removeEventListener('visibilitychange', handleDocumentVisibilityChange)
+  window.visualViewport?.removeEventListener('resize', updateChatViewport)
+  window.visualViewport?.removeEventListener('scroll', updateChatViewport)
+  window.removeEventListener('resize', updateChatViewport)
   if (paliroBoxSelectionAlertTimer) window.clearTimeout(paliroBoxSelectionAlertTimer)
   paliroIapListener?.remove?.()
   clearOpeningTimers()
@@ -358,7 +430,9 @@ onBeforeUnmount(() => {
 })
 
 function syncRouteFromLocation() {
-  const nextRoute = window.location.hash.replace(/^#\//, '')
+  let nextRoute = window.location.hash.replace(/^#\//, '')
+  if (nextRoute === 'video-call' && !videoCallMember.value) nextRoute = session.value ? 'messages' : 'welcome'
+  if (nextRoute === 'conversation' && !paliroCanChatWithMember(session.value?.userID, activeConversation.value?.member?.id)) nextRoute = session.value ? 'messages' : 'welcome'
   if (route.value === 'videos' && nextRoute !== 'videos') {
     captureVideoFeedState()
     clearVideoFeedPlayback()
@@ -373,6 +447,7 @@ function syncRouteFromLocation() {
 }
 
 function openRoute(nextRoute) {
+  if (nextRoute === 'conversation' && !paliroCanChatWithMember(session.value?.userID, activeConversation.value?.member?.id)) nextRoute = 'messages'
   errorMessage.value = ''
   if (route.value === 'videos' && nextRoute !== 'videos') {
     captureVideoFeedState()
@@ -381,6 +456,14 @@ function openRoute(nextRoute) {
   route.value = nextRoute
   window.history.pushState({ route: nextRoute }, '', `#/${nextRoute}`)
   scheduleScrollReset()
+}
+
+function openPrimaryTab(nextRoute) {
+  if (nextRoute === route.value) return
+  if (nextRoute === 'videos') openVideoFeed()
+  else if (nextRoute === 'messages') openMessages()
+  else if (nextRoute === 'me') openMe()
+  else if (nextRoute === 'home') openRoute('home')
 }
 
 function t(key) {
@@ -654,6 +737,7 @@ function setVideoElement(videoID, element) {
 }
 
 function clearVideoFeedPlayback() {
+  videoPlaybackRevision += 1
   videoFeedObserver?.disconnect()
   videoFeedObserver = null
   videoElements.forEach((element) => element.pause())
@@ -669,6 +753,10 @@ function captureVideoFeedState(preferredVideoID = activeVideo.value?.id) {
 }
 
 function setVideoFeedPlayback(videoID, isPlaying) {
+  if (isPlaying && (route.value !== 'videos' || document.hidden || activeVideo.value?.id !== videoID)) {
+    videoElements.get(videoID)?.pause()
+    return
+  }
   videoFeedPlayback.value = { ...videoFeedPlayback.value, [videoID]: isPlaying }
 }
 
@@ -700,7 +788,7 @@ function clearFriendProfileVideoPlayback() {
 }
 
 function playActiveVideo(index) {
-  if (route.value !== 'videos') return
+  if (route.value !== 'videos' || document.hidden) return
   activeVideoIndex.value = index
   const activeID = videoFeed.value[index]?.id
   videoElements.forEach((element, videoID) => {
@@ -708,23 +796,31 @@ function playActiveVideo(index) {
   })
   const activeElement = videoElements.get(activeID)
   if (!activeElement) return
-  setVideoFeedPlayback(activeID, true)
-  activeElement.play().catch(() => setVideoFeedPlayback(activeID, false))
+  userPausedVideoID.value = ''
+  const revision = ++videoPlaybackRevision
+  activeElement.play().catch(() => {
+    if (revision !== videoPlaybackRevision || route.value !== 'videos' || document.hidden) return
+    userPausedVideoID.value = activeID
+    setVideoFeedPlayback(activeID, false)
+  })
 }
 
 function setupVideoFeedPlayback() {
-  clearVideoFeedPlayback()
+  videoFeedObserver?.disconnect()
+  const setupRevision = ++videoPlaybackRevision
   nextTick(() => {
     const root = videoFeedScroll.value
-    if (!root || route.value !== 'videos') return
-    videoFeedObserver = new IntersectionObserver((entries) => {
+    if (!root || route.value !== 'videos' || document.hidden || setupRevision !== videoPlaybackRevision) return
+    const observer = new IntersectionObserver((entries) => {
+      if (videoFeedObserver !== observer || route.value !== 'videos' || document.hidden || isVideoFeedRestoring.value) return
       const visibleEntry = entries
         .filter((entry) => entry.isIntersecting)
         .sort((left, right) => right.intersectionRatio - left.intersectionRatio)[0]
       if (!visibleEntry) return
       const index = Number(visibleEntry.target.dataset.videoIndex)
-      if (Number.isInteger(index)) playActiveVideo(index)
+      if (Number.isInteger(index) && index !== activeVideoIndex.value) playActiveVideo(index)
     }, { root, threshold: [0.56, 0.78, 0.95] })
+    videoFeedObserver = observer
     videoElements.forEach((element) => {
       const slide = element.closest('.paliro-video-slide')
       if (slide) videoFeedObserver?.observe(slide)
@@ -739,8 +835,8 @@ function positionVideoFeedViewport(root = videoFeedScroll.value) {
   const index = matchedIndex >= 0
     ? matchedIndex
     : Math.min(videoReturnState.value.index, Math.max(0, videoFeed.value.length - 1))
-  activeVideoIndex.value = index
   if (paliroVideoRestorePending) {
+    activeVideoIndex.value = index
     const slide = root.querySelector(`[data-video-index="${index}"]`)
     root.scrollTo({
       top: slide?.offsetTop ?? videoReturnState.value.scrollTop,
@@ -753,24 +849,18 @@ function positionVideoFeedViewport(root = videoFeedScroll.value) {
 }
 
 function restoreVideoFeedViewport() {
-  requestAnimationFrame(() => {
-    if (!positionVideoFeedViewport()) return
-    isVideoFeedRestoring.value = false
-    setupVideoFeedPlayback()
-  })
-}
-
-function handleRouteBeforeEnter(element) {
-  if (route.value !== 'videos' || !paliroVideoRestorePending) return
-  positionVideoFeedViewport(element.querySelector('.paliro-video-feed-scroll'))
-}
-
-function handleRouteAfterEnter() {
-  if (route.value === 'videos') restoreVideoFeedViewport()
+  if (route.value !== 'videos') return
+  positionVideoFeedViewport()
+  userPausedVideoID.value = ''
+  isVideoFeedRestoring.value = false
+  setupVideoFeedPlayback()
 }
 
 function handleDocumentVisibilityChange() {
   if (document.hidden) {
+    stopVoicePlayback()
+    if (voiceRecording.value.state === 'recording') void pauseVoiceRecording()
+    else if (voiceRecording.value.state === 'starting') void cancelVoiceRecording()
     if (route.value === 'videos') captureVideoFeedState()
     clearVideoFeedPlayback()
     return
@@ -801,8 +891,12 @@ function restoreVideoFeed({ refresh = false } = {}) {
 function toggleVideoPlayback(video = activeVideo.value) {
   const element = videoElements.get(video?.id)
   if (!element) return
-  if (element.paused) element.play().catch(() => {})
-  else element.pause()
+  if (element.paused) playActiveVideo(videoFeed.value.findIndex((item) => item.id === video.id))
+  else {
+    videoPlaybackRevision += 1
+    userPausedVideoID.value = video.id
+    element.pause()
+  }
 }
 
 function isFollowingVideoMember(video) {
@@ -1007,29 +1101,37 @@ function formatConversationTime(value) {
 }
 
 function messagePreview(message) {
+  if (message?.type === 'friend-request' && !message.body) return t('requestSent')
   return message?.type === 'audio' ? t('voiceMessage') : message?.body ?? ''
 }
 
 function formatVoiceDuration(value) {
-  const totalSeconds = Math.max(0, Math.round(Number(value) || 0))
+  const totalSeconds = Math.max(0, Math.floor(Number(value) || 0))
   return `${Math.floor(totalSeconds / 60)}:${String(totalSeconds % 60).padStart(2, '0')}`
 }
 
-function scrollConversationToEnd() {
-  nextTick(() => conversationScroll.value?.scrollTo({ top: conversationScroll.value.scrollHeight, behavior: 'smooth' }))
+function scrollConversationToEnd(smooth = true) {
+  nextTick(() => conversationScroll.value?.scrollTo({ top: conversationScroll.value.scrollHeight, behavior: smooth === true ? 'smooth' : 'auto' }))
 }
 
-function getPaliroVoiceRecorder() {
-  return window.Capacitor?.Plugins?.PaliroVoiceRecorder ?? window.Capacitor?.Plugins?.PaliroVoiceRecorderPlugin ?? null
+function updateChatViewport() {
+  if (route.value !== 'conversation') return
+  const viewport = window.visualViewport
+  const height = viewport?.height ?? window.innerHeight
+  const wasNearEnd = !conversationScroll.value || conversationScroll.value.scrollHeight - conversationScroll.value.scrollTop - conversationScroll.value.clientHeight < 80
+  chatViewport.value = { height, top: viewport?.offsetTop ?? 0, keyboard: window.innerHeight - height > 100 }
+  if (wasNearEnd || document.activeElement === conversationInput.value) scrollConversationToEnd(false)
 }
 
-function startVoiceDurationTimer() {
-  clearInterval(voiceDurationTimer)
-  voiceDurationTimer = window.setInterval(() => {
-    if (voiceRecording.value.state === 'recording') {
-      voiceRecording.value = { ...voiceRecording.value, durationSeconds: voiceRecording.value.durationSeconds + 0.25 }
-    }
-  }, 250)
+function dismissConversationKeyboard(event) {
+  if (event?.target?.closest('button, input, textarea')) return
+  conversationInput.value?.blur()
+}
+
+function ensureConversationPermission() {
+  if (paliroCanChatWithMember(session.value?.userID, activeConversation.value?.member?.id)) return true
+  profileReminder.value = 'message'
+  return false
 }
 
 function clearVoiceDurationTimer() {
@@ -1037,168 +1139,266 @@ function clearVoiceDurationTimer() {
   voiceDurationTimer = null
 }
 
-function releaseBrowserVoiceStream() {
-  browserVoiceStream?.getTracks().forEach((track) => track.stop())
-  browserVoiceStream = null
-}
-
-async function startBrowserVoiceRecording() {
-  if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) throw new Error('voice-recorder-unavailable')
-  browserVoiceStream = await navigator.mediaDevices.getUserMedia({ audio: true })
-  browserVoiceChunks = []
-  browserVoiceDiscarding = false
-  browserVoiceRecorder = new MediaRecorder(browserVoiceStream)
-  browserVoiceRecorder.addEventListener('dataavailable', (event) => {
-    if (event.data.size) browserVoiceChunks.push(event.data)
-  })
-  browserVoiceRecorder.addEventListener('stop', () => {
-    const discard = browserVoiceDiscarding
-    const source = discard || !browserVoiceChunks.length
-      ? ''
-      : URL.createObjectURL(new Blob(browserVoiceChunks, { type: browserVoiceRecorder?.mimeType || 'audio/mp4' }))
-    browserVoiceRecorder = null
-    browserVoiceChunks = []
-    releaseBrowserVoiceStream()
-    browserVoiceStopResolver?.(source)
-    browserVoiceStopResolver = null
-  }, { once: true })
-  browserVoiceRecorder.start(250)
-}
-
-function stopBrowserVoiceRecording(discard = false) {
-  if (!browserVoiceRecorder || browserVoiceRecorder.state === 'inactive') return Promise.resolve('')
-  browserVoiceDiscarding = discard
-  return new Promise((resolve) => {
-    browserVoiceStopResolver = resolve
-    browserVoiceRecorder.stop()
-  })
+function startVoiceDurationTimer() {
+  clearVoiceDurationTimer()
+  voiceDurationTimer = window.setInterval(() => {
+    if (voiceRecording.value.state !== 'recording') return
+    voiceRecording.value.durationSeconds = voiceSession?.duration() ?? 0
+    if (voiceRecording.value.durationSeconds >= PALIRO_VOICE_MAX_SECONDS) void stopVoiceRecording()
+  }, 100)
 }
 
 function voiceRecordingError(error) {
-  const message = String(error?.message ?? error ?? '').toLocaleLowerCase()
-  return message.includes('permission') || message.includes('denied') ? t('voicePermissionDenied') : t('voiceRecordingFailed')
+  const message = String(error?.name ?? '') + ' ' + String(error?.message ?? error ?? '')
+  return /permission|denied|notallowed|not granted/i.test(message) ? t('voicePermissionDenied') : t('voiceRecordingFailed')
 }
 
 async function startVoiceRecording() {
-  if (!activeConversation.value || voiceRecordingBusy.value || voiceRecording.value.state !== 'idle') return
+  if (!activeConversation.value || voiceRecordingBusy.value || voiceRecording.value.state !== 'idle' || !ensureConversationPermission()) return
+  dismissConversationKeyboard()
+  stopVoicePlayback()
+  conversationError.value = ''
   voiceRecordingBusy.value = true
+  const revision = ++voiceRevision
+  voiceSession = createPaliroVoiceSession({ nativeRecorder: nativeVoiceRecorder })
   voiceRecording.value = { state: 'starting', durationSeconds: 0, source: '', error: '' }
   try {
-    const recorder = getPaliroVoiceRecorder()
-    if (recorder?.start) await recorder.start()
-    else await startBrowserVoiceRecording()
+    const started = await voiceSession.start()
+    if (!started || revision !== voiceRevision || route.value !== 'conversation') return
     voiceRecording.value = { state: 'recording', durationSeconds: 0, source: '', error: '' }
     startVoiceDurationTimer()
   } catch (error) {
-    releaseBrowserVoiceStream()
-    voiceRecording.value = { state: 'idle', durationSeconds: 0, source: '', error: voiceRecordingError(error) }
+    if (revision === voiceRevision) voiceRecording.value = { state: 'idle', durationSeconds: 0, source: '', error: voiceRecordingError(error) }
   } finally {
-    voiceRecordingBusy.value = false
+    if (revision === voiceRevision) voiceRecordingBusy.value = false
   }
 }
 
 async function pauseVoiceRecording() {
   if (voiceRecording.value.state !== 'recording' || voiceRecordingBusy.value) return
+  const revision = voiceRevision
   voiceRecordingBusy.value = true
   try {
-    const recorder = getPaliroVoiceRecorder()
-    if (recorder?.pause) await recorder.pause()
-    else browserVoiceRecorder?.pause()
-    voiceRecording.value = { ...voiceRecording.value, state: 'paused' }
+    await voiceSession.pause()
+    if (revision !== voiceRevision) return
+    clearVoiceDurationTimer()
+    voiceRecording.value = { ...voiceRecording.value, state: 'paused', durationSeconds: voiceSession.duration(), error: '' }
   } catch (error) {
-    voiceRecording.value = { ...voiceRecording.value, error: voiceRecordingError(error) }
-  } finally {
-    voiceRecordingBusy.value = false
-  }
+    if (revision === voiceRevision) voiceRecording.value.error = voiceRecordingError(error)
+  } finally { if (revision === voiceRevision) voiceRecordingBusy.value = false }
 }
 
 async function resumeVoiceRecording() {
-  if (voiceRecording.value.state !== 'paused' || voiceRecordingBusy.value) return
+  if (voiceRecording.value.state !== 'paused' || voiceRecordingBusy.value || !ensureConversationPermission()) return
+  const revision = voiceRevision
   voiceRecordingBusy.value = true
   try {
-    const recorder = getPaliroVoiceRecorder()
-    if (recorder?.resume) await recorder.resume()
-    else browserVoiceRecorder?.resume()
-    voiceRecording.value = { ...voiceRecording.value, state: 'recording' }
+    await voiceSession.resume()
+    if (revision !== voiceRevision) return
+    voiceRecording.value = { ...voiceRecording.value, state: 'recording', error: '' }
+    startVoiceDurationTimer()
   } catch (error) {
-    voiceRecording.value = { ...voiceRecording.value, error: voiceRecordingError(error) }
-  } finally {
-    voiceRecordingBusy.value = false
-  }
+    if (revision === voiceRevision) voiceRecording.value.error = voiceRecordingError(error)
+  } finally { if (revision === voiceRevision) voiceRecordingBusy.value = false }
 }
 
 async function stopVoiceRecording() {
-  if (!['recording', 'paused'].includes(voiceRecording.value.state) || voiceRecordingBusy.value) return voiceRecording.value
+  if (!['recording', 'paused'].includes(voiceRecording.value.state) || voiceRecordingBusy.value) return
+  const revision = voiceRevision
   voiceRecordingBusy.value = true
   clearVoiceDurationTimer()
-  const draft = voiceRecording.value
-  voiceRecording.value = { ...draft, state: 'stopping' }
+  voiceRecording.value = { ...voiceRecording.value, state: 'stopping' }
   try {
-    const recorder = getPaliroVoiceRecorder()
-    const result = recorder?.stop ? await recorder.stop() : { fileUri: await stopBrowserVoiceRecording() }
-    const source = result?.fileUri ?? result?.source ?? ''
-    const durationSeconds = Math.max(draft.durationSeconds, Number(result?.durationSeconds ?? result?.durationMilliseconds / 1000 ?? 0))
-    voiceRecording.value = { state: 'ready', durationSeconds, source, error: source ? '' : t('voiceRecordingFailed') }
+    const draft = await voiceSession.stop()
+    if (!draft || revision !== voiceRevision) return
+    voiceRecording.value = { ...draft, state: 'ready', error: '' }
   } catch (error) {
-    voiceRecording.value = { state: 'idle', durationSeconds: 0, source: '', error: voiceRecordingError(error) }
-  } finally {
-    voiceRecordingBusy.value = false
-  }
-  return voiceRecording.value
+    if (revision === voiceRevision) {
+      await voiceSession.cancel().catch(() => {})
+      if (revision === voiceRevision) voiceRecording.value = { state: 'idle', durationSeconds: 0, source: '', error: voiceRecordingError(error) }
+    }
+  } finally { if (revision === voiceRevision) voiceRecordingBusy.value = false }
 }
 
 async function cancelVoiceRecording() {
+  const revision = ++voiceRevision
   clearVoiceDurationTimer()
-  const wasActive = ['starting', 'recording', 'paused', 'stopping'].includes(voiceRecording.value.state)
-  voiceRecording.value = { state: 'idle', durationSeconds: 0, source: '', error: '' }
-  if (!wasActive) return
-  try {
-    const recorder = getPaliroVoiceRecorder()
-    if (recorder?.cancel) await recorder.cancel()
-    else await stopBrowserVoiceRecording(true)
-  } catch {
-    releaseBrowserVoiceStream()
+  voicePointer = null
+  voiceGestureCancelled.value = false
+  if (!voiceSession) return
+  const current = voiceSession
+  voiceRecordingBusy.value = true
+  voiceRecording.value = { state: 'cancelling', durationSeconds: 0, source: '', error: '' }
+  try { await current.cancel() }
+  catch { conversationError.value = t('voiceRecordingFailed') }
+  finally {
+    if (revision === voiceRevision) {
+      voiceSession = null
+      voiceRecordingBusy.value = false
+      voiceRecording.value = { state: 'idle', durationSeconds: 0, source: '', error: '' }
+    }
   }
 }
 
 async function finishAndSendVoiceRecording() {
-  if (voiceRecording.value.state === 'recording' || voiceRecording.value.state === 'paused') await stopVoiceRecording()
-  if (voiceRecording.value.state !== 'ready') return
-  if (voiceRecording.value.durationSeconds < 1) {
-    voiceRecording.value = { ...voiceRecording.value, error: t('voiceHoldAtLeastOneSecond') }
-    return
-  }
-  const result = paliroSendConversationAudioMessage(session.value?.userID, activeConversation.value?.member.id, voiceRecording.value)
-  if (result.type !== 'success') return
-  activeConversation.value = result.conversation
-  voiceRecording.value = { state: 'idle', durationSeconds: 0, source: '', error: '' }
-  loadMessageState()
-  scrollConversationToEnd()
+  if (voiceSending || voiceRecordingBusy.value || !ensureConversationPermission()) return
+  voiceSending = true
+  const revision = voiceRevision
+  const memberID = activeConversation.value?.member.id
+  try {
+    if (['recording', 'paused'].includes(voiceRecording.value.state)) {
+      if (voiceSession.duration() < 1) {
+        voiceRecording.value.error = t('voiceHoldAtLeastOneSecond')
+        return
+      }
+      await stopVoiceRecording()
+    }
+    if (revision !== voiceRevision || route.value !== 'conversation' || memberID !== activeConversation.value?.member.id || voiceRecording.value.state !== 'ready') return
+    if (!Number.isFinite(voiceRecording.value.durationSeconds) || voiceRecording.value.durationSeconds < 1) {
+      voiceRecording.value.error = t('voiceHoldAtLeastOneSecond')
+      return
+    }
+    const result = paliroSendConversationAudioMessage(session.value?.userID, memberID, voiceRecording.value)
+    if (result.type !== 'success') {
+      voiceRecording.value.error = t(result.type === 'not-friends' ? 'messageMutualOnlyCopy' : 'chatSendFailed')
+      return
+    }
+    voiceSession.commit()
+    voiceSession = null
+    activeConversation.value = result.conversation
+    voiceRecording.value = { state: 'idle', durationSeconds: 0, source: '', error: '' }
+    loadMessageState()
+    scrollConversationToEnd()
+  } catch { voiceRecording.value.error = t('chatSendFailed') }
+  finally { voiceSending = false }
+}
+
+function startVoiceGesture(event) {
+  if (event.button !== 0 || voiceRecordingBusy.value || voiceRecording.value.state !== 'idle') return
+  voicePointer = { id: event.pointerId, x: event.clientX, at: performance.now() }
+  event.currentTarget.closest('.paliro-conversation-view')?.setPointerCapture(event.pointerId)
+  voiceGestureCancelled.value = false
+  voiceStartPromise = startVoiceRecording()
+}
+
+function moveVoiceGesture(event) {
+  if (voicePointer?.id !== event.pointerId) return
+  voiceGestureCancelled.value = event.clientX - voicePointer.x < -60
+}
+
+async function endVoiceGesture(event) {
+  if (voicePointer?.id !== event.pointerId) return
+  const held = performance.now() - voicePointer.at > 350
+  const cancelled = voiceGestureCancelled.value || event.type === 'pointercancel'
+  voicePointer = null
+  voiceGestureCancelled.value = false
+  if (cancelled) { await cancelVoiceRecording(); return }
+  if (!held) return
+  const revision = voiceRevision
+  await voiceStartPromise
+  if (revision === voiceRevision) await finishAndSendVoiceRecording()
 }
 
 function stopVoicePlayback() {
-  activeVoiceAudio?.pause()
+  const audio = activeVoiceAudio
   activeVoiceAudio = null
+  audio?.pause()
   playingVoiceMessageID.value = ''
+  voicePlaybackProgress.value = 0
 }
 
 function toggleVoicePlayback(message) {
-  if (!message?.source) return
-  if (playingVoiceMessageID.value === message.id) {
-    stopVoicePlayback()
-    return
-  }
+  if (!message?.source || voiceRecording.value.state !== 'idle') return
+  if (playingVoiceMessageID.value === message.id) { stopVoicePlayback(); return }
   stopVoicePlayback()
+  conversationError.value = ''
   const audio = new Audio(videoSource(message.source))
   activeVoiceAudio = audio
   playingVoiceMessageID.value = message.id
-  audio.addEventListener('ended', stopVoicePlayback, { once: true })
-  audio.addEventListener('error', stopVoicePlayback, { once: true })
-  audio.play().catch(stopVoicePlayback)
+  const finish = () => { if (activeVoiceAudio === audio) stopVoicePlayback() }
+  const fail = () => {
+    if (activeVoiceAudio !== audio) return
+    stopVoicePlayback()
+    conversationError.value = t('voicePlaybackFailed')
+  }
+  audio.addEventListener('timeupdate', () => {
+    if (activeVoiceAudio === audio) voicePlaybackProgress.value = Math.min(1, audio.currentTime / (audio.duration || message.durationSeconds || 1))
+  })
+  audio.addEventListener('ended', finish, { once: true })
+  audio.addEventListener('error', fail, { once: true })
+  audio.play().catch(fail)
+}
+
+function openConversationProfile() {
+  if (!activeConversation.value) return
+  matchedFriend.value = activeConversation.value.member
+  friendProfileOrigin.value = 'conversation'
+  friendRequestStatus.value = paliroGetFriendRequestStatus(session.value?.userID, matchedFriend.value.id)
+  openRoute('friend-profile')
+}
+
+function openConversationActions() {
+  if (!activeConversation.value) return
+  dismissConversationKeyboard()
+  stopVoicePlayback()
+  void cancelVoiceRecording()
+  matchedFriend.value = activeConversation.value.member
+  friendProfileOrigin.value = 'conversation'
+  showFriendProfileActions.value = true
+}
+
+async function startMemberVideoCall(member) {
+  if (videoCallStarting.value || route.value === 'video-call') return
+  if (!paliroCanChatWithMember(session.value?.userID, member?.id)) { profileReminder.value = 'message'; return }
+  const origin = route.value
+  const userID = session.value?.userID
+  videoCallStarting.value = true
+  dismissConversationKeyboard()
+  stopVoicePlayback()
+  try {
+    await cancelVoiceRecording()
+    if (route.value !== origin || session.value?.userID !== userID) return
+    if (!paliroCanChatWithMember(userID, member.id)) return
+    videoCallMember.value = member
+    videoCallOrigin.value = origin
+    clearFriendProfileVideoPlayback()
+    profileReminder.value = ''
+    openRoute('video-call')
+  } finally { videoCallStarting.value = false }
+}
+
+function openConversationVideo() {
+  void startMemberVideoCall(activeConversation.value?.member)
+}
+
+function requestVideoCallPermissions() {
+  return paliroRequestCallPermissions({ nativePermissions: nativeCallPermissions })
+}
+
+function canContinueVideoCall() {
+  return route.value === 'video-call' && paliroCanChatWithMember(session.value?.userID, videoCallMember.value?.id)
+}
+
+function closeVideoCall() {
+  // Replace the call entry so browser forward/back cannot restart a finished call.
+  const origin = videoCallOrigin.value
+  videoCallMember.value = null
+  const destination = origin === 'conversation' && !canSendConversation.value ? 'messages' : origin
+  route.value = destination
+  window.history.replaceState({ route: destination }, '', `#/${destination}`)
 }
 
 function openConversation(memberID) {
+  loadMeState()
+  if (!paliroCanChatWithMember(session.value?.userID, memberID)) {
+    loadMessageState()
+    profileReminder.value = paliroGetFriendRequestStatus(session.value?.userID, memberID) === 'pending' ? 'request-pending' : 'message'
+    return
+  }
   activeConversation.value = paliroMarkConversationRead(session.value?.userID, memberID)
+  if (!activeConversation.value) { loadMessageState(); return }
+  conversationOrigin.value = 'messages'
+  conversationError.value = ''
   conversationDraft.value = ''
   voiceRecording.value = { state: 'idle', durationSeconds: 0, source: '', error: '' }
   loadMessageState()
@@ -1208,19 +1408,26 @@ function openConversation(memberID) {
 
 function closeConversation() {
   stopVoicePlayback()
-  void cancelVoiceRecording()
+  if (conversationOrigin.value === 'friend-profile') {
+    friendProfileOrigin.value = conversationReturnProfileOrigin.value
+    openRoute('friend-profile')
+    return
+  }
   activeConversation.value = null
   openMessages()
 }
 
 function sendConversationMessage() {
-  if (!activeConversation.value || !conversationDraft.value.trim()) return
-  const result = paliroSendConversationMessage(session.value?.userID, activeConversation.value.member.id, conversationDraft.value)
-  if (result.type !== 'success') return
-  activeConversation.value = result.conversation
-  conversationDraft.value = ''
-  loadMessageState()
-  scrollConversationToEnd()
+  if (!activeConversation.value || !conversationDraft.value.trim() || !ensureConversationPermission()) return
+  conversationError.value = ''
+  try {
+    const result = paliroSendConversationMessage(session.value?.userID, activeConversation.value.member.id, conversationDraft.value)
+    if (result.type !== 'success') { conversationError.value = t(result.type === 'not-friends' ? 'messageMutualOnlyCopy' : 'chatSendFailed'); return }
+    activeConversation.value = result.conversation
+    conversationDraft.value = ''
+    loadMessageState()
+    scrollConversationToEnd()
+  } catch { conversationError.value = t('chatSendFailed') }
 }
 
 function openFriendRequests() {
@@ -1749,6 +1956,7 @@ function trapMatchFocus(event) {
 function openFriendRequestModal() {
   if (friendRequestStatus.value === 'pending') return
   friendRequestMessage.value = ''
+  friendRequestError.value = ''
   showFriendRequestModal.value = true
   nextTick(() => friendRequestTextarea.value?.focus())
 }
@@ -1778,18 +1986,21 @@ function trapFriendRequestFocus(event) {
 function sendMatchFriendRequest() {
   if (friendRequestSending.value || friendRequestStatus.value === 'pending') return
   friendRequestSending.value = true
-  const result = paliroSendFriendRequest(
-    session.value?.userID,
-    matchedFriend.value.id,
-    friendRequestMessage.value,
-  )
-  friendRequestSending.value = false
-  if (result.type === 'success' || result.type === 'already-pending') {
-    friendRequestStatus.value = 'pending'
-    showFriendRequestModal.value = false
-    homeNotice.value = t('friendRequestSentNotice')
-    if (isOpeningBox.value) nextTick(focusMatchResultAction)
-  }
+  friendRequestError.value = ''
+  try {
+    const result = paliroSendFriendRequest(session.value?.userID, matchedFriend.value.id, friendRequestMessage.value, matchedFriend.value)
+    if (result.type === 'success' || result.type === 'already-pending') {
+      friendRequestStatus.value = 'pending'
+      loadMessageState()
+      friendRequestTextarea.value?.blur()
+      showFriendRequestModal.value = false
+      profileReminder.value = result.type === 'success' ? 'request-sent' : 'request-pending'
+    } else {
+      friendRequestError.value = t('friendRequestFailed')
+    }
+  } catch {
+    friendRequestError.value = t('friendRequestFailed')
+  } finally { friendRequestSending.value = false }
 }
 
 function openReportUser(origin = 'home') {
@@ -1807,6 +2018,7 @@ function openReportUser(origin = 'home') {
 
 function closeReportUser() {
   if (reportSubmitting.value) return
+  if (reportOrigin.value === 'conversation') { openRoute('conversation'); return }
   if (reportOrigin.value === 'opening') {
     reportReason.value = ''
     reportDetails.value = ''
@@ -1835,6 +2047,11 @@ function finishFriendSafetyAction({ closeBox = false, noticeKey = 'boxReadyNotic
   friendRequestStatus.value = 'none'
   loadMeState()
   loadMessageState()
+  if (friendProfileOrigin.value === 'conversation') {
+    activeConversation.value = null
+    openMessages()
+    return
+  }
   if (friendProfileOrigin.value === 'videos') {
     restoreVideoFeed({ refresh: true })
     return
@@ -1881,7 +2098,7 @@ function submitReport() {
   reportReason.value = ''
   reportDetails.value = ''
   reportError.value = ''
-  if (reportOrigin.value === 'friend-profile' || reportOrigin.value === 'videos') {
+  if (reportOrigin.value === 'friend-profile' || reportOrigin.value === 'videos' || reportOrigin.value === 'conversation') {
     finishFriendSafetyAction()
     return
   }
@@ -1914,10 +2131,12 @@ function openMatchedFriendProfile() {
 }
 
 function followMatchedFriend() {
-  const result = paliroFollowMember(session.value?.userID, matchedFriend.value)
+  if (isMatchedBlocked.value) return
+  const result = paliroToggleFollowMember(session.value?.userID, matchedFriend.value)
   if (result.type !== 'success') return
   socialState.value = result.state
-  profileMeta.value = paliroGetSocialSummary(session.value?.userID)
+  profileMeta.value = paliroGetSocialSummary(session.value?.userID, languagePreference.value)
+  loadMessageState()
 }
 
 function openMatchedConversation() {
@@ -1927,19 +2146,25 @@ function openMatchedConversation() {
   }
   activeConversation.value = paliroGetOrCreateConversation(session.value?.userID, matchedFriend.value)
   if (!activeConversation.value) return
+  if (friendProfileOrigin.value !== 'conversation') {
+    conversationOrigin.value = 'friend-profile'
+    conversationReturnProfileOrigin.value = friendProfileOrigin.value
+  }
+  conversationError.value = ''
   conversationDraft.value = ''
   loadMessageState()
   openRoute('conversation')
 }
 
 function openMatchedVideo() {
-  if (isMatchedMutualFriend.value) profileReminder.value = 'video'
+  void startMemberVideoCall(matchedFriend.value)
 }
 
 function closeMatchedFriendProfile() {
   clearFriendProfileVideoPlayback()
   showFriendProfileActions.value = false
   showFriendProfileBlockConfirm.value = false
+  if (friendProfileOrigin.value === 'conversation') { openRoute('conversation'); return }
   if (friendProfileOrigin.value === 'videos') {
     restoreVideoFeed()
     return
@@ -1959,7 +2184,7 @@ function openFriendProfileActions() {
 
 function reportMatchedFriendFromProfile() {
   showFriendProfileActions.value = false
-  openReportUser('friend-profile')
+  openReportUser(route.value === 'conversation' ? 'conversation' : 'friend-profile')
 }
 
 function confirmBlockMatchedFriend() {
@@ -2162,7 +2387,51 @@ function finishTopicTest() {
   <main class="paliro-shell">
     <div class="paliro-stars" aria-hidden="true"></div>
 
-    <Transition :name="isVideoFeedRestoring ? '' : 'paliro-route-fade'" mode="out-in" @before-enter="handleRouteBeforeEnter" @after-enter="handleRouteAfterEnter">
+      <section v-if="hasOpenedVideoFeed && session" :class="{ 'is-inactive': route !== 'videos' || isVideoFeedRestoring, 'is-tab-transition': isPrimaryTabTransition }" :aria-hidden="route !== 'videos' || isVideoFeedRestoring" :inert="route !== 'videos' || isVideoFeedRestoring" class="paliro-video-feed paliro-view">
+        <main v-if="videoFeed.length" ref="videoFeedScroll" aria-label="Topic videos" class="paliro-video-feed-scroll">
+          <article v-for="(video, index) in videoFeed" :key="video.id" :data-video-index="index" class="paliro-video-slide">
+            <video
+              :ref="(element) => setVideoElement(video.id, element)"
+              :poster="video.thumbnail"
+              :src="videoSource(video.source)"
+              loop
+              muted
+              playsinline
+              preload="metadata"
+              @click="toggleVideoPlayback(video)"
+              @pause="setVideoFeedPlayback(video.id, false)"
+              @play="setVideoFeedPlayback(video.id, true)"
+            ></video>
+            <div class="paliro-video-scrim" aria-hidden="true"></div>
+            <img v-if="userPausedVideoID === video.id && videoFeedPlayback[video.id] === false" alt="" class="paliro-video-paused-indicator" src="/assets/paliro-video-play@2x.png" />
+            <section class="paliro-video-copy">
+              <h2>@{{ video.member.name }}</h2>
+              <p>{{ video.caption }}</p>
+              <div class="paliro-video-interests"><span v-for="interest in video.member.interests?.slice(0, 3)" :key="interest">#{{ interest }}</span></div>
+            </section>
+            <aside class="paliro-video-actions" :aria-label="`${video.member.name} ${t('video')}`">
+              <button :aria-label="`${video.member.name} ${t('profile')}`" class="paliro-video-author-action" type="button" @click="openVideoMemberProfile(video)"><img :alt="`${video.member.name} avatar`" :src="video.member.avatar" /><i v-if="!isOwnVideo(video)" :class="{ 'is-following': isFollowingVideoMember(video) }" aria-hidden="true" @click.stop="toggleVideoFollow(video)"><img v-if="isFollowingVideoMember(video)" alt="" src="/assets/paliro-video-following@2x.png" /><span v-else>+</span></i></button>
+              <button :aria-label="t('likes')" :aria-pressed="video.liked" :class="{ 'is-liked': video.liked }" type="button" @click="toggleVideoLike(video)"><img alt="" :src="video.liked ? '/assets/paliro-video-like-active@2x.png' : '/assets/paliro-video-like@2x.png'" /><small>{{ video.likes }}</small></button>
+              <button :aria-label="t('comments')" type="button" @click="openVideoComments(video)"><img alt="" src="/assets/paliro-video-comment@2x.png" /><small>{{ video.comments.length }}</small></button>
+              <button :aria-label="t('reportVideo')" class="paliro-video-report-action" type="button" @click="openVideoActions(video)"><img alt="" src="/assets/paliro-video-report@2x.png" /><small>{{ t('reportLabel') }}</small></button>
+            </aside>
+          </article>
+        </main>
+        <section v-else class="paliro-video-empty"><div aria-hidden="true">✦</div><h2>{{ t('noVideosTitle') }}</h2><p>{{ t('noVideosCopy') }}</p><button type="button" @click="openVideoPublish">{{ t('videoPublish') }}</button></section>
+        <header class="paliro-video-header">
+          <button :aria-label="t('videoPublish')" type="button" @click="openVideoPublish"><img alt="" class="paliro-video-publish-icon" src="/assets/paliro-video-publish@2x.png" /></button>
+        </header>
+      </section>
+
+    <nav v-if="session && paliroPrimaryTabs.some(tab => tab.route === route)" class="paliro-home-tabs paliro-primary-tabs" aria-label="Primary navigation">
+      <button v-for="tab in paliroPrimaryTabs" :key="tab.route" :aria-label="t(tab.label)" :aria-current="route === tab.route ? 'page' : undefined"
+        :class="['paliro-home-tab', { 'is-active': route === tab.route }]" type="button" @click="openPrimaryTab(tab.route)">
+        <img class="paliro-home-tab-icon" alt="" :src="`/assets/paliro-tab-${tab.icon}-${route === tab.route ? 'selected' : 'default'}@2x.png`" />
+        <small>{{ t(tab.label) }}</small>
+      </button>
+    </nav>
+
+    <Transition :name="isPrimaryTabTransition ? 'paliro-tab-fade' : 'paliro-route-fade'" :css="!skipVideoRouteAnimation" mode="out-in">
       <section v-if="route === 'welcome'" key="welcome" class="paliro-welcome paliro-view">
       <div class="paliro-status-spacer"></div>
       <div class="paliro-welcome-art" aria-hidden="true">
@@ -2352,70 +2621,9 @@ function finishTopicTest() {
           </button>
           </div>
 
-          <nav class="paliro-home-tabs" aria-label="Primary navigation">
-            <span class="paliro-home-tab is-active" aria-current="page">
-              <img class="paliro-home-tab-icon" alt="" src="/assets/paliro-tab-home-selected@2x.png" />
-              <small>{{ t('home') }}</small>
-            </span>
-            <button :aria-label="t('video')" class="paliro-home-tab" type="button" @click="openVideoFeed">
-              <img class="paliro-home-tab-icon" alt="" src="/assets/paliro-tab-video-default@2x.png" />
-              <small>{{ t('video') }}</small>
-            </button>
-            <button :aria-label="t('message')" class="paliro-home-tab" type="button" @click="openMessages">
-              <img class="paliro-home-tab-icon" alt="" src="/assets/paliro-tab-message-default@2x.png" />
-              <small>{{ t('message') }}</small>
-            </button>
-            <button :aria-label="t('me')" class="paliro-home-tab" type="button" @click="openMe">
-              <img class="paliro-home-tab-icon" alt="" src="/assets/paliro-tab-profile-default@2x.png" />
-              <small>{{ t('me') }}</small>
-            </button>
-          </nav>
         </div>
       </section>
 
-      <section v-else-if="route === 'videos'" key="videos" class="paliro-video-feed paliro-view">
-        <main v-if="videoFeed.length" ref="videoFeedScroll" aria-label="Topic videos" class="paliro-video-feed-scroll">
-          <article v-for="(video, index) in videoFeed" :key="video.id" :data-video-index="index" class="paliro-video-slide">
-            <video
-              :ref="(element) => setVideoElement(video.id, element)"
-              :poster="video.thumbnail"
-              :src="videoSource(video.source)"
-              autoplay
-              loop
-              muted
-              playsinline
-              preload="metadata"
-              @click="toggleVideoPlayback(video)"
-              @pause="setVideoFeedPlayback(video.id, false)"
-              @play="setVideoFeedPlayback(video.id, true)"
-            ></video>
-            <div class="paliro-video-scrim" aria-hidden="true"></div>
-            <img v-if="videoFeedPlayback[video.id] === false" alt="" class="paliro-video-paused-indicator" src="/assets/paliro-video-play@2x.png" />
-            <header class="paliro-video-header">
-              <h1>{{ t('video') }}</h1>
-              <button :aria-label="t('videoPublish')" type="button" @click="openVideoPublish"><img alt="" class="paliro-video-publish-icon" src="/assets/paliro-video-publish@2x.png" /></button>
-            </header>
-            <section class="paliro-video-copy">
-              <h2>@{{ video.member.name }}</h2>
-              <p>{{ video.caption }}</p>
-              <div class="paliro-video-interests"><span v-for="interest in video.member.interests?.slice(0, 3)" :key="interest">#{{ interest }}</span></div>
-            </section>
-            <aside class="paliro-video-actions" :aria-label="`${video.member.name} ${t('video')}`">
-              <button :aria-label="`${video.member.name} ${t('profile')}`" class="paliro-video-author-action" type="button" @click="openVideoMemberProfile(video)"><img :alt="`${video.member.name} avatar`" :src="video.member.avatar" /><i v-if="!isOwnVideo(video)" :class="{ 'is-following': isFollowingVideoMember(video) }" aria-hidden="true" @click.stop="toggleVideoFollow(video)"><img v-if="isFollowingVideoMember(video)" alt="" src="/assets/paliro-video-following@2x.png" /><span v-else>+</span></i></button>
-              <button :aria-label="t('likes')" :aria-pressed="video.liked" :class="{ 'is-liked': video.liked }" type="button" @click="toggleVideoLike(video)"><img alt="" :src="video.liked ? '/assets/paliro-video-like-active@2x.png' : '/assets/paliro-video-like@2x.png'" /><small>{{ video.likes }}</small></button>
-              <button :aria-label="t('comments')" type="button" @click="openVideoComments(video)"><img alt="" src="/assets/paliro-video-comment@2x.png" /><small>{{ video.comments.length }}</small></button>
-              <button :aria-label="t('reportVideo')" class="paliro-video-report-action" type="button" @click="openVideoActions(video)"><img alt="" src="/assets/paliro-video-report@2x.png" /><small>{{ t('reportLabel') }}</small></button>
-            </aside>
-          </article>
-        </main>
-        <section v-else class="paliro-video-empty"><div aria-hidden="true">✦</div><h2>{{ t('noVideosTitle') }}</h2><p>{{ t('noVideosCopy') }}</p><button type="button" @click="openVideoPublish">{{ t('videoPublish') }}</button></section>
-        <nav class="paliro-home-tabs paliro-video-tabs" aria-label="Primary navigation">
-          <button :aria-label="t('home')" class="paliro-home-tab" type="button" @click="openRoute('home')"><img class="paliro-home-tab-icon" alt="" src="/assets/paliro-tab-home-default@2x.png" /><small>{{ t('home') }}</small></button>
-          <span class="paliro-home-tab is-active" aria-current="page"><img class="paliro-home-tab-icon" alt="" src="/assets/paliro-tab-video-selected@2x.png" /><small>{{ t('video') }}</small></span>
-          <button :aria-label="t('message')" class="paliro-home-tab" type="button" @click="openMessages"><img class="paliro-home-tab-icon" alt="" src="/assets/paliro-tab-message-default@2x.png" /><small>{{ t('message') }}</small></button>
-          <button :aria-label="t('me')" class="paliro-home-tab" type="button" @click="openMe"><img class="paliro-home-tab-icon" alt="" src="/assets/paliro-tab-profile-default@2x.png" /><small>{{ t('me') }}</small></button>
-        </nav>
-      </section>
 
       <section v-else-if="route === 'messages'" key="messages" class="paliro-messages paliro-view">
         <header class="paliro-messages-nav">
@@ -2429,54 +2637,69 @@ function finishTopicTest() {
             <button v-for="conversation in filteredConversations" :key="conversation.member.id" type="button" @click="openConversation(conversation.member.id)">
               <img :alt="`${conversation.member.name} avatar`" :src="memberAvatarSource(conversation.member)" />
               <span class="paliro-conversation-copy"><strong>{{ conversation.member.name }}</strong><small>{{ messagePreview(conversation.messages.at(-1)) }}</small></span>
-              <span class="paliro-conversation-meta"><time>{{ formatConversationTime(conversation.messages.at(-1)?.sentAt) }}</time><i v-if="conversation.unreadCount">{{ conversation.unreadCount }}</i></span>
+              <span class="paliro-conversation-meta"><time>{{ formatConversationTime(conversation.messages.at(-1)?.sentAt) }}</time>
+                <span v-if="conversation.isLocked" class="paliro-conversation-lock" role="img" :aria-label="t('friendRequestPendingTitle')"><PaliroChatIcon name="lock" /></span>
+                <i v-else-if="conversation.unreadCount">{{ conversation.unreadCount }}</i>
+              </span>
             </button>
           </section>
           <section v-else class="paliro-message-empty"><div aria-hidden="true">✦</div><h2>{{ t('noConversations') }}</h2><p>{{ t('noConversationsCopy') }}</p></section>
         </main>
-        <nav class="paliro-home-tabs" aria-label="Primary navigation">
-          <button :aria-label="t('home')" class="paliro-home-tab" type="button" @click="openRoute('home')"><img class="paliro-home-tab-icon" alt="" src="/assets/paliro-tab-home-default@2x.png" /><small>{{ t('home') }}</small></button>
-          <button :aria-label="t('video')" class="paliro-home-tab" type="button" @click="openVideoFeed"><img class="paliro-home-tab-icon" alt="" src="/assets/paliro-tab-video-default@2x.png" /><small>{{ t('video') }}</small></button>
-          <span class="paliro-home-tab is-active" aria-current="page"><img class="paliro-home-tab-icon" alt="" src="/assets/paliro-tab-message-selected@2x.png" /><small>{{ t('message') }}</small></span>
-          <button :aria-label="t('me')" class="paliro-home-tab" type="button" @click="openMe"><img class="paliro-home-tab-icon" alt="" src="/assets/paliro-tab-profile-default@2x.png" /><small>{{ t('me') }}</small></button>
-        </nav>
       </section>
 
-      <section v-else-if="route === 'conversation'" key="conversation" class="paliro-conversation-view paliro-view">
-        <header class="paliro-me-secondary-nav">
-          <button :aria-label="t('back')" class="paliro-back" type="button" @click="closeConversation">‹</button>
-          <div v-if="activeConversation" class="paliro-conversation-title"><img alt="" :src="memberAvatarSource(activeConversation.member)" /><h1>{{ activeConversation.member.name }}</h1></div>
-          <span aria-hidden="true"></span>
+      <PaliroVideoCall v-else-if="route === 'video-call' && videoCallMember" key="video-call"
+        :member="videoCallMember" :avatar="memberAvatarSource(videoCallMember)" :t="t"
+        :request-permissions="requestVideoCallPermissions" :can-call="canContinueVideoCall" @close="closeVideoCall" />
+
+      <section v-else-if="route === 'conversation'" key="conversation" class="paliro-conversation-view paliro-view"
+        :class="{ 'is-recording': voiceRecording.state !== 'idle', 'has-keyboard': chatViewport.keyboard }"
+        :style="chatViewport.height ? { height: chatViewport.height + 'px', top: chatViewport.top + 'px' } : {}"
+        @pointermove="moveVoiceGesture" @pointerup="endVoiceGesture" @pointercancel="endVoiceGesture">
+        <header class="paliro-chat-nav">
+          <button :aria-label="t('back')" type="button" @click="closeConversation"><PaliroChatIcon name="back" /></button>
+          <button v-if="activeConversation" class="paliro-chat-member" :aria-label="t('profile')" type="button" @click="openConversationProfile">
+            <img alt="" :src="memberAvatarSource(activeConversation.member)" /><h1>{{ activeConversation.member.name }}</h1>
+          </button>
+          <button :aria-label="t('chatVideoCall')" :disabled="videoCallStarting" class="paliro-chat-video" type="button" @click="openConversationVideo"><PaliroChatIcon name="video" /></button>
+          <button :aria-label="t('moreActions')" class="paliro-chat-more" type="button" @click="openConversationActions"><PaliroChatIcon name="more" /></button>
         </header>
-        <main ref="conversationScroll" class="paliro-conversation-scroll" aria-live="polite">
-          <p class="paliro-conversation-safety">{{ t('conversationSafety') }}</p>
-          <article v-for="message in activeConversation?.messages ?? []" :key="message.id" :class="['paliro-message-bubble', { 'is-self': message.sender === 'self' }]">
-            <template v-if="message.type === 'audio'">
-              <button :aria-label="playingVoiceMessageID === message.id ? t('stopVoiceMessage') : t('playVoiceMessage')" class="paliro-audio-message" type="button" @click="toggleVoicePlayback(message)">
-                <span aria-hidden="true" class="paliro-audio-play">{{ playingVoiceMessageID === message.id ? '■' : '▶' }}</span>
-                <span aria-hidden="true" class="paliro-audio-wave"><i v-for="index in 8" :key="index"></i></span>
+        <main ref="conversationScroll" class="paliro-conversation-scroll" role="log" :aria-label="t('conversations')" aria-live="polite" @click="dismissConversationKeyboard">
+          <article v-for="message in activeConversation?.messages ?? []" :key="message.id" :class="['paliro-chat-row', { 'is-self': message.sender === 'self' }]">
+            <img v-if="message.sender !== 'self'" class="paliro-chat-avatar" alt="" :src="memberAvatarSource(activeConversation.member)" />
+            <div :class="['paliro-message-bubble', { 'is-self': message.sender === 'self' }]">
+              <button v-if="message.type === 'audio'" :aria-label="playingVoiceMessageID === message.id ? t('stopVoiceMessage') : t('playVoiceMessage')"
+                :aria-pressed="playingVoiceMessageID === message.id" :disabled="voiceRecording.state !== 'idle'"
+                class="paliro-audio-message" type="button" @click="toggleVoicePlayback(message)">
+                <PaliroChatIcon :name="playingVoiceMessageID === message.id ? 'stop' : 'play'" />
+                <span aria-hidden="true" class="paliro-audio-wave"><i v-for="(height, index) in [12, 20, 8, 24, 16, 20, 10]" :key="index"
+                  :style="{ height: height + 'px' }" :class="{ 'is-played': playingVoiceMessageID === message.id && voicePlaybackProgress >= index / 7 }"></i></span>
                 <strong>{{ formatVoiceDuration(message.durationSeconds) }}</strong>
               </button>
-            </template>
-            <p v-else>{{ message.body }}</p><time>{{ formatConversationTime(message.sentAt) }}</time>
+              <p v-else>{{ message.body }}</p>
+              <time class="paliro-chat-message-time" :datetime="message.sentAt">{{ formatConversationTime(message.sentAt) }}</time>
+            </div>
           </article>
         </main>
-        <section v-if="voiceRecording.state !== 'idle'" class="paliro-voice-recording" :aria-label="t('voiceRecording')" aria-live="polite">
-          <div class="paliro-voice-recording-head"><strong>{{ formatVoiceDuration(voiceRecording.durationSeconds) }}</strong><span>{{ t('voiceRecording') }}</span></div>
-          <div aria-hidden="true" class="paliro-voice-live-wave"><i v-for="index in 9" :key="index"></i></div>
+        <p v-if="conversationError || (voiceRecording.state === 'idle' && voiceRecording.error)" class="paliro-chat-error" role="alert">{{ conversationError || voiceRecording.error }}</p>
+        <section v-if="voiceRecording.state !== 'idle'" class="paliro-voice-recording" :class="{ 'is-paused': voiceRecording.state !== 'recording', 'is-cancelling': voiceGestureCancelled }" :aria-label="t('voiceRecording')">
+          <div class="paliro-voice-recording-head"><strong>{{ formatVoiceDuration(voiceRecording.durationSeconds) }}</strong>
+            <span aria-hidden="true" class="paliro-voice-live-wave"><i v-for="height in [6, 18, 24, 12, 32, 8, 14]" :key="height" :style="{ height: height + 'px' }"></i></span>
+            <span>{{ voiceGestureCancelled ? t('chatReleaseCancel') : voiceRecording.state === 'paused' ? t('chatRecordingPaused') : t('chatSlideCancel') }}</span>
+          </div>
+          <button class="paliro-record-mic" :aria-label="voiceRecording.state === 'paused' ? t('resumeRecording') : t('pauseRecording')" :disabled="voiceRecordingBusy || !['recording', 'paused'].includes(voiceRecording.state)" type="button"
+            @click="voiceRecording.state === 'paused' ? resumeVoiceRecording() : pauseVoiceRecording()"><img alt="" src="/assets/paliro-chat-mic@2x.png" /></button>
           <p v-if="voiceRecording.error" role="alert">{{ voiceRecording.error }}</p>
-          <p v-else>{{ voiceRecording.state === 'ready' ? t('voiceHoldAtLeastOneSecond') : t('voiceRecordingHint') }}</p>
+          <p v-else>{{ voiceRecordingBusy ? t('chatRecordingProcessing') : voiceRecording.state === 'ready' ? t('chatRecordingReady') : t('chatHoldHint') }}</p>
           <div class="paliro-voice-recording-actions">
-            <button type="button" @click="cancelVoiceRecording">{{ t('cancelRecording') }}</button>
-            <button v-if="voiceRecording.state === 'recording'" :disabled="voiceRecordingBusy" type="button" @click="pauseVoiceRecording">{{ t('pauseRecording') }}</button>
-            <button v-else-if="voiceRecording.state === 'paused'" :disabled="voiceRecordingBusy" type="button" @click="resumeVoiceRecording">{{ t('resumeRecording') }}</button>
-            <button :disabled="voiceRecordingBusy || voiceRecording.state === 'starting' || voiceRecording.state === 'stopping'" type="button" @click="finishAndSendVoiceRecording">{{ t('sendVoiceMessage') }}</button>
+            <button :disabled="voiceRecording.state === 'cancelling'" type="button" @click="cancelVoiceRecording">{{ t('cancelRecording') }}</button>
+            <button v-if="voiceRecording.state !== 'ready'" :disabled="voiceRecordingBusy || !['recording', 'paused'].includes(voiceRecording.state)" type="button" @click="voiceRecording.state === 'paused' ? resumeVoiceRecording() : pauseVoiceRecording()">{{ voiceRecording.state === 'paused' ? t('resumeRecording') : t('pauseRecording') }}</button>
+            <button :disabled="voiceRecordingBusy || voiceRecording.durationSeconds < 1" type="button" @click="finishAndSendVoiceRecording">{{ t('send') }}</button>
           </div>
         </section>
         <form v-else class="paliro-conversation-composer" @submit.prevent="sendConversationMessage">
-          <button :aria-label="t('voiceMessage')" class="paliro-composer-voice-trigger" type="button" @click="startVoiceRecording"><span aria-hidden="true">♩</span></button>
-          <input v-model="conversationDraft" :maxlength="280" :placeholder="t('messagePlaceholder')" type="text" @focus="scrollConversationToEnd" />
-          <button :disabled="!conversationDraft.trim()" type="submit"><span aria-hidden="true">➤</span><span class="paliro-composer-send-label">{{ t('send') }}</span></button>
+          <button :aria-label="t('voiceMessage')" class="paliro-composer-voice-trigger" type="button" @pointerdown.prevent="startVoiceGesture" @click="$event.detail === 0 && startVoiceRecording()"><img alt="" src="/assets/paliro-chat-mic@2x.png" /></button>
+          <input ref="conversationInput" v-model="conversationDraft" :maxlength="280" :placeholder="t('messagePlaceholder')" :aria-label="t('messagePlaceholder')" type="text" enterkeyhint="send" autocomplete="off" @focus="scrollConversationToEnd(false)" @keydown.enter="$event.isComposing && $event.preventDefault()" />
+          <button :aria-label="t('send')" :disabled="!conversationDraft.trim()" type="submit" @pointerdown.prevent><PaliroChatIcon name="send" /></button>
         </form>
       </section>
 
@@ -2529,24 +2752,6 @@ function finishTopicTest() {
           </nav>
         </main>
 
-        <nav class="paliro-home-tabs" aria-label="Primary navigation">
-          <button class="paliro-home-tab" aria-label="Open home" type="button" @click="openRoute('home')">
-            <img class="paliro-home-tab-icon" alt="" src="/assets/paliro-tab-home-default@2x.png" />
-            <small>{{ t('home') }}</small>
-          </button>
-          <button :aria-label="t('video')" class="paliro-home-tab" type="button" @click="openVideoFeed">
-            <img class="paliro-home-tab-icon" alt="" src="/assets/paliro-tab-video-default@2x.png" />
-            <small>{{ t('video') }}</small>
-          </button>
-          <button :aria-label="t('message')" class="paliro-home-tab" type="button" @click="openMessages">
-            <img class="paliro-home-tab-icon" alt="" src="/assets/paliro-tab-message-default@2x.png" />
-            <small>{{ t('message') }}</small>
-          </button>
-          <span class="paliro-home-tab is-active" aria-current="page">
-            <img class="paliro-home-tab-icon" alt="" src="/assets/paliro-tab-profile-selected@2x.png" />
-            <small>{{ t('me') }}</small>
-          </span>
-        </nav>
       </section>
 
       <section v-else-if="route === 'edit-profile'" key="edit-profile" class="paliro-me-secondary paliro-view">
@@ -2799,9 +3004,9 @@ function finishTopicTest() {
           </section>
         </div>
         <footer class="paliro-friend-profile-actions">
-          <button :class="{ 'is-followed': isMatchedFollowing }" :disabled="isMatchedFollowing" type="button" @click="followMatchedFriend">{{ isMatchedFollowing ? t('followed') : t('follow') }}</button>
+          <button :class="{ 'is-followed': isMatchedFollowing }" :disabled="isMatchedBlocked" :aria-pressed="isMatchedFollowing" :aria-label="isMatchedFollowing ? t('unfollow') : t('follow')" type="button" @click="followMatchedFriend">{{ isMatchedFollowing ? t('followed') : t('follow') }}</button>
           <button :aria-disabled="!isMatchedMutualFriend" :class="{ 'is-locked': !isMatchedMutualFriend }" type="button" @click="openMatchedConversation"><span aria-hidden="true">{{ isMatchedMutualFriend ? '' : '⌕' }}</span>{{ t('message') }}</button>
-          <button v-if="isMatchedMutualFriend" :aria-label="t('videoMoments')" class="paliro-friend-profile-video" type="button" @click="openMatchedVideo"><span aria-hidden="true">▣</span></button>
+          <button v-if="isMatchedMutualFriend" :aria-label="t('chatVideoCall')" :disabled="videoCallStarting" class="paliro-friend-profile-video" type="button" @click="openMatchedVideo"><PaliroChatIcon name="video" /></button>
         </footer>
       </section>
 
@@ -2962,6 +3167,7 @@ function finishTopicTest() {
             <span>{{ friendRequestMessage.length }}/120</span>
           </label>
           <p id="paliro-friend-request-safety">{{ t('friendRequestSafety') }}</p>
+          <p v-if="friendRequestError" class="paliro-error" role="alert">{{ friendRequestError }}</p>
           <div class="paliro-friend-request-actions">
             <button :disabled="friendRequestSending" type="button" @click="closeFriendRequestModal">{{ t('cancel') }}</button>
             <button :disabled="friendRequestSending" type="button" @click="sendMatchFriendRequest">{{ t('send') }}</button>
@@ -2972,11 +3178,11 @@ function finishTopicTest() {
 
     <Teleport to="body">
       <div v-if="profileReminder" class="paliro-profile-reminder-backdrop" @click.self="profileReminder = ''">
-        <section aria-modal="true" class="paliro-profile-reminder" role="dialog" aria-labelledby="paliro-profile-reminder-title">
+        <section aria-modal="true" class="paliro-profile-reminder" role="dialog" aria-labelledby="paliro-profile-reminder-title" @keydown.esc="profileReminder = ''" @keydown.tab.prevent="profileReminderConfirm?.focus()">
           <span aria-hidden="true" class="paliro-profile-reminder-art">✦</span>
-          <h2 id="paliro-profile-reminder-title">{{ profileReminder === 'message' ? t('messageMutualOnlyTitle') : t('videoMoments') }}</h2>
-          <p>{{ profileReminder === 'message' ? t('messageMutualOnlyCopy') : t('videoMomentsCopy') }}</p>
-          <button class="paliro-home-modal-button" type="button" @click="profileReminder = ''">{{ t('ok') }}</button>
+          <h2 id="paliro-profile-reminder-title">{{ t(profileReminder === 'request-sent' ? 'friendRequestSentTitle' : profileReminder === 'request-pending' ? 'friendRequestPendingTitle' : 'messageMutualOnlyTitle') }}</h2>
+          <p>{{ t(profileReminder === 'request-sent' ? 'friendRequestSentNotice' : profileReminder === 'request-pending' ? 'friendRequestPendingCopy' : 'messageMutualOnlyCopy') }}</p>
+          <button ref="profileReminderConfirm" class="paliro-home-modal-button" type="button" @click="profileReminder = ''">{{ t('ok') }}</button>
         </section>
       </div>
     </Teleport>

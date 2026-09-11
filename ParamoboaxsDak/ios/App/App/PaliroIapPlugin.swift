@@ -247,6 +247,40 @@ final class PaliroMediaPickerPlugin: CAPPlugin, CAPBridgedPlugin, PHPickerViewCo
     }
 }
 
+@objc(PaliroCallPermissionsPlugin)
+final class PaliroCallPermissionsPlugin: CAPPlugin, CAPBridgedPlugin {
+    let identifier = "PaliroCallPermissionsPlugin"
+    let jsName = "PaliroCallPermissions"
+    let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "request", returnType: CAPPluginReturnPromise)
+    ]
+
+    @objc func request(_ call: CAPPluginCall) {
+        requestAccess(for: .video) { [weak self] camera in
+            guard camera else {
+                call.resolve(["camera": false, "microphone": false])
+                return
+            }
+            self?.requestAccess(for: .audio) { microphone in
+                call.resolve(["camera": camera, "microphone": microphone])
+            }
+        }
+    }
+
+    private func requestAccess(for mediaType: AVMediaType, completion: @escaping (Bool) -> Void) {
+        switch AVCaptureDevice.authorizationStatus(for: mediaType) {
+        case .authorized:
+            completion(true)
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: mediaType) { granted in
+                DispatchQueue.main.async { completion(granted) }
+            }
+        default:
+            completion(false)
+        }
+    }
+}
+
 @objc(PaliroVoiceRecorderPlugin)
 final class PaliroVoiceRecorderPlugin: CAPPlugin, CAPBridgedPlugin {
     let identifier = "PaliroVoiceRecorderPlugin"
@@ -256,7 +290,8 @@ final class PaliroVoiceRecorderPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "pause", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "resume", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "stop", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "cancel", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "cancel", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "discard", returnType: CAPPluginReturnPromise)
     ]
 
     private var recorder: AVAudioRecorder?
@@ -341,10 +376,23 @@ final class PaliroVoiceRecorderPlugin: CAPPlugin, CAPBridgedPlugin {
         call.resolve(["cancelled": true])
     }
 
+    @objc func discard(_ call: CAPPluginCall) {
+        do {
+            let directory = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+                .appendingPathComponent("PaliroVoiceMessages", isDirectory: true).resolvingSymlinksInPath()
+            guard let path = call.getString("fileUri"), let url = URL(string: path), url.isFileURL,
+                  url.resolvingSymlinksInPath().deletingLastPathComponent().path == directory.path,
+                  url.lastPathComponent.hasPrefix("paliro-voice-"), url.pathExtension == "m4a" else {
+                call.reject("Invalid voice message file.")
+                return
+            }
+            if FileManager.default.fileExists(atPath: url.path) { try FileManager.default.removeItem(at: url) }
+            call.resolve(["discarded": true])
+        } catch { call.reject("Unable to discard recording.", nil, error) }
+    }
+
     private func recordingDuration() -> TimeInterval {
-        guard let recordingStartedAt else { return 0 }
-        let currentPause = pauseStartedAt.map { Date().timeIntervalSince($0) } ?? 0
-        return max(0, Date().timeIntervalSince(recordingStartedAt) - pausedDuration - currentPause)
+        return max(0, recorder?.currentTime ?? 0)
     }
 
     private func resetRecorder(removeFile: Bool) {
