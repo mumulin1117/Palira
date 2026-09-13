@@ -4,6 +4,9 @@ import { Capacitor, registerPlugin } from '@capacitor/core'
 import { createPaliroVoiceSession, PALIRO_VOICE_MAX_SECONDS } from './services/paliroVoiceSession'
 import PaliroChatIcon from './components/PaliroChatIcon.vue'
 import PaliroVideoCall from './components/PaliroVideoCall.vue'
+import PaliroOverlayTransition from './components/PaliroOverlayTransition.vue'
+import PaliroStateFeedback from './components/PaliroStateFeedback.vue'
+import { PALIRO_BOX_OPENING_MOTION } from './services/paliroBrandMotion'
 import { paliroRequestCallPermissions } from './services/paliroVideoCall'
 import { paliroPrimaryTabs, paliroRouteTransition } from './services/paliroNavigation'
 import {
@@ -87,7 +90,9 @@ const policyScroll = ref(null)
 const policyOrigin = ref('welcome')
 const boxState = ref(null)
 const selectedBox = ref(null)
+const boxSelectionAnimating = ref(null)
 const showBoxRules = ref(false)
+const homePageReady = ref(false)
 const showCoinPrompt = ref(false)
 const showBoxComposer = ref(false)
 const showMediaSourcePicker = ref(false)
@@ -198,12 +203,15 @@ const videoPublishSource = ref('library')
 const videoPublishError = ref('')
 const videoPublishLoading = ref(false)
 const showVideoPublishReward = ref(false)
+const videoRewardPending = ref(false)
 const videoElements = new Map()
 const friendProfileVideoElements = new Map()
 let videoFeedObserver = null
 let videoPlaybackRevision = 0
 
 watch(route, (nextRoute, previousRoute) => {
+  homePageReady.value = false
+  if (nextRoute !== 'home') boxSelectionAnimating.value = null
   if (previousRoute === 'video-call' && nextRoute !== 'video-call') videoCallMember.value = null
   if (previousRoute === 'conversation' && nextRoute !== 'conversation') {
     stopVoicePlayback()
@@ -223,6 +231,8 @@ watch(route, (nextRoute, previousRoute) => {
 
 watch(session, (nextSession, previousSession) => {
   if (nextSession?.userID === previousSession?.userID) return
+  videoRewardPending.value = false
+  showVideoPublishReward.value = false
   clearVideoFeedPlayback()
   hasOpenedVideoFeed.value = false
   videoFeed.value = []
@@ -838,11 +848,9 @@ function positionVideoFeedViewport(root = videoFeedScroll.value) {
   if (paliroVideoRestorePending) {
     activeVideoIndex.value = index
     const slide = root.querySelector(`[data-video-index="${index}"]`)
-    root.scrollTo({
-      top: slide?.offsetTop ?? videoReturnState.value.scrollTop,
-      left: 0,
-      behavior: 'auto',
-    })
+    const top = slide?.offsetTop ?? videoReturnState.value.scrollTop
+    // A retained player already at its slide needs no new scroll/compositor update.
+    if (Math.abs(root.scrollTop - top) > 1) root.scrollTo({ top, left: 0, behavior: 'auto' })
     paliroVideoRestorePending = false
   }
   return true
@@ -1069,7 +1077,7 @@ async function pickVideoForPublish(source) {
 }
 
 function publishVideo() {
-  if (videoPublishLoading.value) return
+  if (!showVideoPublish.value || videoPublishLoading.value) return
   if (!videoPublishDraft.value.source || !videoPublishDraft.value.caption.trim()) {
     videoPublishError.value = t('videoPublishRequired')
     return
@@ -1087,7 +1095,14 @@ function publishVideo() {
   loadMeState()
   loadVideoFeed(post.id)
   nextTick(() => videoFeedScroll.value?.scrollTo({ top: 0, behavior: 'smooth' }))
-  if (reward.type === 'success') showVideoPublishReward.value = true
+  if (reward.type === 'success') {
+    videoRewardPending.value = true
+    showVideoPublishReward.value = true
+  }
+}
+
+function finishVideoRewardFeedback(event) {
+  if (['paliro-reward-progress', 'paliro-reward-progress-reduced'].includes(event.animationName) && event.target === event.currentTarget) videoRewardPending.value = false
 }
 
 function formatConversationTime(value) {
@@ -1667,11 +1682,17 @@ function dismissBoxRules() {
   showBoxRules.value = false
 }
 
+function handlePageEntered(element) {
+  if (route.value === 'home' && element.classList.contains('paliro-home')) homePageReady.value = true
+}
+
 function selectBox(index) {
+  if (isBoxActionLocked.value || selectedBox.value === index) return
   if (paliroBoxSelectionAlertTimer) window.clearTimeout(paliroBoxSelectionAlertTimer)
   paliroBoxSelectionAlertTimer = null
   boxSelectionAlertActive.value = false
   selectedBox.value = index
+  boxSelectionAnimating.value = index
   homeNotice.value = t('boxSelected')
 }
 
@@ -1910,8 +1931,8 @@ function startTakeOneOpening() {
     return
   }
 
-  scheduleOpeningStep(() => { boxOpeningStage.value = 'revealing' }, 1500)
-  scheduleOpeningStep(showMatchResult, 2300)
+  scheduleOpeningStep(() => { boxOpeningStage.value = 'revealing' }, PALIRO_BOX_OPENING_MOTION.revealAt)
+  scheduleOpeningStep(showMatchResult, PALIRO_BOX_OPENING_MOTION.resultAt)
 }
 
 function showMatchResult() {
@@ -2410,8 +2431,8 @@ function finishTopicTest() {
               <div class="paliro-video-interests"><span v-for="interest in video.member.interests?.slice(0, 3)" :key="interest">#{{ interest }}</span></div>
             </section>
             <aside class="paliro-video-actions" :aria-label="`${video.member.name} ${t('video')}`">
-              <button :aria-label="`${video.member.name} ${t('profile')}`" class="paliro-video-author-action" type="button" @click="openVideoMemberProfile(video)"><img :alt="`${video.member.name} avatar`" :src="video.member.avatar" /><i v-if="!isOwnVideo(video)" :class="{ 'is-following': isFollowingVideoMember(video) }" aria-hidden="true" @click.stop="toggleVideoFollow(video)"><img v-if="isFollowingVideoMember(video)" alt="" src="/assets/paliro-video-following@2x.png" /><span v-else>+</span></i></button>
-              <button :aria-label="t('likes')" :aria-pressed="video.liked" :class="{ 'is-liked': video.liked }" type="button" @click="toggleVideoLike(video)"><img alt="" :src="video.liked ? '/assets/paliro-video-like-active@2x.png' : '/assets/paliro-video-like@2x.png'" /><small>{{ video.likes }}</small></button>
+              <button :aria-label="`${video.member.name} ${t('profile')}`" class="paliro-video-author-action" type="button" @click="openVideoMemberProfile(video)"><img :alt="`${video.member.name} avatar`" :src="video.member.avatar" /><i v-if="!isOwnVideo(video)" :class="{ 'is-following': isFollowingVideoMember(video) }" aria-hidden="true" @click.stop="toggleVideoFollow(video)"><PaliroStateFeedback :value="isFollowingVideoMember(video)" :positive="isFollowingVideoMember(video)" kind="follow"><img v-if="isFollowingVideoMember(video)" alt="" src="/assets/paliro-video-following@2x.png" /><span v-else>+</span></PaliroStateFeedback></i></button>
+              <button :aria-label="t('likes')" :aria-pressed="video.liked" :class="{ 'is-liked': video.liked }" type="button" @click="toggleVideoLike(video)"><PaliroStateFeedback :value="video.liked" :positive="video.liked" kind="like"><img alt="" :src="video.liked ? '/assets/paliro-video-like-active@2x.png' : '/assets/paliro-video-like@2x.png'" /></PaliroStateFeedback><small><PaliroStateFeedback :value="video.likes" kind="count">{{ video.likes }}</PaliroStateFeedback></small></button>
               <button :aria-label="t('comments')" type="button" @click="openVideoComments(video)"><img alt="" src="/assets/paliro-video-comment@2x.png" /><small>{{ video.comments.length }}</small></button>
               <button :aria-label="t('reportVideo')" class="paliro-video-report-action" type="button" @click="openVideoActions(video)"><img alt="" src="/assets/paliro-video-report@2x.png" /><small>{{ t('reportLabel') }}</small></button>
             </aside>
@@ -2431,7 +2452,7 @@ function finishTopicTest() {
       </button>
     </nav>
 
-    <Transition :name="isPrimaryTabTransition ? 'paliro-tab-fade' : 'paliro-route-fade'" :css="!skipVideoRouteAnimation" mode="out-in">
+    <Transition :name="isPrimaryTabTransition ? 'paliro-tab-fade' : 'paliro-route-fade'" :css="!skipVideoRouteAnimation" :mode="isPrimaryTabTransition ? undefined : 'out-in'" @after-enter="handlePageEntered">
       <section v-if="route === 'welcome'" key="welcome" class="paliro-welcome paliro-view">
       <div class="paliro-status-spacer"></div>
       <div class="paliro-welcome-art" aria-hidden="true">
@@ -2465,9 +2486,11 @@ function finishTopicTest() {
           },
         ]"
       >
-      <button :aria-label="t('back')" class="paliro-back" @click="openRoute('welcome')">‹</button>
-      <h1 v-if="route === 'login'" class="paliro-login-title">{{ t('logIn') }}</h1>
-      <h1 v-else class="paliro-signup-title">{{ t('createAccount') }}</h1>
+      <header class="paliro-auth-nav">
+        <button :aria-label="t('back')" class="paliro-back" @click="openRoute('welcome')">‹</button>
+        <h1 v-if="route === 'login'" class="paliro-login-title">{{ t('logIn') }}</h1>
+        <h1 v-else class="paliro-signup-title">{{ t('createAccount') }}</h1>
+      </header>
       <div class="paliro-auth-illustration" aria-hidden="true">
         <div class="paliro-book-glow"></div>
         <img
@@ -2592,9 +2615,12 @@ function finishTopicTest() {
             v-for="box in [0, 1, 2, 3, 4, 5]"
             :key="box"
             :aria-label="`${t('boxRules')} ${box + 1}`"
-            :class="['paliro-floating-box-target', `paliro-floating-box-${box + 1}`, { 'is-selected': selectedBox === box }]"
+            :class="['paliro-floating-box-target', `paliro-floating-box-${box + 1}`, { 'is-selected': selectedBox === box, 'is-selection-changing': boxSelectionAnimating === box }]"
+            :aria-pressed="selectedBox === box"
+            :disabled="isBoxActionLocked"
             type="button"
             @click="selectBox(box)"
+            @animationend="boxSelectionAnimating === box && (boxSelectionAnimating = null)"
           ></button>
 
           <div class="paliro-home-free-panel">
@@ -2603,7 +2629,7 @@ function finishTopicTest() {
               <span>{{ t('freeTime') }}</span>
               <strong>{{ freeBoxActionsLeft }}/{{ boxActionLimit }}</strong>
             </div>
-            <div class="paliro-home-progress" aria-label="Daily free box actions remaining">
+            <div :class="{ 'is-rewarded': videoRewardPending && !showBoxRules }" class="paliro-home-progress" aria-label="Daily free box actions remaining" @animationend="finishVideoRewardFeedback">
               <span :style="boxProgressStyle"></span>
             </div>
           </div>
@@ -3004,7 +3030,7 @@ function finishTopicTest() {
           </section>
         </div>
         <footer class="paliro-friend-profile-actions">
-          <button :class="{ 'is-followed': isMatchedFollowing }" :disabled="isMatchedBlocked" :aria-pressed="isMatchedFollowing" :aria-label="isMatchedFollowing ? t('unfollow') : t('follow')" type="button" @click="followMatchedFriend">{{ isMatchedFollowing ? t('followed') : t('follow') }}</button>
+          <button :class="{ 'is-followed': isMatchedFollowing }" :disabled="isMatchedBlocked" :aria-pressed="isMatchedFollowing" :aria-label="isMatchedFollowing ? t('unfollow') : t('follow')" type="button" @click="followMatchedFriend"><PaliroStateFeedback :value="isMatchedFollowing" kind="label">{{ isMatchedFollowing ? t('followed') : t('follow') }}</PaliroStateFeedback></button>
           <button :aria-disabled="!isMatchedMutualFriend" :class="{ 'is-locked': !isMatchedMutualFriend }" type="button" @click="openMatchedConversation"><span aria-hidden="true">{{ isMatchedMutualFriend ? '' : '⌕' }}</span>{{ t('message') }}</button>
           <button v-if="isMatchedMutualFriend" :aria-label="t('chatVideoCall')" :disabled="videoCallStarting" class="paliro-friend-profile-video" type="button" @click="openMatchedVideo"><PaliroChatIcon name="video" /></button>
         </footer>
@@ -3121,7 +3147,7 @@ function finishTopicTest() {
     </Transition>
 
     <Teleport to="body">
-      <div v-if="isOpeningBox" :class="['paliro-opening-overlay', `is-${boxOpeningStage}`]" role="presentation">
+      <div v-if="isOpeningBox" :class="['paliro-opening-overlay', `is-${boxOpeningStage}`]" :style="{ '--paliro-box-charge': `${PALIRO_BOX_OPENING_MOTION.revealAt}ms`, '--paliro-box-reveal': `${PALIRO_BOX_OPENING_MOTION.resultAt - PALIRO_BOX_OPENING_MOTION.revealAt}ms`, '--paliro-box-settle': `${PALIRO_BOX_OPENING_MOTION.settleDuration}ms` }" role="presentation">
         <section v-if="boxOpeningStage !== 'result'" aria-live="polite" :aria-label="t('openingBox')" class="paliro-opening-experience" role="status">
           <span class="paliro-opening-spark paliro-opening-spark-one" aria-hidden="true"></span>
           <span class="paliro-opening-spark paliro-opening-spark-two" aria-hidden="true"></span>
@@ -3159,6 +3185,7 @@ function finishTopicTest() {
     </Teleport>
 
     <Teleport to="body">
+      <PaliroOverlayTransition kind="dialog">
       <div v-if="showFriendRequestModal" class="paliro-friend-request-backdrop" @click.self="closeFriendRequestModal">
         <section ref="friendRequestDialog" aria-describedby="paliro-friend-request-safety" aria-labelledby="paliro-friend-request-title" aria-modal="true" class="paliro-friend-request-dialog" role="dialog" tabindex="-1" @keydown.esc="closeFriendRequestModal" @keydown="trapFriendRequestFocus">
           <h2 id="paliro-friend-request-title">{{ t('friendRequest') }}</h2>
@@ -3174,9 +3201,11 @@ function finishTopicTest() {
           </div>
         </section>
       </div>
+      </PaliroOverlayTransition>
     </Teleport>
 
     <Teleport to="body">
+      <PaliroOverlayTransition kind="dialog">
       <div v-if="profileReminder" class="paliro-profile-reminder-backdrop" @click.self="profileReminder = ''">
         <section aria-modal="true" class="paliro-profile-reminder" role="dialog" aria-labelledby="paliro-profile-reminder-title" @keydown.esc="profileReminder = ''" @keydown.tab.prevent="profileReminderConfirm?.focus()">
           <span aria-hidden="true" class="paliro-profile-reminder-art">✦</span>
@@ -3185,9 +3214,11 @@ function finishTopicTest() {
           <button ref="profileReminderConfirm" class="paliro-home-modal-button" type="button" @click="profileReminder = ''">{{ t('ok') }}</button>
         </section>
       </div>
+      </PaliroOverlayTransition>
     </Teleport>
 
     <Teleport to="body">
+      <PaliroOverlayTransition kind="sheet">
       <div v-if="showFriendProfileActions" class="paliro-profile-safety-backdrop" @click.self="showFriendProfileActions = false">
         <section aria-modal="true" class="paliro-profile-safety-actions" role="dialog" :aria-label="t('moreActions')">
           <button type="button" @click="reportMatchedFriendFromProfile"><span aria-hidden="true">!</span>{{ t('reportUser') }}</button>
@@ -3195,9 +3226,11 @@ function finishTopicTest() {
           <button type="button" @click="showFriendProfileActions = false">{{ t('cancel') }}</button>
         </section>
       </div>
+      </PaliroOverlayTransition>
     </Teleport>
 
     <Teleport to="body">
+      <PaliroOverlayTransition kind="dialog">
       <div v-if="showFriendProfileBlockConfirm" class="paliro-profile-safety-backdrop" @click.self="showFriendProfileBlockConfirm = false">
         <section aria-describedby="paliro-profile-block-copy" aria-labelledby="paliro-profile-block-title" aria-modal="true" class="paliro-profile-block-dialog" role="dialog">
           <span aria-hidden="true" class="paliro-profile-block-symbol">!</span>
@@ -3207,9 +3240,11 @@ function finishTopicTest() {
           <button type="button" @click="showFriendProfileBlockConfirm = false">{{ t('cancel') }}</button>
         </section>
       </div>
+      </PaliroOverlayTransition>
     </Teleport>
 
     <Teleport to="body">
+      <PaliroOverlayTransition kind="sheet">
       <div v-if="showVideoComments && selectedVideo" class="paliro-video-sheet-backdrop" @click.self="showVideoComments = false">
         <section aria-modal="true" class="paliro-video-comments-sheet" role="dialog" :aria-label="t('comments')">
           <header><h2>{{ t('comments') }} <span>({{ selectedVideoComments.length }})</span></h2><button :aria-label="t('close')" type="button" @click="showVideoComments = false">×</button></header>
@@ -3218,16 +3253,18 @@ function finishTopicTest() {
               <img v-if="commentAvatarSource(comment)" :alt="`${comment.authorName} avatar`" :src="commentAvatarSource(comment)" />
               <span v-else aria-hidden="true">{{ comment.authorName.slice(0, 1) }}</span>
               <div class="paliro-video-comment-copy"><strong>{{ comment.authorName }}</strong><p>{{ comment.body }}</p></div>
-              <button :aria-label="t('likes')" :aria-pressed="comment.liked" :class="{ 'is-liked': comment.liked }" class="paliro-video-comment-like" type="button" @click="toggleVideoCommentLike(comment)"><span aria-hidden="true">{{ comment.liked ? '♥' : '♡' }}</span><small>{{ comment.likes }}</small></button>
+              <button :aria-label="t('likes')" :aria-pressed="comment.liked" :class="{ 'is-liked': comment.liked }" class="paliro-video-comment-like" type="button" @click="toggleVideoCommentLike(comment)"><PaliroStateFeedback :value="comment.liked" :positive="comment.liked" kind="like" aria-hidden="true">{{ comment.liked ? '♥' : '♡' }}</PaliroStateFeedback><small><PaliroStateFeedback :value="comment.likes" kind="count">{{ comment.likes }}</PaliroStateFeedback></small></button>
             </article>
           </main>
           <form @submit.prevent="submitVideoComment"><img :alt="`${currentMemberName} avatar`" class="paliro-video-comment-composer-avatar" :src="currentMemberAvatarSource" /><input v-model="videoCommentDraft" :maxlength="180" :placeholder="t('addComment')" type="text" /><button :disabled="!videoCommentDraft.trim()" type="submit">{{ t('postComment') }}</button></form>
           <p v-if="videoCommentError" class="paliro-video-form-error" role="alert">{{ videoCommentError }}</p>
         </section>
       </div>
+      </PaliroOverlayTransition>
     </Teleport>
 
     <Teleport to="body">
+      <PaliroOverlayTransition kind="sheet">
       <div v-if="showVideoActions && selectedVideo" class="paliro-video-sheet-backdrop" @click.self="showVideoActions = false">
         <section aria-modal="true" class="paliro-video-action-sheet" role="dialog" :aria-label="t('reportVideo')">
           <button type="button" @click="hideSelectedVideo"><span aria-hidden="true">◒</span>{{ t('notInterested') }}</button>
@@ -3236,9 +3273,11 @@ function finishTopicTest() {
           <button type="button" @click="showVideoActions = false">{{ t('cancel') }}</button>
         </section>
       </div>
+      </PaliroOverlayTransition>
     </Teleport>
 
     <Teleport to="body">
+      <PaliroOverlayTransition kind="sheet">
       <div v-if="showVideoReport && selectedVideo" class="paliro-video-sheet-backdrop" @click.self="showVideoReport = false">
         <form aria-modal="true" class="paliro-video-report-sheet" role="dialog" :aria-label="t('videoReportTitle')" @submit.prevent="submitVideoReport">
           <header><h2>{{ t('videoReportTitle') }}</h2><button :aria-label="t('close')" type="button" @click="showVideoReport = false">×</button></header>
@@ -3251,9 +3290,11 @@ function finishTopicTest() {
           <button class="paliro-video-submit" :disabled="!videoReportReason" type="submit">{{ t('submit') }}</button>
         </form>
       </div>
+      </PaliroOverlayTransition>
     </Teleport>
 
     <Teleport to="body">
+      <PaliroOverlayTransition kind="sheet">
       <div v-if="showVideoPublish" class="paliro-video-publish-backdrop" @click.self="showVideoPublish = false">
         <form aria-modal="true" class="paliro-video-publish-sheet" role="dialog" :aria-label="t('videoPublishTitle')" @submit.prevent="publishVideo">
           <header><button :aria-label="t('back')" type="button" @click="showVideoPublish = false">‹</button><h2>{{ t('publish') }}</h2><span aria-hidden="true"></span></header>
@@ -3268,20 +3309,24 @@ function finishTopicTest() {
           <button class="paliro-video-submit" :disabled="videoPublishLoading" type="submit">{{ videoPublishLoading ? t('processing') : t('publish') }}</button>
         </form>
       </div>
+      </PaliroOverlayTransition>
     </Teleport>
 
     <Teleport to="body">
+      <PaliroOverlayTransition kind="dialog">
       <div v-if="showVideoPublishReward" class="paliro-video-reward-backdrop" @click.self="showVideoPublishReward = false">
         <section aria-describedby="paliro-video-reward-copy" aria-labelledby="paliro-video-reward-title" aria-modal="true" class="paliro-video-reward-dialog" role="dialog">
-          <img alt="" src="/assets/paliro-make-box-flight@2x.png" />
+          <div class="paliro-reward-art" aria-hidden="true"><img alt="" src="/assets/paliro-make-box-flight@2x.png" /><span>+1</span></div>
           <h2 id="paliro-video-reward-title">{{ t('videoRewardTitle') }}</h2>
           <p id="paliro-video-reward-copy">{{ t('videoRewardCopy') }}</p>
           <button type="button" @click="showVideoPublishReward = false">{{ t('videoRewardConfirm') }}</button>
         </section>
       </div>
+      </PaliroOverlayTransition>
     </Teleport>
 
     <Teleport to="body">
+      <PaliroOverlayTransition kind="dialog">
       <div v-if="showFriendshipCelebration && acceptedFriend" class="paliro-friendship-backdrop" @click.self="closeFriendshipCelebration">
         <section aria-describedby="paliro-friendship-copy" aria-labelledby="paliro-friendship-title" aria-modal="true" class="paliro-friendship-dialog" role="dialog">
           <div aria-hidden="true" class="paliro-friendship-avatars"><img :src="currentMemberAvatar.src" /><img :src="acceptedFriend.avatar" /></div>
@@ -3291,9 +3336,11 @@ function finishTopicTest() {
           <button type="button" @click="closeFriendshipCelebration">{{ t('maybeLater') }}</button>
         </section>
       </div>
+      </PaliroOverlayTransition>
     </Teleport>
 
     <Teleport to="body">
+      <PaliroOverlayTransition kind="dialog">
       <div v-if="showBoxComposer" class="paliro-composer-backdrop" @click.self="closeBoxComposer">
         <section aria-labelledby="paliro-composer-title" aria-modal="true" class="paliro-composer" role="dialog">
           <button :aria-label="t('close')" class="paliro-composer-close" type="button" @click="closeBoxComposer"><img alt="" src="/assets/paliro-composer-close@2x.png" /></button>
@@ -3309,9 +3356,11 @@ function finishTopicTest() {
           <button :disabled="isCreatingBox || !composerImages.length || !composerText.trim()" class="paliro-composer-post" type="button" @click="publishComposerBox"><span>{{ t('post') }}</span></button>
         </section>
       </div>
+      </PaliroOverlayTransition>
     </Teleport>
 
     <Teleport to="body">
+      <PaliroOverlayTransition kind="sheet">
       <div v-if="showMediaSourcePicker" class="paliro-media-source-backdrop" @click.self="showMediaSourcePicker = false">
         <section aria-modal="true" class="paliro-media-source" role="dialog">
           <h2>{{ t('addPhoto') }}</h2>
@@ -3320,9 +3369,11 @@ function finishTopicTest() {
           <button type="button" @click="showMediaSourcePicker = false">{{ t('cancel') }}</button>
         </section>
       </div>
+      </PaliroOverlayTransition>
     </Teleport>
 
     <Teleport to="body">
+      <PaliroOverlayTransition kind="sheet">
       <div v-if="showProfilePhotoSourcePicker" class="paliro-media-source-backdrop" @click.self="showProfilePhotoSourcePicker = false">
         <section aria-modal="true" class="paliro-media-source" role="dialog">
           <h2>{{ t('changeProfilePhoto') }}</h2>
@@ -3331,9 +3382,11 @@ function finishTopicTest() {
           <button type="button" @click="showProfilePhotoSourcePicker = false">{{ t('cancel') }}</button>
         </section>
       </div>
+      </PaliroOverlayTransition>
     </Teleport>
 
     <Teleport to="body">
+      <PaliroOverlayTransition kind="sheet">
       <div v-if="showAccountDeletionNotice" class="paliro-media-source-backdrop" @click.self="showAccountDeletionNotice = false">
         <section aria-modal="true" class="paliro-media-source" role="dialog">
           <h2>{{ t('deleteAccount') }}</h2>
@@ -3342,10 +3395,11 @@ function finishTopicTest() {
           <button type="button" @click="showAccountDeletionNotice = false">{{ t('cancel') }}</button>
         </section>
       </div>
+      </PaliroOverlayTransition>
     </Teleport>
 
-    <Transition name="paliro-rules-sheet">
-    <div v-if="showBoxRules" class="paliro-rules-backdrop" role="presentation">
+    <Transition name="paliro-rules-sheet" appear>
+    <div v-if="showBoxRules && route === 'home' && homePageReady" class="paliro-rules-backdrop" role="presentation">
       <section class="paliro-rules-experience" aria-modal="true" role="dialog" aria-labelledby="paliro-box-rules-title">
         <img class="paliro-rules-frame" alt="" src="/assets/paliro-rules-frame@2x.png" />
         <button :aria-label="t('close')" class="paliro-rules-close" type="button" @click="dismissBoxRules">
@@ -3361,6 +3415,7 @@ function finishTopicTest() {
     </Transition>
 
     <Teleport to="body">
+      <PaliroOverlayTransition kind="dialog">
       <div v-if="showCoinPrompt" class="paliro-home-modal-backdrop" role="presentation" @click.self="dismissCoinPrompt">
         <section class="paliro-home-coin-modal" aria-describedby="paliro-coin-copy" aria-modal="true" role="dialog" aria-labelledby="paliro-coin-title">
           <img class="paliro-home-coin-art" :alt="t('coinPromptArt')" src="/assets/paliro-home-coin-modal-art@2x.png" />
@@ -3371,9 +3426,11 @@ function finishTopicTest() {
           <button class="paliro-home-modal-secondary" type="button" @click="dismissCoinPrompt">{{ t('maybeLater') }}</button>
         </section>
       </div>
+      </PaliroOverlayTransition>
     </Teleport>
 
     <Teleport to="body">
+      <PaliroOverlayTransition kind="dialog">
       <div v-if="walletDialogMessage" class="paliro-wallet-dialog-backdrop" role="presentation" @click.self="walletDialogMessage = ''">
         <section aria-describedby="paliro-wallet-dialog-copy" aria-labelledby="paliro-wallet-dialog-title" aria-modal="true" class="paliro-wallet-dialog" role="alertdialog">
           <h2 id="paliro-wallet-dialog-title">{{ t('wallet') }}</h2>
@@ -3381,8 +3438,10 @@ function finishTopicTest() {
           <button class="paliro-home-modal-button" type="button" @click="walletDialogMessage = ''">{{ t('ok') }}</button>
         </section>
       </div>
+      </PaliroOverlayTransition>
     </Teleport>
 
+    <PaliroOverlayTransition>
     <div v-if="showEula" class="paliro-modal-backdrop" role="presentation">
       <section class="paliro-eula-modal" aria-modal="true" role="dialog" aria-labelledby="paliro-eula-title">
         <header class="paliro-eula-header">
@@ -3402,5 +3461,6 @@ function finishTopicTest() {
         </footer>
       </section>
     </div>
+    </PaliroOverlayTransition>
   </main>
 </template>

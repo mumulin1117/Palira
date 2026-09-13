@@ -20,10 +20,11 @@ function createPlaybackHarness() {
   const observers = []
   const root = {
     scrollTop: 1200,
+    scrollCount: 0,
     querySelector(selector) {
       return { offsetTop: Number(selector.match(/\d+/)[0]) * 600 }
     },
-    scrollTo({ top }) { this.scrollTop = top },
+    scrollTo({ top }) { this.scrollCount++; this.scrollTop = top },
   }
   const context = vm.createContext({
     route: { value: 'videos' },
@@ -90,6 +91,7 @@ test('profile round trip retains the selected player, offset and playback time',
   flushTicks()
   assert.equal(c.videoElements.get('c'), original)
   assert.equal(root.scrollTop, 1200)
+  assert.equal(root.scrollCount, 0, 'Returning to the retained slide must not restart scroll snapping')
   assert.equal(original.currentTime, 8.5)
   assert.equal(original.paused, false)
   assert.equal(c.userPausedVideoID.value, '')
@@ -143,6 +145,7 @@ test('a removed or blocked video falls back to an available slide', () => {
   flushTicks()
   assert.equal(c.activeVideoIndex.value, 1)
   assert.equal(root.scrollTop, 600)
+  assert.equal(root.scrollCount, 1)
   assert.equal(c.videoElements.get('b').paused, false)
 })
 

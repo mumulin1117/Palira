@@ -1,0 +1,142 @@
+:root {
+  --paliro-motion-press: 140ms;
+  --paliro-motion-enter: 260ms;
+  --paliro-motion-exit: 180ms;
+  --paliro-motion-ease: cubic-bezier(.22, .8, .24, 1);
+}
+
+:where(.paliro-shell button, [role='dialog'] button, [role='alertdialog'] button) {
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--paliro-motion-press) ease-out, filter var(--paliro-motion-press) ease-out,
+    background-color var(--paliro-motion-press) ease-out, border-color var(--paliro-motion-press) ease-out;
+}
+
+:where(.paliro-shell button, [role='dialog'] button, [role='alertdialog'] button):enabled:not([aria-disabled='true']):active {
+  filter: brightness(.9);
+}
+
+:is(.paliro-primary-button, .paliro-secondary-button, .paliro-friend-profile-actions button,
+  .paliro-video-submit, .paliro-match-result-actions button, [role='dialog'] button,
+  [role='alertdialog'] button):enabled:not([aria-disabled='true']):active {
+  transform: scale(.98);
+}
+
+:is(.paliro-back, .paliro-video-header button,
+  .paliro-video-actions button:not(.paliro-video-author-action), .paliro-video-comment-like,
+  .paliro-composer-close, .paliro-friend-profile-more):enabled:active {
+  transform: scale(.94);
+}
+.paliro-password-visibility:enabled:active { transform: translateY(-50%) scale(.94); }
+.paliro-friend-profile-post-play:enabled:active { transform: translate(-50%, -50%) scale(.94); }
+
+/* Keep the tab's label and its hit area stationary while its icon responds. */
+.paliro-home-tab-icon { transition: transform var(--paliro-motion-press) ease-out; }
+.paliro-home-tab:enabled:active .paliro-home-tab-icon { transform: scale(.92); }
+.paliro-video-author-action:enabled:active { transform: none; }
+.paliro-video-author-action > img { transition: transform var(--paliro-motion-press) ease-out; }
+.paliro-video-author-action:enabled:active > img { transform: scale(.96); }
+
+.paliro-overlay-sheet-enter-active, .paliro-overlay-dialog-enter-active {
+  transition: opacity var(--paliro-motion-enter) ease;
+}
+.paliro-overlay-sheet-leave-active, .paliro-overlay-dialog-leave-active {
+  transition: opacity var(--paliro-motion-exit) ease;
+  pointer-events: none;
+}
+.paliro-overlay-sheet-enter-active > *, .paliro-overlay-dialog-enter-active > * {
+  transition: transform var(--paliro-motion-enter) var(--paliro-motion-ease);
+}
+.paliro-overlay-sheet-leave-active > *, .paliro-overlay-dialog-leave-active > * {
+  transition: transform var(--paliro-motion-exit) ease-in;
+}
+.paliro-overlay-sheet-enter-from, .paliro-overlay-sheet-leave-to,
+.paliro-overlay-dialog-enter-from, .paliro-overlay-dialog-leave-to { opacity: 0; }
+.paliro-overlay-sheet-enter-from > *, .paliro-overlay-sheet-leave-to > * { transform: translateY(100%); }
+.paliro-overlay-dialog-enter-from > *, .paliro-overlay-dialog-leave-to > * { transform: scale(.96); }
+
+/* Selection surrounds the existing GIF artwork without scaling its hit target. */
+.paliro-floating-box-target.is-selected { box-shadow: none; }
+.paliro-floating-box-target:active { transform: none; }
+.paliro-floating-box-target::before, .paliro-floating-box-target::after {
+  position: absolute; inset: 0; border: 2px solid #4dfff6; border-radius: 50%;
+  content: ''; pointer-events: none; opacity: 0;
+}
+.paliro-floating-box-target::before {
+  transform: scale(.96); box-shadow: 0 0 16px rgba(77, 255, 246, .7);
+  transition: opacity .2s ease, transform .26s var(--paliro-motion-ease);
+}
+.paliro-floating-box-target.is-selected::before { opacity: 1; transform: scale(1); }
+.paliro-floating-box-target.is-selected.is-selection-changing::after { animation: paliro-selection-ring .48s ease-out; }
+@keyframes paliro-selection-ring { from { opacity: .8; transform: scale(.98); } to { opacity: 0; transform: scale(1.18); } }
+
+.paliro-opening-experience::before {
+  position: absolute; inset: -12%; border-radius: 50%; content: ''; opacity: 0; pointer-events: none;
+  background: radial-gradient(circle, rgba(77,255,246,.32), rgba(68,117,236,.12) 45%, transparent 70%);
+}
+.paliro-opening-overlay.is-opening .paliro-opening-experience::before { animation: paliro-box-charge var(--paliro-box-charge) ease-out both; }
+.paliro-opening-overlay.is-revealing .paliro-opening-machine { animation-duration: var(--paliro-box-reveal); }
+.paliro-opening-overlay.is-revealing .paliro-opening-spark { animation-duration: calc(var(--paliro-box-reveal) - 60ms); }
+.paliro-opening-overlay.is-revealing .paliro-opening-spark-two { animation-delay: 60ms; }
+.paliro-match-result { animation: paliro-brand-result-in var(--paliro-box-settle, 360ms) var(--paliro-motion-ease) both; }
+@keyframes paliro-box-charge { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: scale(1.1); } }
+@keyframes paliro-brand-result-in { from { opacity: 0; transform: translateY(14px) scale(.94); } to { opacity: 1; transform: none; } }
+
+.paliro-state-feedback { display: inline-grid; vertical-align: middle; place-items: center; }
+.paliro-state-value { grid-area: 1 / 1; display: inline-grid; place-items: center; }
+.paliro-state-feedback-count { min-width: 2ch; overflow: hidden; font-variant-numeric: tabular-nums; }
+.paliro-state-feedback-label { max-width: 100%; min-height: 1.2em; }
+.paliro-state-label-enter-active, .paliro-state-label-leave-active,
+.paliro-state-count-enter-active, .paliro-state-count-leave-active { transition: opacity .16s ease, transform .16s ease; }
+.paliro-state-label-enter-from, .paliro-state-label-leave-to { opacity: 0; transform: translateY(2px); }
+.paliro-state-count-enter-from { opacity: 0; transform: translateY(6px); }
+.paliro-state-count-leave-to { opacity: 0; transform: translateY(-6px); }
+.paliro-state-like-enter-active, .paliro-state-like-leave-active,
+.paliro-state-follow-enter-active, .paliro-state-follow-leave-active { transition: opacity .14s ease; }
+.paliro-state-like-enter-from, .paliro-state-like-leave-to,
+.paliro-state-follow-enter-from, .paliro-state-follow-leave-to { opacity: 0; }
+.paliro-state-like-enter-active.is-positive { animation: paliro-like-confirm .32s ease-out; }
+.paliro-state-follow-enter-active.is-positive { animation: paliro-follow-confirm .28s var(--paliro-motion-ease); }
+@keyframes paliro-like-confirm { 0% { transform: scale(.84); } 48% { transform: scale(1.16); } 100% { transform: scale(1); } }
+@keyframes paliro-follow-confirm { from { transform: scale(.8) rotate(-12deg); } to { transform: scale(1) rotate(0); } }
+.paliro-video-actions .paliro-state-feedback-like { width: 44px; height: 44px; }
+.paliro-video-actions .paliro-state-feedback-like img { display: block; width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 2px 7px rgba(0,0,0,.55)); }
+.paliro-video-author-action .paliro-state-feedback-follow { width: 18px; height: 18px; }
+.paliro-video-comment-like > .paliro-state-feedback-like { width: 26px; height: 26px; }
+.paliro-video-comment-like .paliro-state-value { font-size: inherit; line-height: inherit; }
+.paliro-video-comment-like .paliro-state-feedback-count { font-size: 10px; line-height: 1.1; }
+
+.paliro-reward-art { position: relative; width: 74px; height: 74px; margin: 0 auto; }
+.paliro-reward-art::before {
+  position: absolute; inset: -18px; border-radius: 50%; content: ''; pointer-events: none;
+  background: radial-gradient(circle, rgba(77,255,246,.3), transparent 68%);
+  animation: paliro-reward-halo .7s ease-out both;
+}
+.paliro-reward-art img { position: relative; animation: paliro-reward-arrive .55s var(--paliro-motion-ease) both; }
+.paliro-reward-art > span {
+  position: absolute; top: 2px; right: -14px; padding: 3px 7px; border-radius: 12px;
+  color: #071337; background: #4dfff6; font-size: 12px; font-weight: 800;
+  animation: paliro-reward-arrive .4s .12s var(--paliro-motion-ease) both;
+}
+.paliro-home-progress.is-rewarded { animation: paliro-reward-progress .95s ease-out; }
+@keyframes paliro-reward-halo { from { opacity: 0; transform: scale(.6); } 45% { opacity: 1; } to { opacity: 0; transform: scale(1.4); } }
+@keyframes paliro-reward-arrive { from { opacity: 0; transform: translateY(8px) scale(.88); } to { opacity: 1; transform: none; } }
+@keyframes paliro-reward-progress { 0%, 100% { box-shadow: none; } 35% { box-shadow: 0 0 14px rgba(77,255,246,.7); border-color: #4dfff6; } }
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --paliro-motion-press: 0ms; --paliro-motion-enter: 0ms; --paliro-motion-exit: 0ms; }
+  .paliro-route-fade-enter-active, .paliro-route-fade-leave-active { transition: none; }
+  .paliro-route-fade-enter-from, .paliro-route-fade-leave-to { transform: none; }
+  .paliro-welcome-art, .paliro-welcome-actions { animation: none; }
+  .paliro-overlay-sheet-enter-from > *, .paliro-overlay-sheet-leave-to > *,
+  .paliro-overlay-dialog-enter-from > *, .paliro-overlay-dialog-leave-to > * { transform: none; }
+  :where(.paliro-shell button, [role='dialog'] button, [role='alertdialog'] button) { transition-duration: 0ms; }
+  .paliro-floating-box-target::before { transition: none; }
+  .paliro-floating-box-target.is-selected.is-selection-changing::after,
+  .paliro-opening-overlay.is-opening .paliro-opening-experience::before,
+  .paliro-match-result, .paliro-reward-art::before, .paliro-reward-art img, .paliro-reward-art > span,
+  .paliro-state-like-enter-active.is-positive, .paliro-state-follow-enter-active.is-positive { animation: none; }
+  .paliro-state-value { transition-duration: 0ms; }
+  /* Complete the one-shot reward lifecycle without displaying a flash. */
+  .paliro-home-progress.is-rewarded { animation: paliro-reward-progress-reduced 1ms; }
+  @keyframes paliro-reward-progress-reduced { from { opacity: 1; } to { opacity: 1; } }
+}
