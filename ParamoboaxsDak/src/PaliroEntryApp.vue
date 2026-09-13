@@ -9,6 +9,8 @@ import PaliroChatIcon from './components/PaliroChatIcon.vue'
 import PaliroVideoCall from './components/PaliroVideoCall.vue'
 import PaliroOverlayTransition from './components/PaliroOverlayTransition.vue'
 import PaliroStateFeedback from './components/PaliroStateFeedback.vue'
+import PaliroPullRefresh from './components/PaliroPullRefresh.vue'
+import { usePaliroListRequest } from './services/paliroListRequest'
 import { PALIRO_BOX_OPENING_MOTION } from './services/paliroBrandMotion'
 import { paliroRequestCallPermissions } from './services/paliroVideoCall'
 import { paliroPrimaryTabs, paliroRouteTransition } from './services/paliroNavigation'
@@ -81,12 +83,17 @@ const errorMessage = ref('')
 const showEula = ref(false)
 const hasAgreed = ref(false)
 const session = ref(null)
+const videoListRequest = usePaliroListRequest()
+const messageListRequest = usePaliroListRequest()
+const messageListScroll = ref(null)
+const videoEmptyScroll = ref(null)
 const authForm = ref({ email: '', password: '', confirmPassword: '' })
 const authBusy = ref(false)
 let authController = null
 let registrationDraft = null
 let incompleteAuth = null
 const accountApi = createPaliroAccountApi()
+const nativeLaunchScreen = Capacitor.isNativePlatform() ? registerPlugin('PaliroLaunchScreen') : null
 const serverSession = createPaliroServerSession({
   api: accountApi,
   credentials: createPaliroCredentialStore({ nativeStore: Capacitor.isNativePlatform() ? registerPlugin('PaliroAuthStorage') : null }),
@@ -261,6 +268,8 @@ watch(route, (nextRoute, previousRoute) => {
 
 watch(session, (nextSession, previousSession) => {
   if (nextSession?.userID === previousSession?.userID) return
+  videoListRequest.reset()
+  messageListRequest.reset()
   videoRewardPending.value = false
   showVideoPublishReward.value = false
   clearVideoFeedPlayback()
@@ -424,6 +433,15 @@ const meMenuItems = [
 ]
 const reportReasons = ['reportReasonHarassment', 'reportReasonSpam', 'reportReasonInappropriate', 'reportReasonFakeProfile', 'reportReasonUnderage', 'reportReasonOther']
 
+async function revealWebContent() {
+  await nextTick()
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      void nativeLaunchScreen?.hide().catch(() => {})
+    })
+  })
+}
+
 const pageTitle = computed(() => ({
   login: t('welcomeBack'),
   signup: t('createYourBox'),
@@ -436,6 +454,7 @@ onMounted(() => {
   paliroSeedUsers()
   hasAgreed.value = paliroGetEulaAccepted()
   void restoreServerSession()
+  void revealWebContent()
   applyLocale()
   void setupNativeIapBridge()
   window.addEventListener('popstate', syncRouteFromLocation)
@@ -446,6 +465,8 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  videoListRequest.reset()
+  messageListRequest.reset()
   profileController?.abort()
   authController?.abort()
   window.removeEventListener('popstate', syncRouteFromLocation)
@@ -797,6 +818,19 @@ function openMessages() {
   activeConversation.value = null
   loadMessageState()
   openRoute('messages')
+  if (!messageListRequest.ready.value) void requestMessageList()
+}
+
+async function requestMessageList() {
+  await messageListRequest.run(() => loadMessageState())
+}
+
+async function requestVideoList() {
+  const loaded = await videoListRequest.run(() => loadVideoFeed(activeVideo.value?.id || videoReturnState.value.videoID))
+  if (loaded && route.value === 'videos') {
+    await nextTick()
+    setupVideoFeedPlayback()
+  }
 }
 
 function videoSource(source) {
@@ -952,10 +986,11 @@ function handleDocumentVisibilityChange() {
 
 function openVideoFeed() {
   loadMeState()
-  loadVideoFeed(videoReturnState.value.videoID || activeVideo.value?.id)
+  if (videoListRequest.ready.value) loadVideoFeed(videoReturnState.value.videoID || activeVideo.value?.id)
   paliroVideoRestorePending = Boolean(videoReturnState.value.videoID)
   isVideoFeedRestoring.value = paliroVideoRestorePending
   openRoute('videos')
+  if (!videoListRequest.ready.value) void requestVideoList()
 }
 
 function restoreVideoFeed({ refresh = false } = {}) {
@@ -2635,6 +2670,10 @@ function finishTopicTest() {
     <div class="paliro-stars" aria-hidden="true"></div>
 
       <section v-if="hasOpenedVideoFeed && session" :class="{ 'is-inactive': route !== 'videos' || isVideoFeedRestoring, 'is-tab-transition': isPrimaryTabTransition }" :aria-hidden="route !== 'videos' || isVideoFeedRestoring" :inert="route !== 'videos' || isVideoFeedRestoring" class="paliro-video-feed paliro-view">
+        <div v-if="!videoListRequest.ready.value && videoListRequest.busy.value" class="paliro-video-loading" role="status" aria-live="polite">
+          <span class="paliro-list-spinner" aria-hidden="true"></span><span>{{ t('listLoading') }}</span>
+          <div class="paliro-video-loading-lines" aria-hidden="true"><i></i><i></i></div>
+        </div>
         <main v-if="videoFeed.length" ref="videoFeedScroll" aria-label="Topic videos" class="paliro-video-feed-scroll">
           <article v-for="(video, index) in videoFeed" :key="video.id" :data-video-index="index" class="paliro-video-slide">
             <video
@@ -2664,7 +2703,9 @@ function finishTopicTest() {
             </aside>
           </article>
         </main>
-        <section v-else class="paliro-video-empty"><div aria-hidden="true">✦</div><h2>{{ t('noVideosTitle') }}</h2><p>{{ t('noVideosCopy') }}</p><button type="button" @click="openVideoPublish">{{ t('videoPublish') }}</button></section>
+        <section v-else ref="videoEmptyScroll" class="paliro-video-empty"><template v-if="!videoListRequest.busy.value"><div aria-hidden="true">✦</div><h2>{{ videoListRequest.failed.value ? t('listFailed') : t('noVideosTitle') }}</h2><p v-if="!videoListRequest.failed.value">{{ t('noVideosCopy') }}</p><button v-if="videoListRequest.failed.value" type="button" @click="requestVideoList">{{ t('listRetry') }}</button><button v-else type="button" @click="openVideoPublish">{{ t('videoPublish') }}</button></template></section>
+        <PaliroPullRefresh class="paliro-video-refresh" :target="videoFeedScroll || videoEmptyScroll" :enabled="route === 'videos' && videoListRequest.ready.value && !selectedVideo"
+          :busy="videoListRequest.busy.value && videoListRequest.ready.value" :failed="videoListRequest.failed.value && videoListRequest.ready.value" :t="t" @refresh="requestVideoList" />
         <header class="paliro-video-header">
           <button :aria-label="t('videoPublish')" type="button" @click="openVideoPublish"><img alt="" class="paliro-video-publish-icon" src="/assets/paliro-video-publish@2x.png" /></button>
         </header>
@@ -2679,7 +2720,12 @@ function finishTopicTest() {
     </nav>
 
     <Transition :name="isPrimaryTabTransition ? 'paliro-tab-fade' : 'paliro-route-fade'" :css="!skipVideoRouteAnimation" :mode="isPrimaryTabTransition ? undefined : 'out-in'" @after-enter="handlePageEntered">
-      <section v-if="route === 'welcome'" key="welcome" class="paliro-welcome paliro-view">
+      <section v-if="route === 'boot'" key="boot" aria-busy="true" class="paliro-boot paliro-view">
+        <img alt="" src="/assets/paliro-launch-screen@2x.png" />
+        <div aria-hidden="true" class="paliro-boot-indicator"><i></i><i></i><i></i></div>
+      </section>
+
+      <section v-else-if="route === 'welcome'" key="welcome" class="paliro-welcome paliro-view">
       <div class="paliro-status-spacer"></div>
       <div class="paliro-welcome-art" aria-hidden="true">
         <img alt="" src="/assets/paliro-welcome-hero@2x.png" />
@@ -2884,10 +2930,16 @@ function finishTopicTest() {
           <h1>{{ t('messages') }}</h1>
           <button :aria-label="t('friendRequests')" class="paliro-message-notification" type="button" @click="openFriendRequests"><span aria-hidden="true"></span><i v-if="incomingFriendRequests.length" aria-hidden="true"></i></button>
         </header>
-        <main class="paliro-messages-scroll">
+        <PaliroPullRefresh class="paliro-message-refresh" :target="messageListScroll" :enabled="messageListRequest.ready.value"
+          :busy="messageListRequest.busy.value && messageListRequest.ready.value" :failed="messageListRequest.failed.value && messageListRequest.ready.value" :t="t" @refresh="requestMessageList" />
+        <main ref="messageListScroll" class="paliro-messages-scroll" :aria-busy="messageListRequest.busy.value">
           <label class="paliro-message-search"><span aria-hidden="true">⌕</span><input v-model="messageSearch" :placeholder="t('searchMessages')" type="search" /></label>
           <h2>{{ t('conversations') }}</h2>
-          <section v-if="filteredConversations.length" :aria-label="t('conversations')" class="paliro-conversation-list">
+          <section v-if="!messageListRequest.ready.value && messageListRequest.busy.value" class="paliro-message-skeleton" role="status" :aria-label="t('listLoading')">
+            <div v-for="row in 6" :key="row" aria-hidden="true"><i></i><span><b></b><b></b></span><small></small></div>
+          </section>
+          <section v-else-if="messageListRequest.failed.value && !messageListRequest.ready.value" class="paliro-message-empty"><h2>{{ t('listFailed') }}</h2><button type="button" @click="requestMessageList">{{ t('listRetry') }}</button></section>
+          <section v-else-if="filteredConversations.length" :aria-label="t('conversations')" class="paliro-conversation-list">
             <button v-for="conversation in filteredConversations" :key="conversation.member.id" type="button" @click="openConversation(conversation.member.id)">
               <img :alt="`${conversation.member.name} avatar`" :src="memberAvatarSource(conversation.member)" />
               <span class="paliro-conversation-copy"><strong>{{ conversation.member.name }}</strong><small>{{ messagePreview(conversation.messages.at(-1)) }}</small></span>

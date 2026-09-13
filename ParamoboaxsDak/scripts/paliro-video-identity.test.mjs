@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 import { paliroVideoIdentityFixtures } from '../src/services/paliroVideoIdentityFixtures.js'
+import { paliroToggleVideoCommentLike } from '../src/services/paliroLocalStore.js'
 import { paliroSeedUsers, paliroGetMockMembers, paliroGetVideoFeed, paliroGetMemberPosts, paliroGetSocialState, paliroGetConversations, paliroGetConversation, paliroGetBlockedUsers } from '../src/services/paliroLocalStore.js'
 
 function withStore(run) {
@@ -14,6 +15,24 @@ function withStore(run) {
   } }
   try { run(paliroSeedUsers()[0].id, values) } finally { delete globalThis.window }
 }
+
+test('English and Korean comment likes exceed 14, persist across reads and return to baseline on unlike', () => withStore(userID => {
+  for (const language of ['en', 'ko']) {
+    const video = paliroGetVideoFeed(userID, language)[0]
+    const comment = video.comments[0]
+    assert.equal(comment.likes, 14)
+    assert.equal(comment.liked, false)
+    const readComment = () => paliroGetVideoFeed(userID, language).find(item => item.id === video.id).comments.find(item => item.id === comment.id)
+    assert.equal(paliroToggleVideoCommentLike(userID, video.id, comment.id).type, 'success')
+    for (let read = 0; read < 3; read++) {
+      assert.equal(readComment().likes, 15)
+      assert.equal(readComment().liked, true)
+    }
+    paliroToggleVideoCommentLike(userID, video.id, comment.id)
+    assert.equal(readComment().likes, 14)
+    assert.equal(readComment().liked, false)
+  }
+}))
 
 test('nine video identities have unique owners, sources and generated assets', async () => {
   const fixtures = paliroVideoIdentityFixtures

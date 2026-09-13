@@ -5,6 +5,13 @@ export const PALIRO_LOCALES = [
 
 const copy = {
   ko: {
+    listLoading: '불러오는 중...',
+    listRefreshing: '새로 고치는 중...',
+    listPull: '당겨서 새로 고침',
+    listRelease: '놓으면 새로 고침',
+    listRefresh: '새로 고침',
+    listRetry: '다시 시도',
+    listFailed: '불러오지 못했어요.',
     appName: '팔리로',
     home: '홈',
     video: '비디오',
@@ -304,6 +311,13 @@ const copy = {
     openingBox: '주제 상자 여는 중', meetMember: '만나 보세요', ruleOne: '하루에 최대 3회의 무료 상자 행동을 사용할 수 있습니다. 횟수는 매일 00:00에 초기화되며 Topic Test 완료 시 추가 열기 1회를 받을 수 있습니다.', ruleTwo: '상자 텍스트는 100자 이내여야 합니다. 공유 상자는 최대 3장의 이미지를 포함할 수 있으며 긍정적이고 존중하는 주제여야 합니다.', ruleThree: '팔리로는 존중하는 커뮤니티를 위해 신고, 차단 및 검토 기능을 제공합니다.', ruleFour: '위반 시 콘텐츠 삭제, 기능 제한, 정지 또는 계정 해지가 이루어질 수 있습니다. 상호 연결 전에는 추가 메시지나 통화를 이용할 수 없습니다.', exampleBoxCard: '예시 상자 카드', coinPromptArt: '미스터리 상자와 코인', spendCoinsPrompt: '다음 행동에 코인을 사용할까요?', createBoxAction: '새 상자 만들기', openBoxAction: '주제 상자 열기',
   },
   en: {
+    listLoading: 'Loading...',
+    listRefreshing: 'Refreshing...',
+    listPull: 'Pull to refresh',
+    listRelease: 'Release to refresh',
+    listRefresh: 'Refresh',
+    listRetry: 'Try again',
+    listFailed: 'Could not load this list.',
     appName: 'Paliro',
     home: 'Home',
     video: 'Video',

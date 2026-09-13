@@ -807,7 +807,7 @@ function commentWithInteraction(comment, interaction) {
     ...comment,
     ...(author ? { authorName: author.name, authorAvatar: author.avatar } : {}),
     liked,
-    likes: Math.min(14, Math.max(0, Number(comment.baseLikes ?? comment.likes ?? 0) + (liked ? 1 : 0))),
+    likes: Math.max(0, Number(comment.baseLikes ?? comment.likes ?? 0) + (liked ? 1 : 0)),
   }
 }
 

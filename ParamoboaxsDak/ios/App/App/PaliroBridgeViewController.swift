@@ -3,14 +3,89 @@ import Foundation
 import Security
 
 final class PaliroBridgeViewController: CAPBridgeViewController {
+    private var launchOverlay: UIImageView?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = UIColor(red: 5 / 255, green: 11 / 255, blue: 33 / 255, alpha: 1)
+        showLaunchOverlay()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(hideLaunchOverlay),
+            name: .paliroWebContentReady,
+            object: nil
+        )
+
+        // Never leave the native cover stuck if JavaScript fails before mounting.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 15) { [weak self] in
+            self?.hideLaunchOverlay()
+        }
+    }
+
     override func capacitorDidLoad() {
         super.capacitorDidLoad()
         bridge?.registerPluginInstance(PaliroAuthStoragePlugin())
+        bridge?.registerPluginInstance(PaliroLaunchScreenPlugin())
+        webView?.isOpaque = false
+        webView?.backgroundColor = .clear
+        webView?.scrollView.backgroundColor = .clear
         if #available(iOS 15.0, *) {
             bridge?.registerPluginType(PaliroIapPlugin.self)
             bridge?.registerPluginType(PaliroMediaPickerPlugin.self)
             bridge?.registerPluginType(PaliroVoiceRecorderPlugin.self)
             bridge?.registerPluginType(PaliroCallPermissionsPlugin.self)
+        }
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    private func showLaunchOverlay() {
+        guard launchOverlay == nil, let image = UIImage(named: "appaliguaungld") else { return }
+        let overlay = UIImageView(image: image)
+        overlay.translatesAutoresizingMaskIntoConstraints = false
+        overlay.contentMode = .scaleAspectFill
+        overlay.clipsToBounds = true
+        overlay.isUserInteractionEnabled = false
+        overlay.accessibilityElementsHidden = true
+        view.addSubview(overlay)
+        NSLayoutConstraint.activate([
+            overlay.topAnchor.constraint(equalTo: view.topAnchor),
+            overlay.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            overlay.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            overlay.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
+        launchOverlay = overlay
+    }
+
+    @objc private func hideLaunchOverlay() {
+        guard let overlay = launchOverlay else { return }
+        launchOverlay = nil
+        UIView.animate(withDuration: 0.28, delay: 0, options: [.curveEaseOut, .beginFromCurrentState]) {
+            overlay.alpha = 0
+        } completion: { _ in
+            overlay.removeFromSuperview()
+        }
+    }
+}
+
+private extension Notification.Name {
+    static let paliroWebContentReady = Notification.Name("paliro.webContentReady")
+}
+
+@objc(PaliroLaunchScreenPlugin)
+final class PaliroLaunchScreenPlugin: CAPPlugin, CAPBridgedPlugin {
+    let identifier = "PaliroLaunchScreenPlugin"
+    let jsName = "PaliroLaunchScreen"
+    let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "hide", returnType: CAPPluginReturnPromise)
+    ]
+
+    @objc func hide(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .paliroWebContentReady, object: nil)
+            call.resolve()
         }
     }
 }
