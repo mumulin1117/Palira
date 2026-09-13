@@ -8,5 +8,7 @@ export const paliroPrimaryTabs = [
 export function paliroRouteTransition(from, to) {
   const isPrimary = (route) => paliroPrimaryTabs.some((tab) => tab.route === route)
   const primary = from !== to && isPrimary(from) && isPrimary(to)
-  return { primary, skipVideo: !primary && (from === 'videos' || to === 'videos') }
+  // Profile entrances share the standard motion; returning still reveals the retained player immediately.
+  const opensProfile = to === 'friend-profile'
+  return { primary, skipVideo: !primary && !opensProfile && (from === 'videos' || to === 'videos') }
 }

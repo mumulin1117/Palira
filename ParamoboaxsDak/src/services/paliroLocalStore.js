@@ -1,3 +1,8 @@
+import { paliroGetMockBoxContent } from './paliroMockBoxContent.js'
+import { paliroVideoIdentityFixtures } from './paliroVideoIdentityFixtures.js'
+
+const paliroVideoIdentityByOwner = new Map(paliroVideoIdentityFixtures.map((fixture) => [fixture.ownerID, fixture]))
+
 const PALIRO_USERS_KEY = 'paliro.localUsers'
 const PALIRO_SESSION_KEY = 'paliro.session'
 const PALIRO_EULA_KEY = 'paliro.eulaAccepted'
@@ -49,6 +54,9 @@ export const PALIRO_COIN_PACKS = [
 
 function createPaliroMockMember({ id, userID, name, language, age, gender, mood, avatar, profileBackground, bio, interests, followerCount, followingCount, likes, relationship, box }) {
   const ownedPhoto = paliroMockMemberPhotoSource(language, userID) || profileBackground || avatar || box.image
+  const boxContent = paliroGetMockBoxContent(language, userID)
+  const videoIdentity = paliroVideoIdentityByOwner.get(id)
+  const memberInterests = [...new Set([...boxContent.interests, ...(videoIdentity?.interests ?? []), ...interests])].slice(0, 3)
   return {
     id,
     userID,
@@ -59,22 +67,22 @@ function createPaliroMockMember({ id, userID, name, language, age, gender, mood,
     gender,
     mood,
     tags: [mood],
-    avatar: ownedPhoto,
-    profileBackground: ownedPhoto,
-    bio,
-    about: bio,
-    interests,
+    avatar: videoIdentity?.avatarFromVideo ? videoIdentity.avatar : ownedPhoto,
+    profileBackground: videoIdentity?.avatarFromVideo ? videoIdentity.profileBackground : ownedPhoto,
+    bio: videoIdentity?.bio ?? bio,
+    about: videoIdentity?.bio ?? bio,
+    interests: memberInterests,
     relationship,
     stats: { followers: followerCount, following: followingCount, likes, posts: 1 },
     boxPosts: [{
       id: `${id}-box-1`,
       ownerID: id,
       type: 'box',
-      theme: box.theme,
-      title: box.title,
-      description: box.description,
-      interests: interests.slice(0, 3),
-      images: [ownedPhoto],
+      theme: boxContent.theme,
+      title: boxContent.title,
+      description: boxContent.description,
+      interests: boxContent.interests,
+      images: [boxContent.image],
       createdAt: box.createdAt,
     }],
     videoPosts: [],
@@ -83,65 +91,58 @@ function createPaliroMockMember({ id, userID, name, language, age, gender, mood,
 
 const PALIRO_MOCK_MEMBERS_BY_LANGUAGE = {
   ko: [
-    createPaliroMockMember({ id: 'paliro-member-haneul', userID: 'PAL-KR-1001', name: '하늘_별빛', language: 'ko', age: 24, gender: 'Female', mood: 'Feeling Happy', avatar: '/assets/paliro-mock-ko-avatar-01.png', bio: '책과 음악, 그리고 오늘의 작은 발견을 좋아해요.', interests: ['Music', 'Reading', 'Coffee'], followerCount: 9, followingCount: 7, likes: 13, relationship: 'mutual', box: { theme: '공통 관심사', title: '책과 음악 사이', description: '요즘 마음에 남은 책과 음악 이야기를 나누고 싶어요.', image: '/assets/paliro-mock-ko-video-01.png', createdAt: '2026-09-08T12:00:00.000Z' } }),
-    createPaliroMockMember({ id: 'paliro-member-minji', userID: 'PAL-KR-1002', name: '민지_코스모', language: 'ko', age: 26, gender: 'Female', mood: 'Want to Chat', bio: '게임과 여행 이야기를 주제로 친근하게 소통해요.', interests: ['Gaming', 'Travel', 'Technology'], followerCount: 11, followingCount: 8, likes: 12, relationship: 'mutual', box: { theme: '대화하고 싶어요', title: '같이 이야기할 게임', description: '좋아하는 게임과 다음 여행지에 대해 편하게 이야기해요.', image: '/assets/paliro-mock-ko-video-02.png', createdAt: '2026-09-08T11:40:00.000Z' } }),
-    createPaliroMockMember({ id: 'paliro-member-seoyun', userID: 'PAL-KR-1003', name: '서윤_파동', language: 'ko', age: 23, gender: 'Female', mood: 'A Little Shy', avatar: '/assets/paliro-mock-ko-avatar-03.png', bio: '사진과 자연을 기록하며 새로운 주제를 발견하고 있어요.', interests: ['Photography', 'Nature', 'Art'], followerCount: 8, followingCount: 6, likes: 10, relationship: 'following', box: { theme: '작은 발견', title: '빛이 머문 풍경', description: '산책 중 만난 빛과 자연 사진을 조용히 나누고 싶어요.', image: '/assets/paliro-mock-ko-video-03.png', createdAt: '2026-09-08T11:20:00.000Z' } }),
-    createPaliroMockMember({ id: 'paliro-member-jia', userID: 'PAL-KR-1004', name: '지아_루프', language: 'ko', age: 28, gender: 'Other', mood: 'Feeling Chill', avatar: '/assets/paliro-mock-ko-avatar-04.png', bio: '차분한 대화와 영화, 요리 주제를 나누는 것을 좋아해요.', interests: ['Movies', 'Cooking', 'Coffee'], followerCount: 7, followingCount: 9, likes: 11, relationship: 'incoming-request', box: { theme: '느긋한 저녁', title: '영화와 요리 이야기', description: '최근 본 영화와 간단한 저녁 레시피를 함께 나눠요.', image: '/assets/paliro-mock-ko-video-04.png', createdAt: '2026-09-08T11:00:00.000Z' } }),
-    createPaliroMockMember({ id: 'paliro-member-soyeon', userID: 'PAL-KR-1005', name: '소연_플래닛', language: 'ko', age: 25, gender: 'Female', mood: 'Ready for Fun', avatar: '/assets/paliro-mock-ko-avatar-05.png', bio: '패션, 댄스, 그리고 가벼운 창작 아이디어를 모아요.', interests: ['Fashion', 'Dancing', 'Art'], followerCount: 12, followingCount: 10, likes: 14, relationship: 'none', box: { theme: '창작 아이디어', title: '색과 리듬을 모은 상자', description: '오늘 발견한 패션과 춤의 재미있는 영감을 담았어요.', image: '/assets/paliro-mock-ko-video-05.png', createdAt: '2026-09-08T10:40:00.000Z' } }),
+    createPaliroMockMember({ id: 'paliro-member-haneul', userID: 'PAL-KR-1001', name: '하늘_별빛', language: 'ko', age: 24, gender: 'Female', mood: 'Feeling Happy', avatar: '/assets/paliro-mock-ko-avatar-01.png', bio: '책과 음악, 그리고 오늘의 작은 발견을 좋아해요.', interests: ['Music', 'Reading', 'Coffee'], followerCount: 9, followingCount: 7, likes: 13, relationship: 'mutual', box: { createdAt: '2026-09-08T12:00:00.000Z' } }),
+    createPaliroMockMember({ id: 'paliro-member-minji', userID: 'PAL-KR-1002', name: '민지_코스모', language: 'ko', age: 26, gender: 'Female', mood: 'Want to Chat', bio: '게임과 여행 이야기를 주제로 친근하게 소통해요.', interests: ['Gaming', 'Travel', 'Technology'], followerCount: 11, followingCount: 8, likes: 12, relationship: 'mutual', box: { createdAt: '2026-09-08T11:40:00.000Z' } }),
+    createPaliroMockMember({ id: 'paliro-member-seoyun', userID: 'PAL-KR-1003', name: '서윤_파동', language: 'ko', age: 23, gender: 'Female', mood: 'A Little Shy', avatar: '/assets/paliro-mock-ko-avatar-03.png', bio: '사진과 자연을 기록하며 새로운 주제를 발견하고 있어요.', interests: ['Photography', 'Nature', 'Art'], followerCount: 8, followingCount: 6, likes: 10, relationship: 'following', box: { createdAt: '2026-09-08T11:20:00.000Z' } }),
+    createPaliroMockMember({ id: 'paliro-member-jia', userID: 'PAL-KR-1004', name: '지아_루프', language: 'ko', age: 28, gender: 'Other', mood: 'Feeling Chill', avatar: '/assets/paliro-mock-ko-avatar-04.png', bio: '차분한 대화와 영화, 요리 주제를 나누는 것을 좋아해요.', interests: ['Movies', 'Cooking', 'Coffee'], followerCount: 7, followingCount: 9, likes: 11, relationship: 'incoming-request', box: { createdAt: '2026-09-08T11:00:00.000Z' } }),
+    createPaliroMockMember({ id: 'paliro-member-soyeon', userID: 'PAL-KR-1005', name: '소연_플래닛', language: 'ko', age: 25, gender: 'Female', mood: 'Ready for Fun', avatar: '/assets/paliro-mock-ko-avatar-05.png', bio: '패션, 댄스, 그리고 가벼운 창작 아이디어를 모아요.', interests: ['Fashion', 'Dancing', 'Art'], followerCount: 12, followingCount: 10, likes: 14, relationship: 'none', box: { createdAt: '2026-09-08T10:40:00.000Z' } }),
   ],
   en: [
-    createPaliroMockMember({ id: 'paliro-member-maya', userID: 'PAL-EN-2001', name: 'Maya_Orion', language: 'en', age: 24, gender: 'Female', mood: 'Feeling Happy', avatar: '/assets/paliro-mock-en-avatar-01.png', bio: 'Collecting reading notes, playlists, and kind conversation prompts.', interests: ['Music', 'Reading', 'Coffee'], followerCount: 9, followingCount: 7, likes: 13, relationship: 'mutual', box: { theme: 'Shared Interests', title: 'Between books and music', description: 'A few reading notes and songs that stayed with me today.', image: '/assets/paliro-mock-en-video-01.png', createdAt: '2026-09-08T12:00:00.000Z' } }),
-    createPaliroMockMember({ id: 'paliro-member-luna', userID: 'PAL-EN-2002', name: 'Luna_Star', language: 'en', age: 26, gender: 'Female', mood: 'Want to Chat', avatar: '/assets/paliro-mock-en-avatar-02.png', bio: 'Sharing playful game topics and short travel stories.', interests: ['Gaming', 'Travel', 'Technology'], followerCount: 11, followingCount: 8, likes: 12, relationship: 'mutual', box: { theme: 'Want to Chat', title: 'Games worth talking about', description: 'Let us swap favorite games and ideas for the next weekend trip.', image: '/assets/paliro-mock-en-video-02.png', createdAt: '2026-09-08T11:40:00.000Z' } }),
-    createPaliroMockMember({ id: 'paliro-member-nova', userID: 'PAL-EN-2003', name: 'Nova_Drift', language: 'en', age: 23, gender: 'Female', mood: 'A Little Shy', avatar: '/assets/paliro-mock-en-avatar-03.png', bio: 'Documenting quiet outdoor moments and small creative projects.', interests: ['Photography', 'Nature', 'Art'], followerCount: 8, followingCount: 6, likes: 10, relationship: 'following', box: { theme: 'Small Discoveries', title: 'Where the light stayed', description: 'Quiet photographs and colors collected during an afternoon walk.', image: '/assets/paliro-mock-en-video-03.png', createdAt: '2026-09-08T11:20:00.000Z' } }),
-    createPaliroMockMember({ id: 'paliro-member-iris', userID: 'PAL-EN-2004', name: 'Iris_Atlas', language: 'en', age: 28, gender: 'Other', mood: 'Feeling Chill', avatar: '/assets/paliro-mock-en-avatar-04.png', bio: 'Here for movies, cooking ideas, and thoughtful shared topics.', interests: ['Movies', 'Cooking', 'Coffee'], followerCount: 7, followingCount: 9, likes: 11, relationship: 'incoming-request', box: { theme: 'Slow Evening', title: 'A film and a simple recipe', description: 'Sharing a favorite scene and an easy idea for dinner.', image: '/assets/paliro-mock-en-video-04.png', createdAt: '2026-09-08T11:00:00.000Z' } }),
-    createPaliroMockMember({ id: 'paliro-member-ava', userID: 'PAL-EN-2005', name: 'Ava_Nebula', language: 'en', age: 25, gender: 'Female', mood: 'Ready for Fun', avatar: '/assets/paliro-mock-en-avatar-05.png', bio: 'Gathering fashion references, dance clips, and creative sparks.', interests: ['Fashion', 'Dancing', 'Art'], followerCount: 12, followingCount: 10, likes: 14, relationship: 'none', box: { theme: 'Creative Sparks', title: 'A box of color and rhythm', description: 'Today’s playful fashion and dance ideas, all in one place.', image: '/assets/paliro-mock-en-video-05.png', createdAt: '2026-09-08T10:40:00.000Z' } }),
+    createPaliroMockMember({ id: 'paliro-member-maya', userID: 'PAL-EN-2001', name: 'Maya_Orion', language: 'en', age: 24, gender: 'Female', mood: 'Feeling Happy', avatar: '/assets/paliro-mock-en-avatar-01.png', bio: 'Collecting reading notes, playlists, and kind conversation prompts.', interests: ['Music', 'Reading', 'Coffee'], followerCount: 9, followingCount: 7, likes: 13, relationship: 'mutual', box: { createdAt: '2026-09-08T12:00:00.000Z' } }),
+    createPaliroMockMember({ id: 'paliro-member-luna', userID: 'PAL-EN-2002', name: 'Luna_Star', language: 'en', age: 26, gender: 'Female', mood: 'Want to Chat', avatar: '/assets/paliro-mock-en-avatar-02.png', bio: 'Sharing playful game topics and short travel stories.', interests: ['Gaming', 'Travel', 'Technology'], followerCount: 11, followingCount: 8, likes: 12, relationship: 'mutual', box: { createdAt: '2026-09-08T11:40:00.000Z' } }),
+    createPaliroMockMember({ id: 'paliro-member-nova', userID: 'PAL-EN-2003', name: 'Nova_Drift', language: 'en', age: 23, gender: 'Female', mood: 'A Little Shy', avatar: '/assets/paliro-mock-en-avatar-03.png', bio: 'Documenting quiet outdoor moments and small creative projects.', interests: ['Photography', 'Nature', 'Art'], followerCount: 8, followingCount: 6, likes: 10, relationship: 'following', box: { createdAt: '2026-09-08T11:20:00.000Z' } }),
+    createPaliroMockMember({ id: 'paliro-member-iris', userID: 'PAL-EN-2004', name: 'Iris_Atlas', language: 'en', age: 28, gender: 'Other', mood: 'Feeling Chill', avatar: '/assets/paliro-mock-en-avatar-04.png', bio: 'Here for movies, cooking ideas, and thoughtful shared topics.', interests: ['Movies', 'Cooking', 'Coffee'], followerCount: 7, followingCount: 9, likes: 11, relationship: 'incoming-request', box: { createdAt: '2026-09-08T11:00:00.000Z' } }),
+    createPaliroMockMember({ id: 'paliro-member-ava', userID: 'PAL-EN-2005', name: 'Ava_Nebula', language: 'en', age: 25, gender: 'Female', mood: 'Ready for Fun', avatar: '/assets/paliro-mock-en-avatar-05.png', bio: 'Gathering fashion references, dance clips, and creative sparks.', interests: ['Fashion', 'Dancing', 'Art'], followerCount: 12, followingCount: 10, likes: 14, relationship: 'none', box: { createdAt: '2026-09-08T10:40:00.000Z' } }),
   ],
 }
 
 const PALIRO_ADDITIONAL_MEMBER_COPY = {
   ko: [
-    { name: '유나_문빛', bio: '달빛 아래 듣기 좋은 음악과 따뜻한 대화를 좋아해요.', theme: '밤의 플레이리스트', title: '달빛과 음악 한 조각', description: '늦은 밤 함께 듣고 싶은 노래와 편안한 질문을 담았어요.' },
-    { name: '다온_리듬', bio: '새로운 춤과 재미있는 리듬을 발견하면 바로 기록해요.', theme: '즐거운 리듬', title: '오늘 발견한 춤', description: '기분을 밝게 만든 리듬과 짧은 춤 이야기를 나눠요.' },
-    { name: '채원_모먼트', bio: '카메라로 평범한 하루의 반짝이는 순간을 모으고 있어요.', theme: '사진 이야기', title: '평범해서 특별한 순간', description: '오늘 카메라에 담긴 작은 장면과 그때의 기분이에요.' },
-    { name: '수아_오로라', bio: '여행 지도와 새로운 카페를 살펴보는 시간이 즐거워요.', theme: '다음 여행', title: '가 보고 싶은 작은 도시', description: '조용한 거리와 새로운 카페가 있는 여행지를 골라 봤어요.' },
-    { name: '나린_웨이브', bio: '바다와 산책, 천천히 이어지는 대화를 좋아해요.', theme: '편안한 시간', title: '바다를 닮은 대화', description: '파도 소리를 들으며 나누고 싶은 편안한 이야기를 담았어요.' },
-    { name: '예린_노트', bio: '읽은 책에서 마음에 남은 문장과 생각을 기록합니다.', theme: '독서 노트', title: '오늘 마음에 남은 문장', description: '최근 읽은 책과 오래 기억하고 싶은 생각을 함께 나눠요.' },
-    { name: '아린_코멧', bio: '별과 우주, 상상력을 자극하는 이야기에 관심이 많아요.', theme: '호기심 상자', title: '별을 보며 떠올린 질문', description: '우주와 미래에 대해 편하게 상상해 볼 주제를 준비했어요.' },
-    { name: '지우_메아리', bio: '좋은 목소리와 공연에서 받은 감동을 다른 사람과 나눠요.', theme: '음악의 여운', title: '계속 생각나는 목소리', description: '오늘 들은 노래와 공연이 남긴 기분을 이야기하고 싶어요.' },
-    { name: '유진_스파크', bio: '작은 아이디어를 그림과 색으로 표현하는 것을 좋아해요.', theme: '창작 불꽃', title: '색으로 시작한 아이디어', description: '새로운 그림과 디자인으로 이어질 영감을 담은 상자예요.' },
-    { name: '보라_드림', bio: '꿈같은 영화 장면과 상상 속 이야기를 수집하고 있어요.', theme: '영화 이야기', title: '다시 보고 싶은 한 장면', description: '오래 기억에 남은 영화 장면과 그 이유를 나누고 싶어요.' },
-    { name: '은서_클라우드', bio: '여유로운 주말과 직접 만든 디저트 이야기를 좋아해요.', theme: '주말의 여유', title: '구름 같은 오후', description: '달콤한 디저트와 느긋한 주말 계획을 함께 이야기해요.' },
-    { name: '세아_픽셀', bio: '게임 속 세계와 재미있는 기술 아이디어를 탐험해요.', theme: '게임 탐험', title: '함께 플레이할 세계', description: '요즘 즐기는 게임과 궁금한 기술 이야기를 모았어요.' },
-    { name: '다희_멜로디', bio: '하루의 기분을 음악과 짧은 글로 남기는 편이에요.', theme: '오늘의 멜로디', title: '기분을 닮은 노래', description: '오늘의 감정과 가장 잘 어울리는 노래를 소개할게요.' },
-    { name: '현아_브리즈', bio: '자연 속에서 쉬며 새로운 사람의 이야기를 듣고 싶어요.', theme: '자연 산책', title: '바람이 좋은 날', description: '천천히 걷다가 발견한 풍경과 쉬어 가는 방법을 나눠요.' },
-    { name: '라온_캔버스', bio: '패션과 미술에서 찾은 색다른 조합을 즐겨 기록해요.', theme: '컬러 무드', title: '오늘의 색 조합', description: '옷과 그림에서 발견한 재미있는 색과 분위기를 담았어요.' },
+    { name: '유나_문빛', bio: '달빛 아래 듣기 좋은 음악과 따뜻한 대화를 좋아해요.', interests: ['Music', 'Nightlife', 'Coffee'] },
+    { name: '다온_리듬', bio: '새로운 춤과 재미있는 리듬을 발견하면 바로 기록해요.', interests: ['Dancing', 'Music', 'Fitness'] },
+    { name: '채원_모먼트', bio: '카메라로 평범한 하루의 반짝이는 순간을 모으고 있어요.', interests: ['Photography', 'Art', 'Nature'] },
+    { name: '수아_오로라', bio: '여행 지도와 새로운 카페를 살펴보는 시간이 즐거워요.', interests: ['Travel', 'Coffee', 'Photography'] },
+    { name: '나린_웨이브', bio: '바다와 산책, 천천히 이어지는 대화를 좋아해요.', interests: ['Nature', 'Travel', 'Photography'] },
+    { name: '예린_노트', bio: '읽은 책에서 마음에 남은 문장과 생각을 기록합니다.', interests: ['Reading', 'Coffee', 'Music'] },
+    { name: '아린_코멧', bio: '별과 우주, 상상력을 자극하는 이야기에 관심이 많아요.', interests: ['Technology', 'Nature', 'Movies'] },
+    { name: '지우_메아리', bio: '좋은 목소리와 공연에서 받은 감동을 다른 사람과 나눠요.', interests: ['Music', 'Nightlife', 'Art'] },
+    { name: '유진_스파크', bio: '작은 아이디어를 그림과 색으로 표현하는 것을 좋아해요.', interests: ['Art', 'Photography', 'Fashion'] },
+    { name: '보라_드림', bio: '꿈같은 영화 장면과 상상 속 이야기를 수집하고 있어요.', interests: ['Movies', 'Art', 'Fashion'] },
+    { name: '은서_클라우드', bio: '여유로운 주말과 직접 만든 디저트 이야기를 좋아해요.', interests: ['Cooking', 'Coffee', 'Reading'] },
+    { name: '세아_픽셀', bio: '게임 속 세계와 재미있는 기술 아이디어를 탐험해요.', interests: ['Gaming', 'Technology', 'Anime'] },
+    { name: '다희_멜로디', bio: '하루의 기분을 음악과 짧은 글로 남기는 편이에요.', interests: ['Music', 'Art', 'Nightlife'] },
+    { name: '현아_브리즈', bio: '자연 속에서 쉬며 새로운 사람의 이야기를 듣고 싶어요.', interests: ['Nature', 'Photography', 'Travel'] },
+    { name: '라온_캔버스', bio: '패션과 미술에서 찾은 색다른 조합을 즐겨 기록해요.', interests: ['Fashion', 'Art', 'Photography'] },
   ],
   en: [
-    { name: 'Chloe_Pulse', bio: 'Saving upbeat playlists and small moments that make the day brighter.', theme: 'Good Energy', title: 'A playlist for today', description: 'Songs and easy conversation prompts for a brighter afternoon.' },
-    { name: 'Emma_Comet', bio: 'Curious about space, future ideas, and conversations that wander.', theme: 'Curious Minds', title: 'A question under the stars', description: 'A few playful thoughts about space, imagination, and what comes next.' },
-    { name: 'Zoe_Melody', bio: 'Turning everyday moods into playlists and short creative notes.', theme: 'Daily Melody', title: 'A song that fits today', description: 'The track that matches my mood and the story behind choosing it.' },
-    { name: 'Lily_Canvas', bio: 'Collecting colors, sketches, and thoughtful ideas from ordinary places.', theme: 'Creative Notes', title: 'An idea that began with color', description: 'A small collection of visual details that could inspire something new.' },
-    { name: 'Nora_Breeze', bio: 'Happiest near the ocean, on a trail, or in a calm conversation.', theme: 'Quiet Outdoors', title: 'A walk by the water', description: 'A peaceful view and a question for anyone who enjoys slowing down.' },
-    { name: 'Ella_Pixel', bio: 'Exploring game worlds, playful technology, and clever design details.', theme: 'Game Talk', title: 'A world worth exploring', description: 'A favorite game setting and the details that make it feel alive.' },
-    { name: 'Ruby_Moon', bio: 'Here for late-night music, gentle humor, and honest conversation.', theme: 'Night Thoughts', title: 'A little midnight playlist', description: 'Quiet songs and relaxed topics for people who are still awake.' },
-    { name: 'Grace_Echo', bio: 'Remembering live performances and voices that stay with you.', theme: 'Sound Memories', title: 'A voice I still remember', description: 'One performance that left an impression and why it mattered.' },
-    { name: 'Sophie_Rhythm', bio: 'Learning new dance steps and sharing the fun parts of practice.', theme: 'Move Together', title: 'A rhythm worth trying', description: 'A simple dance idea and the song that makes it hard to sit still.' },
-    { name: 'Aria_Cloud', bio: 'Planning slow weekends around coffee, books, and homemade desserts.', theme: 'Slow Weekend', title: 'A soft afternoon plan', description: 'Coffee, something sweet, and a book that suits a quiet day.' },
-    { name: 'Hazel_Spark', bio: 'Gathering practical ideas that can turn into small creative projects.', theme: 'Fresh Ideas', title: 'One idea to make today', description: 'A manageable creative prompt for starting without overthinking.' },
-    { name: 'Mia_Wander', bio: 'Marking hidden streets, local food, and peaceful places on my map.', theme: 'Travel Notes', title: 'A city I want to wander', description: 'Small streets, local cafés, and a destination for an unhurried trip.' },
-    { name: 'Ivy_Page', bio: 'Writing down favorite lines from books and questions they leave behind.', theme: 'Reading Together', title: 'A line worth discussing', description: 'A recent passage and the thought that kept returning afterward.' },
-    { name: 'Clara_Glow', bio: 'Photographing warm light and the details people usually pass by.', theme: 'Photo Moments', title: 'Where the light landed', description: 'A small scene shaped by light, color, and a lucky moment.' },
-    { name: 'Stella_Dream', bio: 'Saving memorable film scenes, fashion references, and dreamy ideas.', theme: 'Dreamy Details', title: 'A scene to revisit', description: 'A favorite visual moment and the mood I would like to recreate.' },
+    { name: 'Chloe_Pulse', bio: 'Saving upbeat playlists and small moments that make the day brighter.', interests: ['Music', 'Nightlife', 'Coffee'] },
+    { name: 'Emma_Comet', bio: 'Curious about space, future ideas, and conversations that wander.', interests: ['Technology', 'Nature', 'Movies'] },
+    { name: 'Zoe_Melody', bio: 'Turning everyday moods into playlists and short creative notes.', interests: ['Music', 'Art', 'Nightlife'] },
+    { name: 'Lily_Canvas', bio: 'Collecting colors, sketches, and thoughtful ideas from ordinary places.', interests: ['Art', 'Photography', 'Fashion'] },
+    { name: 'Nora_Breeze', bio: 'Happiest near the ocean, on a trail, or in a calm conversation.', interests: ['Nature', 'Travel', 'Photography'] },
+    { name: 'Ella_Pixel', bio: 'Exploring game worlds, playful technology, and clever design details.', interests: ['Gaming', 'Technology', 'Anime'] },
+    { name: 'Ruby_Moon', bio: 'Here for late-night music, gentle humor, and honest conversation.', interests: ['Music', 'Nightlife', 'Coffee'] },
+    { name: 'Grace_Echo', bio: 'Remembering live performances and voices that stay with you.', interests: ['Music', 'Art', 'Nightlife'] },
+    { name: 'Sophie_Rhythm', bio: 'Learning new dance steps and sharing the fun parts of practice.', interests: ['Dancing', 'Fitness', 'Music'] },
+    { name: 'Aria_Cloud', bio: 'Planning slow weekends around coffee, books, and homemade desserts.', interests: ['Coffee', 'Cooking', 'Reading'] },
+    { name: 'Hazel_Spark', bio: 'Gathering practical ideas that can turn into small creative projects.', interests: ['Art', 'Photography', 'Technology'] },
+    { name: 'Mia_Wander', bio: 'Marking hidden streets, local food, and peaceful places on my map.', interests: ['Travel', 'Photography', 'Coffee'] },
+    { name: 'Ivy_Page', bio: 'Writing down favorite lines from books and questions they leave behind.', interests: ['Reading', 'Coffee', 'Music'] },
+    { name: 'Clara_Glow', bio: 'Photographing warm light and the details people usually pass by.', interests: ['Photography', 'Nature', 'Art'] },
+    { name: 'Stella_Dream', bio: 'Saving memorable film scenes, fashion references, and dreamy ideas.', interests: ['Movies', 'Fashion', 'Art'] },
   ],
 }
 
-const PALIRO_ADDITIONAL_INTERESTS = [
-  ['Music', 'Reading', 'Coffee'],
-  ['Dancing', 'Fashion', 'Music'],
-  ['Photography', 'Art', 'Nature'],
-  ['Travel', 'Coffee', 'Movies'],
-  ['Nature', 'Music', 'Travel'],
-]
 const PALIRO_ADDITIONAL_MOODS = ['Feeling Happy', 'Ready for Fun', 'A Little Shy', 'Want to Chat', 'Feeling Chill']
 
 Object.entries(PALIRO_ADDITIONAL_MEMBER_COPY).forEach(([language, members]) => {
@@ -156,15 +157,12 @@ Object.entries(PALIRO_ADDITIONAL_MEMBER_COPY).forEach(([language, members]) => {
       gender: offset % 5 === 4 ? 'Other' : offset % 2 === 0 ? 'Female' : 'Male',
       mood: PALIRO_ADDITIONAL_MOODS[offset % PALIRO_ADDITIONAL_MOODS.length],
       bio: copy.bio,
-      interests: PALIRO_ADDITIONAL_INTERESTS[offset % PALIRO_ADDITIONAL_INTERESTS.length],
+      interests: copy.interests,
       followerCount: 5 + (offset % 10),
       followingCount: 4 + ((offset * 2) % 10),
       likes: 3 + ((offset * 3) % 12),
       relationship: 'none',
       box: {
-        theme: copy.theme,
-        title: copy.title,
-        description: copy.description,
         createdAt: `2026-09-${String(8 - Math.floor(offset / 8)).padStart(2, '0')}T${String(10 + (offset % 8)).padStart(2, '0')}:00:00.000Z`,
       },
     }))
@@ -176,6 +174,10 @@ function assertPaliroMockMediaOwnership() {
   Object.values(PALIRO_MOCK_MEMBERS_BY_LANGUAGE).flat().forEach((member) => {
     if (member.boxPosts.length !== 1 || member.boxPosts[0].ownerID !== member.id) {
       throw new Error(`Invalid Paliro Box ownership: ${member.id}`)
+    }
+    const boxImage = member.boxPosts[0].images[0]
+    if (boxImage === member.avatar || boxImage === member.profileBackground) {
+      throw new Error(`Paliro Box image must not reuse profile media: ${member.id}`)
     }
     const sources = [member.avatar, member.profileBackground, ...member.boxPosts[0].images]
     sources.forEach((source) => {
@@ -196,9 +198,13 @@ const PALIRO_BOUND_VIDEO_IDS = new Set()
 const PALIRO_BOUND_VIDEO_SOURCES = new Set()
 const PALIRO_BOUND_VIDEO_OWNER_IDS = new Set()
 
-function createPaliroVideoFixture({ id, language, ownerID, index, caption, title, likes, comments, createdAt }) {
+function createPaliroVideoFixture({ id, language, ownerID, index, likes, comments, createdAt }) {
   const member = PALIRO_MOCK_MEMBER_BY_ID.get(ownerID)
   const source = `/assets/paliro-feed-${language}-${String(index).padStart(2, '0')}.mp4`
+  const identity = paliroVideoIdentityByOwner.get(ownerID)
+  if (!identity || identity.language !== language || identity.source !== source) {
+    throw new Error(`Paliro video identity does not match its owner: ${id}`)
+  }
   if (!member || member.language !== language || PALIRO_BOUND_VIDEO_IDS.has(id) || PALIRO_BOUND_VIDEO_SOURCES.has(source) || PALIRO_BOUND_VIDEO_OWNER_IDS.has(ownerID)) {
     throw new Error(`Invalid Paliro video fixture binding: ${id}`)
   }
@@ -219,8 +225,8 @@ function createPaliroVideoFixture({ id, language, ownerID, index, caption, title
     member: clonePaliroMember(member),
     source,
     thumbnail: `/assets/paliro-feed-${language}-${String(index).padStart(2, '0')}-cover.png`,
-    caption,
-    title,
+    caption: identity.caption,
+    title: identity.title,
     baseLikes: likes,
     baseComments,
     language,
@@ -234,17 +240,17 @@ function paliroProfileAvatarSource(profile) {
 
 const PALIRO_VIDEO_FIXTURES_BY_LANGUAGE = {
   ko: [
-    createPaliroVideoFixture({ id: 'paliro-feed-ko-01', language: 'ko', ownerID: 'paliro-member-haneul', index: 1, title: '오늘의 작은 발견', caption: '책과 음악 사이에서 만난 조용한 영감이에요.', likes: 13, comments: [{ id: 'paliro-comment-ko-01', authorID: 'paliro-member-minji', body: '분위기가 정말 좋아요.', baseLikes: 14, createdAt: '2026-09-10T09:20:00.000Z' }], createdAt: '2026-09-10T10:00:00.000Z' }),
-    createPaliroVideoFixture({ id: 'paliro-feed-ko-02', language: 'ko', ownerID: 'paliro-member-minji', index: 2, title: '함께 듣는 리듬', caption: '오늘의 플레이리스트에서 가장 마음에 든 한 곡을 나눠요.', likes: 12, comments: [{ id: 'paliro-comment-ko-02', authorID: 'paliro-member-seoyun', body: '다음 곡도 궁금해요.', baseLikes: 9, createdAt: '2026-09-10T09:05:00.000Z' }], createdAt: '2026-09-10T09:40:00.000Z' }),
-    createPaliroVideoFixture({ id: 'paliro-feed-ko-03', language: 'ko', ownerID: 'paliro-member-seoyun', index: 3, title: '빛이 머문 순간', caption: '사진과 자연에서 찾은 오늘의 색을 기록했어요.', likes: 10, comments: [{ id: 'paliro-comment-ko-03', authorID: 'paliro-member-haneul', body: '이 장면의 빛이 인상적이에요.', baseLikes: 11, createdAt: '2026-09-10T08:44:00.000Z' }], createdAt: '2026-09-10T09:20:00.000Z' }),
+    createPaliroVideoFixture({ id: 'paliro-feed-ko-01', language: 'ko', ownerID: 'paliro-member-haneul', index: 1, likes: 13, comments: [{ id: 'paliro-comment-ko-01', authorID: 'paliro-member-minji', body: '분위기가 정말 좋아요.', baseLikes: 14, createdAt: '2026-09-10T09:20:00.000Z' }], createdAt: '2026-09-10T10:00:00.000Z' }),
+    createPaliroVideoFixture({ id: 'paliro-feed-ko-02', language: 'ko', ownerID: 'paliro-member-minji', index: 2, likes: 12, comments: [{ id: 'paliro-comment-ko-02', authorID: 'paliro-member-seoyun', body: '다음 곡도 궁금해요.', baseLikes: 9, createdAt: '2026-09-10T09:05:00.000Z' }], createdAt: '2026-09-10T09:40:00.000Z' }),
+    createPaliroVideoFixture({ id: 'paliro-feed-ko-03', language: 'ko', ownerID: 'paliro-member-seoyun', index: 3, likes: 10, comments: [{ id: 'paliro-comment-ko-03', authorID: 'paliro-member-haneul', body: '이 장면의 빛이 인상적이에요.', baseLikes: 11, createdAt: '2026-09-10T08:44:00.000Z' }], createdAt: '2026-09-10T09:20:00.000Z' }),
   ],
   en: [
-    createPaliroVideoFixture({ id: 'paliro-feed-en-01', language: 'en', ownerID: 'paliro-member-maya', index: 1, title: 'A bright little note', caption: 'A small moment from a day of reading, music, and shared curiosity.', likes: 13, comments: [{ id: 'paliro-comment-en-01', authorID: 'paliro-member-luna', body: 'This has such a thoughtful mood.', baseLikes: 14, createdAt: '2026-09-10T09:20:00.000Z' }], createdAt: '2026-09-10T10:00:00.000Z' }),
-    createPaliroVideoFixture({ id: 'paliro-feed-en-02', language: 'en', ownerID: 'paliro-member-luna', index: 2, title: 'A song worth sharing', caption: 'One sound from today that feels right for a calm topic Box.', likes: 12, comments: [{ id: 'paliro-comment-en-02', authorID: 'paliro-member-nova', body: 'Adding this to my playlist.', baseLikes: 9, createdAt: '2026-09-10T09:05:00.000Z' }], createdAt: '2026-09-10T09:40:00.000Z' }),
-    createPaliroVideoFixture({ id: 'paliro-feed-en-03', language: 'en', ownerID: 'paliro-member-nova', index: 3, title: 'A new perspective', caption: 'A short visual note from an outdoor walk and a creative afternoon.', likes: 10, comments: [{ id: 'paliro-comment-en-03', authorID: 'paliro-member-maya', body: 'The light here is beautiful.', baseLikes: 11, createdAt: '2026-09-10T08:44:00.000Z' }], createdAt: '2026-09-10T09:20:00.000Z' }),
-    createPaliroVideoFixture({ id: 'paliro-feed-en-04', language: 'en', ownerID: 'paliro-member-iris', index: 4, title: 'A cheerful hello', caption: 'A quick moment that made today feel lighter.', likes: 9, comments: [{ id: 'paliro-comment-en-04', authorID: 'paliro-member-ava', body: 'This made me smile.', baseLikes: 8, createdAt: '2026-09-10T08:25:00.000Z' }], createdAt: '2026-09-10T09:00:00.000Z' }),
-    createPaliroVideoFixture({ id: 'paliro-feed-en-05', language: 'en', ownerID: 'paliro-member-ava', index: 5, title: 'A candid moment', caption: 'Keeping this little moment exactly as it happened.', likes: 14, comments: [{ id: 'paliro-comment-en-05', authorID: 'paliro-member-iris', body: 'Such a fun energy.', baseLikes: 12, createdAt: '2026-09-10T08:02:00.000Z' }], createdAt: '2026-09-10T08:40:00.000Z' }),
-    createPaliroVideoFixture({ id: 'paliro-feed-en-06', language: 'en', ownerID: 'paliro-member-en-06', index: 6, title: 'A voice worth hearing', caption: 'One performance I wanted to share with the room.', likes: 11, comments: [{ id: 'paliro-comment-en-06', authorID: 'paliro-member-nova', body: 'That voice is unforgettable.', baseLikes: 7, createdAt: '2026-09-10T07:41:00.000Z' }], createdAt: '2026-09-10T08:20:00.000Z' }),
+    createPaliroVideoFixture({ id: 'paliro-feed-en-01', language: 'en', ownerID: 'paliro-member-maya', index: 1, likes: 13, comments: [{ id: 'paliro-comment-en-01', authorID: 'paliro-member-luna', body: 'This has such a thoughtful mood.', baseLikes: 14, createdAt: '2026-09-10T09:20:00.000Z' }], createdAt: '2026-09-10T10:00:00.000Z' }),
+    createPaliroVideoFixture({ id: 'paliro-feed-en-02', language: 'en', ownerID: 'paliro-member-luna', index: 2, likes: 12, comments: [{ id: 'paliro-comment-en-02', authorID: 'paliro-member-nova', body: 'Adding this to my playlist.', baseLikes: 9, createdAt: '2026-09-10T09:05:00.000Z' }], createdAt: '2026-09-10T09:40:00.000Z' }),
+    createPaliroVideoFixture({ id: 'paliro-feed-en-03', language: 'en', ownerID: 'paliro-member-nova', index: 3, likes: 10, comments: [{ id: 'paliro-comment-en-03', authorID: 'paliro-member-maya', body: 'The light here is beautiful.', baseLikes: 11, createdAt: '2026-09-10T08:44:00.000Z' }], createdAt: '2026-09-10T09:20:00.000Z' }),
+    createPaliroVideoFixture({ id: 'paliro-feed-en-04', language: 'en', ownerID: 'paliro-member-iris', index: 4, likes: 9, comments: [{ id: 'paliro-comment-en-04', authorID: 'paliro-member-ava', body: 'This made me smile.', baseLikes: 8, createdAt: '2026-09-10T08:25:00.000Z' }], createdAt: '2026-09-10T09:00:00.000Z' }),
+    createPaliroVideoFixture({ id: 'paliro-feed-en-05', language: 'en', ownerID: 'paliro-member-ava', index: 5, likes: 14, comments: [{ id: 'paliro-comment-en-05', authorID: 'paliro-member-iris', body: 'Such a fun energy.', baseLikes: 12, createdAt: '2026-09-10T08:02:00.000Z' }], createdAt: '2026-09-10T08:40:00.000Z' }),
+    createPaliroVideoFixture({ id: 'paliro-feed-en-06', language: 'en', ownerID: 'paliro-member-en-06', index: 6, likes: 11, comments: [{ id: 'paliro-comment-en-06', authorID: 'paliro-member-nova', body: 'That voice is unforgettable.', baseLikes: 7, createdAt: '2026-09-10T07:41:00.000Z' }], createdAt: '2026-09-10T08:20:00.000Z' }),
   ],
 }
 
@@ -277,13 +283,12 @@ const PALIRO_TEST_ACCOUNT_MEMBERS = Object.values(PALIRO_MOCK_MEMBERS_BY_LANGUAG
 const PALIRO_TEST_ACCOUNT_SOCIAL_STATE = {
   followers: PALIRO_TEST_ACCOUNT_MEMBERS.filter((member) => ['mutual', 'follower'].includes(member.relationship)),
   following: PALIRO_TEST_ACCOUNT_MEMBERS.filter((member) => ['mutual', 'following'].includes(member.relationship)),
-  posts: [
-    { id: 'paliro-demo-box-quiet-moments', theme: 'Quiet Moments', title: 'A small Box for slow weekend ideas', description: 'A Box shaped around music, travel, and an easy conversation prompt.', interests: ['Music', 'Travel'], createdAt: '2026-09-08T09:30:00.000Z' },
-    { id: 'paliro-demo-box-creative-sparks', theme: 'Creative Sparks', title: 'Books, sketches, and shared curiosity', description: 'A Box for discovering thoughtful hobbies through shared topics.', interests: ['Reading', 'Art'], createdAt: '2026-09-05T14:15:00.000Z' },
-  ],
+  posts: [],
 }
 
-const PALIRO_MOCK_PROFILE_FIXTURE_VERSION = 5
+const PALIRO_LEGACY_DEMO_POST_IDS = new Set(['paliro-demo-box-quiet-moments', 'paliro-demo-box-creative-sparks'])
+
+const PALIRO_MOCK_PROFILE_FIXTURE_VERSION = 6
 const PALIRO_LEGACY_MOCK_MEMBER_IDS = new Set([
   'paliro-member-luna-star',
   'paliro-member-nebula',
@@ -534,6 +539,7 @@ function createInitialSocialState(userID) {
 }
 
 function clonePaliroMember(member) {
+  member = PALIRO_MOCK_MEMBER_BY_ID.get(member.id) ?? member
   return {
     ...member,
     tags: [...(member.tags ?? [])],
@@ -577,7 +583,16 @@ function ensureTestAccountRelationships(userID, socialByUser, state) {
 
 function getSocialStateByUser(userID) {
   const socialByUser = readJson(PALIRO_SOCIAL_STATE_KEY, {})
-  const savedState = socialByUser[userID]
+  let savedState = socialByUser[userID]
+  // Remove only the two retired demo posts, preserving all member-created content.
+  if (userID === testUser.id && Array.isArray(savedState?.posts)) {
+    const posts = savedState.posts.filter((post) => !PALIRO_LEGACY_DEMO_POST_IDS.has(post.id))
+    if (posts.length !== savedState.posts.length) {
+      savedState = { ...savedState, posts }
+      socialByUser[userID] = savedState
+      writeJson(PALIRO_SOCIAL_STATE_KEY, socialByUser)
+    }
+  }
   if (savedState) {
     const state = ensureTestAccountRelationships(userID, socialByUser, {
       followers: Array.isArray(savedState.followers) ? savedState.followers : [],
@@ -645,15 +660,17 @@ export function paliroGetSocialSummary(userID, language = '') {
 export function paliroCreateBoxPost(userID, post) {
   if (!userID) return null
   const { socialByUser, state } = getSocialStateByUser(userID)
+  const images = Array.isArray(post?.images)
+    ? post.images.filter((image) => typeof image === 'string' && image.startsWith('data:image/') && image.length <= 1_200_000).slice(0, 3)
+    : []
+  if (!images.length) return null
   const nextPost = {
     id: `paliro-box-${crypto.randomUUID()}`,
     theme: String(post?.theme ?? 'Shared Interests').slice(0, 48),
     title: String(post?.title ?? 'A new topic Box').slice(0, 80),
     description: String(post?.description ?? '').slice(0, 150),
     interests: Array.isArray(post?.interests) ? post.interests.slice(0, 3) : [],
-    images: Array.isArray(post?.images)
-      ? post.images.filter((image) => typeof image === 'string' && image.startsWith('data:image/') && image.length <= 1_200_000).slice(0, 3)
-      : [],
+    images,
     createdAt: new Date().toISOString(),
   }
   const nextState = { ...state, posts: [nextPost, ...state.posts].slice(0, 30) }
@@ -724,8 +741,10 @@ function saveVideoState(userID, videoStateByUser, state) {
 
 function commentWithInteraction(comment, interaction) {
   const liked = interaction?.commentLikes?.[comment.id] === true
+  const author = PALIRO_MOCK_MEMBER_BY_ID.get(comment.authorID)
   return {
     ...comment,
+    ...(author ? { authorName: author.name, authorAvatar: author.avatar } : {}),
     liked,
     likes: Math.min(14, Math.max(0, Number(comment.baseLikes ?? comment.likes ?? 0) + (liked ? 1 : 0))),
   }
@@ -857,7 +876,10 @@ export function paliroCreateVideoPost(userID, video) {
 
 export function paliroGetBlockedUsers(userID) {
   if (!userID) return []
-  return readJson(PALIRO_BLOCKED_USERS_KEY, {})[userID] ?? []
+  return (readJson(PALIRO_BLOCKED_USERS_KEY, {})[userID] ?? []).map((entry) => {
+    const member = PALIRO_MOCK_MEMBER_BY_ID.get(entry.id)
+    return member ? { ...entry, name: member.name, avatar: member.avatar } : entry
+  })
 }
 
 function getExcludedMatchMemberIDs(userID) {

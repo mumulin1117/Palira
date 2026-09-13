@@ -13,10 +13,15 @@ test('all primary tab pairs animate, including entering and leaving videos', () 
   }
 })
 
-test('video/profile round trips retain their immediate frame-preserving transitions', () => {
-  for (const pair of [['videos', 'friend-profile'], ['friend-profile', 'videos']]) {
-    assert.deepEqual(paliroRouteTransition(...pair), { primary: false, skipVideo: true })
+test('profile entrances share standard motion from video, Box, relationships and messages', () => {
+  for (const from of ['videos', 'home', 'social-detail', 'messages', 'conversation']) {
+    assert.deepEqual(paliroRouteTransition(from, 'friend-profile'), { primary: false, skipVideo: false })
   }
+})
+
+test('returning from profile preserves immediate video recovery and other transitions', () => {
+  assert.deepEqual(paliroRouteTransition('friend-profile', 'videos'), { primary: false, skipVideo: true })
+  assert.deepEqual(paliroRouteTransition('videos', 'video-publish'), { primary: false, skipVideo: true })
   assert.deepEqual(paliroRouteTransition('messages', 'conversation'), { primary: false, skipVideo: false })
 })
 

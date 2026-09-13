@@ -770,13 +770,14 @@ button { cursor: pointer; }
 .paliro-friend-profile-posts article.is-box img { padding: 0; background: #14112f; object-fit: cover; }
 .paliro-friend-profile-posts article.is-box .paliro-friend-profile-post-media span { color: #74fff7; }
 .paliro-friend-profile-posts p { overflow: hidden; margin: 7px 8px 2px; color: #fff; font-size: 10px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.paliro-friend-profile-posts article.is-box p { overflow: visible; white-space: normal; overflow-wrap: anywhere; line-height: 1.45; }
 .paliro-friend-profile-posts small { display: block; margin: 0 8px 8px; color: rgba(207, 203, 228, .58); font-size: 9px; }
 .paliro-friend-profile-actions { display: grid; flex: 0 0 auto; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 10px; padding: 10px 24px max(15px, env(safe-area-inset-bottom)); border-top: 1px solid rgba(132, 124, 171, .18); background: rgba(8, 8, 29, .96); }
 .paliro-friend-profile-actions button { min-width: 0; min-height: 38px; border: 1px solid rgba(108, 145, 231, .58); border-radius: 999px; color: #fff; background: rgba(17, 22, 56, .72); font: inherit; font-size: 12px; font-weight: 800; }
 .paliro-friend-profile-actions button:first-child:not(.is-followed) { border-color: transparent; background: linear-gradient(90deg, #20eee7, #4388dd); }
 .paliro-friend-profile-actions button.is-followed { color: rgba(255, 255, 255, .76); background: transparent; }
 .paliro-friend-profile-actions button.is-locked { color: rgba(255, 255, 255, .46); border-color: rgba(135, 133, 163, .3); background: rgba(23, 22, 46, .62); }
-.paliro-friend-profile-actions button.is-locked span { margin-right: 4px; font-size: 11px; }
+.paliro-friend-profile-message { display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
 .paliro-friend-profile-actions .paliro-friend-profile-video { width: 40px; border-color: #28eeea; color: #2cf3ed; background: transparent; font-size: 16px; }
 .paliro-friend-profile-video svg { display: block; width: 20px; height: 20px; margin: auto; }
 .paliro-friend-profile-actions button:disabled { cursor: default; }
@@ -924,7 +925,7 @@ button { cursor: pointer; }
 .paliro-rules-copy { position: absolute; z-index: 2; top: calc(49.5% - 40px); right: 11%; bottom: calc(170px + env(safe-area-inset-bottom)); left: 11%; overflow-y: auto; padding: 0 5px 14px; color: #fff; font-size: clamp(11px, 3.47vw, 13px); font-weight: 500; line-height: 1.42; text-align: center; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 .paliro-rules-copy h2 { margin: 0 0 12px; color: #fff; font-size: clamp(18px, 5.33vw, 20px); font-weight: 800; line-height: 1.1; }
 .paliro-rules-copy p { margin: 0 0 15px; }
-.paliro-rules-card { position: absolute; z-index: 3; bottom: calc(10px + env(safe-area-inset-bottom)); left: 50%; width: 48.8%; height: auto; transform: translateX(-50%); pointer-events: none; }
+.paliro-rules-card { position: absolute; z-index: 3; bottom: calc(-10px + env(safe-area-inset-bottom)); left: 50%; width: 48.8%; height: auto; transform: translateX(-50%); pointer-events: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .paliro-rules-sheet-enter-active, .paliro-rules-sheet-leave-active,

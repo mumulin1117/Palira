@@ -340,6 +340,7 @@ const isMatchedMutualFriend = computed(() => {
 const isMatchedBlocked = computed(() => blockedUsers.value.some((member) => member.id === matchedFriend.value.id))
 const matchedAbout = computed(() => matchedFriend.value.about || matchedFriend.value.bio)
 const matchedMemberPosts = computed(() => paliroGetMemberPosts(matchedFriend.value))
+const matchedBoxPost = computed(() => matchedMemberPosts.value.find((post) => post.contentType === 'box') ?? null)
 const activeVideo = computed(() => videoFeed.value[activeVideoIndex.value] ?? null)
 const selectedVideoComments = computed(() => selectedVideo.value?.comments ?? [])
 const videoRewardAvailable = computed(() => boxState.value?.videoRewardDay !== currentLocalDayKey())
@@ -350,7 +351,7 @@ const publishedVideos = computed(() => {
 const socialDetailTitle = computed(() => t(`${socialDetail.value}Title`))
 const profilePosts = computed(() => [
   ...publishedVideos.value.map((video) => ({ ...video, contentType: 'video' })),
-  ...(socialState.value.posts ?? []).map((post) => ({ ...post, contentType: 'box' })),
+  ...(socialState.value.posts ?? []).map((post) => ({ ...post, contentType: 'box', coverImage: post.images?.[0] ?? '' })),
 ].sort((left, right) => String(right.createdAt ?? '').localeCompare(String(left.createdAt ?? ''))))
 const socialDetailItems = computed(() => socialDetail.value === 'posts' ? profilePosts.value : socialState.value[socialDetail.value] ?? [])
 const filteredSocialDetailItems = computed(() => {
@@ -1765,13 +1766,57 @@ function getPaliroMediaPicker() {
   return window.Capacitor?.Plugins?.PaliroMediaPicker ?? window.Capacitor?.Plugins?.PaliroMediaPickerPlugin ?? null
 }
 
+function loadComposerImage(dataUrl) {
+  return new Promise((resolve, reject) => {
+    if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) { reject(new Error('Invalid image data')); return }
+    const image = new Image()
+    image.onload = () => resolve(image)
+    image.onerror = () => reject(new Error('Unable to decode image'))
+    image.src = dataUrl
+  })
+}
+
+async function prepareComposerImage(dataUrl) {
+  const image = await loadComposerImage(dataUrl)
+  const targetDataUrlLength = 420_000
+  let lastResult = ''
+
+  for (const maximumEdge of [960, 800, 640]) {
+    const scale = Math.min(1, maximumEdge / Math.max(image.naturalWidth, image.naturalHeight))
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale))
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale))
+    const context = canvas.getContext('2d')
+    if (!context) throw new Error('Image canvas is unavailable')
+    context.drawImage(image, 0, 0, canvas.width, canvas.height)
+
+    for (const quality of [0.82, 0.72, 0.62, 0.52]) {
+      lastResult = canvas.toDataURL('image/jpeg', quality)
+      if (lastResult.length <= targetDataUrlLength) return lastResult
+    }
+  }
+
+  if (lastResult.length <= 1_200_000) return lastResult
+  throw new Error('Image is too large to store')
+}
+
+async function appendComposerImage(dataUrl) {
+  try {
+    const preparedImage = await prepareComposerImage(dataUrl)
+    composerImages.value = [...composerImages.value, preparedImage].slice(0, 3)
+    composerError.value = ''
+  } catch {
+    composerError.value = t('mediaPickerFailed')
+  }
+}
+
 async function pickComposerImage(source) {
   showMediaSourcePicker.value = false
   const picker = getPaliroMediaPicker()
   try {
     if (picker?.pick) {
       const result = await picker.pick({ source })
-      if (result?.dataUrl) composerImages.value = [...composerImages.value, result.dataUrl].slice(0, 3)
+      if (result?.dataUrl) await appendComposerImage(result.dataUrl)
       return
     }
     if (source === 'camera') throw new Error(t('cameraNativeOnly'))
@@ -1782,7 +1827,7 @@ async function pickComposerImage(source) {
       const file = input.files?.[0]
       if (!file) return
       const reader = new FileReader()
-      reader.onload = () => { if (typeof reader.result === 'string') composerImages.value = [...composerImages.value, reader.result].slice(0, 3) }
+      reader.onload = () => { if (typeof reader.result === 'string') void appendComposerImage(reader.result) }
       reader.readAsDataURL(file)
     }
     input.click()
@@ -1826,13 +1871,17 @@ function finishBoxAction(action) {
   if (action === 'make') {
     const theme = boxThemes[selectedBox.value ?? 0]
     const memberProfile = currentMemberProfile.value
-    paliroCreateBoxPost(session.value?.userID, {
+    const createdPost = paliroCreateBoxPost(session.value?.userID, {
       theme,
       title: composerText.value.trim().slice(0, 80),
       description: composerText.value.trim(),
       interests: memberProfile.interests,
       images: composerImages.value,
     })
+    if (!createdPost) {
+      composerError.value = t('mediaPickerFailed')
+      return
+    }
     composerImages.value = []
     composerText.value = ''
     showBoxComposer.value = false
@@ -2837,7 +2886,7 @@ function finishTopicTest() {
           <section v-if="socialDetailItems.length" :aria-label="socialDetailTitle" class="paliro-profile-post-grid">
             <article v-for="post in socialDetailItems" :key="post.id" class="paliro-profile-post-card">
               <video v-if="post.contentType === 'video'" :src="videoSource(post.source)" muted playsinline preload="metadata"></video>
-              <div v-else :class="['paliro-profile-box-post-art', `is-${post.theme?.toLocaleLowerCase().replace(/[^a-z]+/g, '-')}`]" aria-hidden="true"><img v-if="post.images?.[0]" :src="post.images[0]" /><span v-else>✦</span></div>
+              <div v-else :class="['paliro-profile-box-post-art', `is-${post.theme?.toLocaleLowerCase().replace(/[^a-z]+/g, '-')}`]" aria-hidden="true"><img v-if="post.coverImage" :src="post.coverImage" /><span v-else>✦</span></div>
               <span aria-hidden="true" class="paliro-profile-post-play">{{ post.contentType === 'video' ? '▶' : '✦' }}</span>
               <button :aria-label="t('deletePost')" class="paliro-profile-post-delete" type="button" @click="deleteProfilePost(post)">⌫</button>
               <div><strong>{{ post.title }}</strong><small>{{ post.contentType === 'video' ? post.caption : post.description }}</small></div>
@@ -3022,7 +3071,7 @@ function finishTopicTest() {
               <div>
                 <article v-for="post in matchedMemberPosts" :key="post.id" :class="`is-${post.contentType}`">
                   <div class="paliro-friend-profile-post-media"><img v-if="post.contentType === 'box'" :alt="post.title" :src="post.thumbnail" /><video v-else :ref="(element) => setFriendProfileVideoElement(post.id, element)" :aria-label="post.title" loop muted playsinline preload="metadata" :poster="post.thumbnail" :src="videoSource(post.source)" @click="toggleFriendProfileVideo(post)" @pause="setFriendProfileVideoPlayback(post.id, false)" @play="setFriendProfileVideoPlayback(post.id, true)"></video><span v-if="post.contentType === 'box'" aria-hidden="true">✦</span><button v-else :aria-label="post.title" :aria-pressed="Boolean(friendProfileVideoPlayback[post.id])" :class="['paliro-friend-profile-post-play', { 'is-playing': friendProfileVideoPlayback[post.id] }]" type="button" @click.stop="toggleFriendProfileVideo(post)"><span aria-hidden="true">{{ friendProfileVideoPlayback[post.id] ? 'Ⅱ' : '▶' }}</span></button></div>
-                  <p>{{ post.title }}</p>
+                  <p>{{ post.contentType === 'box' ? (post.description || post.title) : post.title }}</p>
                   <small>{{ post.contentType === 'box' ? post.theme : `${post.likes} ${t('likes')}` }}</small>
                 </article>
               </div>
@@ -3031,7 +3080,7 @@ function finishTopicTest() {
         </div>
         <footer class="paliro-friend-profile-actions">
           <button :class="{ 'is-followed': isMatchedFollowing }" :disabled="isMatchedBlocked" :aria-pressed="isMatchedFollowing" :aria-label="isMatchedFollowing ? t('unfollow') : t('follow')" type="button" @click="followMatchedFriend"><PaliroStateFeedback :value="isMatchedFollowing" kind="label">{{ isMatchedFollowing ? t('followed') : t('follow') }}</PaliroStateFeedback></button>
-          <button :aria-disabled="!isMatchedMutualFriend" :class="{ 'is-locked': !isMatchedMutualFriend }" type="button" @click="openMatchedConversation"><span aria-hidden="true">{{ isMatchedMutualFriend ? '' : '⌕' }}</span>{{ t('message') }}</button>
+          <button :aria-disabled="!isMatchedMutualFriend" class="paliro-friend-profile-message" :class="{ 'is-locked': !isMatchedMutualFriend }" type="button" @click="openMatchedConversation"><span v-if="!isMatchedMutualFriend" aria-hidden="true" class="paliro-conversation-lock"><PaliroChatIcon name="lock" /></span>{{ t('message') }}</button>
           <button v-if="isMatchedMutualFriend" :aria-label="t('chatVideoCall')" :disabled="videoCallStarting" class="paliro-friend-profile-video" type="button" @click="openMatchedVideo"><PaliroChatIcon name="video" /></button>
         </footer>
       </section>
@@ -3158,9 +3207,9 @@ function finishTopicTest() {
           <div class="paliro-match-card">
             <img alt="" class="paliro-match-card-frame" src="/assets/paliro-match-card@2x.png" />
             <button :aria-label="t('reportUser')" class="paliro-match-report" type="button" @click="openReportUser('opening')"><img alt="" src="/assets/paliro-match-report@2x.png" /></button>
-            <img :alt="`${matchedFriend.nickname} avatar`" class="paliro-match-avatar" :src="matchedFriend.avatar" />
+            <img :alt="matchedBoxPost?.title || `${matchedFriend.nickname} Box`" class="paliro-match-avatar" :src="matchedBoxPost?.images?.[0] || matchedFriend.avatar" />
             <div class="paliro-match-copy">
-              <p id="paliro-match-copy">{{ matchedFriend.bio }}</p>
+              <p id="paliro-match-copy">{{ matchedBoxPost?.description || matchedBoxPost?.title || '' }}</p>
             </div>
             <button v-if="!isMatchedBlocked" ref="matchPrimaryButton" :aria-label="friendRequestButtonLabel" :aria-pressed="friendRequestStatus === 'pending'" :class="['paliro-match-add-friend', { 'is-pending': friendRequestStatus === 'pending' }]" :disabled="friendRequestStatus === 'pending'" type="button" @click="openFriendRequestModal">
               <span>{{ friendRequestStatus === 'pending' ? t('requestSent') : t('addFriends') }}</span>
