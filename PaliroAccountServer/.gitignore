@@ -3,6 +3,7 @@ node_modules/
 dist/
 .paliro-data/
 .paliro-data.lock
+.paliro-backups/
 .env
 .env.*
 !.env.example

@@ -1,5 +1,13 @@
 # Paliro 登录注册接口联调
 
+## 当前接口协议
+
+App 统一使用 `/palirov1/paliro`：注册、登录、退出为 `/auth/register`、`/auth/login`、`/auth/logout`；读写本人资料为 GET/PATCH `/me/profile`；删除账号为 DELETE `/me/account`。
+
+注册请求和用户响应将 `profile` 改为 `palirovmemberProfile`；资料字段依次为 `palirovdisplayName`、`palirovavatarKey`、`palirovbirthDate`、`palirovaboutMe`、`palirovinterestTags`、`palirovcurrentMood`、`palirovpreferredLanguage`，`gender` 不变。PATCH 直接提交改动的新字段，不加资料包装对象。
+
+`paliroAccountApi.js` 负责双向转换，App 页面、本地缓存、测试账号关系和消息仍使用原有内部字段，不需要清空数据。照片仍按原规则保存在本机。后端保留旧协议供旧版客户端使用，新版 App 不会在失败时回退旧接口。更新服务后需重新启动后端，并重新构建/同步 iOS Web 资源。
+
 ## 启动
 
 先在一个终端保持后端运行：
@@ -16,18 +24,18 @@ cd /Users/linqian/Documents/Palira/ParamoboaxsDak
 npm run dev -- --host 127.0.0.1 --port 5173
 ```
 
-接口地址默认 `http://127.0.0.1:3001`。可通过 `.env` 的 `VITE_PALIRO_AUTH_API_URL` 调整，示例见 `.env.example`；修改后必须重启Vite，iOS包还要重新构建和同步。当前仅支持本机浏览器及同一Mac上的iOS模拟器。真机和正式服务器部署不在本次范围；不要公网暴露这个本地后端。
+开发接口默认 `http://127.0.0.1:3001`，示例见 `.env.example`；生产构建由 `.env.production` 固定使用 `https://mobile.paliroweb.site`。修改环境变量后必须重新构建，iOS还要重新执行 Capacitor copy。服务器上的 Node 服务仍只监听 `127.0.0.1:3300`，公网只能通过该子域的独立 Nginx HTTPS 反向代理访问。
 
 iOS打包：`npm run build` 后运行 `npx cap copy ios`，再在Xcode运行 `ios/App/App.xcworkspace`。原有build脚本已修正为真正执行 `vite build`。
 
 ## 数据边界
 
-- 登录：POST `/v1/auth/login` 成功才保存会话并进入首页；错误密码、离线、超时不能退回本地验证，也不自动创建未知账号。
-- 注册：邮箱密码页面及个人资料前两步仅保留内存草稿；最后兴趣页面点击完成，一次POST `/v1/auth/register` 提交邮箱、密码、协议同意及完整资料。返回201后直接进入主模块，不再请求登录。失败保留草稿，连续点击不会重复请求。
+- 登录：POST `/palirov1/paliro/auth/login` 成功才保存会话并进入首页；错误密码、离线、超时不能退回本地验证，也不自动创建未知账号。
+- 注册：邮箱密码页面及个人资料前两步仅保留内存草稿；最后兴趣页面点击完成，一次POST `/palirov1/paliro/auth/register` 提交邮箱、密码、协议同意及完整资料。返回201后直接进入主模块，不再请求登录。失败保留草稿，连续点击不会重复请求。
 - 完整资料：昵称、默认头像key、生日、签名、性别、状态、兴趣、语言。普通注册密码至少8位，成年生日和至少3个兴趣由服务器再次校验。
 - 测试账号：`paliro@gmail.com` / `67896789`，只有后端认证返回受控测试标识及保留UUID，才映射为本地 `paliro-test-user`。原有关系列表、聊天、已发动态及本地修改资料继续沿用，不重新生成一套。后端启动时同步指定的新密码并撤销该账号旧会话，更新后需重新登录；不会影响其他账号。
 - 新普通账号：服务器UUID作为本地用户ID，账号数据相互隔离，没有测试账号的预置关系和消息。
-- 本人个人资料：进入个人中心或编辑页会GET `/v1/me`，成功后服务器支持的字段更新本地缓存；编辑保存只PATCH实际修改的字段，成功才更新显示。昵称、签名、生日、性别、状态、兴趣及默认头像标识以服务器返回为准。
+- 本人个人资料：进入个人中心或编辑页会GET `/palirov1/paliro/me/profile`，成功后服务器支持的字段更新本地缓存；编辑保存只PATCH实际修改的字段，成功才更新显示。昵称、签名、生日、性别、状态、兴趣及默认头像标识以服务器返回为准。
 - 自选头像照片：后端尚无文件上传接口，沿用本地保存并明确提示“仅保存在此设备”。照片不会作为额外字段提交，也不会被GET/PATCH返回覆盖；换设备不会自动带上照片。
 - 视频、魔盒、聊天、关系、他人主页模拟资料及语言设置仍沿用现有本地数据，本次不为这些模块新增接口。
 - 普通旧本地账号未自动迁移；不按未验证邮箱合并身份。升级后旧本地会话不能继续作为认证凭据，需要重新服务器登录或注册。其他用户数据不清除。
@@ -40,7 +48,7 @@ iOS卸载重装：原生层在`UserDefaults`保存安装实例标识。正常升
 
 本轮修改位于`ParamoboaxsDak/ios/App/App/PaliroBridgeViewController.swift`、`src/services/paliroAccountApi.js`、`scripts/paliro-server-auth.test.mjs`和本文档。验证包括升级/重装分支单测、全部前端回归测试、Vite生产构建、Capacitor iOS资源同步和iOS模拟器工程编译。没有实际卸载当前模拟器中的用户App，避免破坏已有本地测试数据；请按“登录 > 删除App > 重新安装”做一次最终黑盒验收。
 
-启动后先GET `/v1/me`校验会话，通过才进入主模块。默认24小时过期，没有refresh token；到期或401需重新登录。服务未启动时显示连接失败，不假装登录成功。
+启动后先GET `/palirov1/paliro/me/profile`校验会话，通过才进入主模块。默认24小时过期，没有refresh token；到期或401需重新登录。服务未启动时显示连接失败，不假装登录成功。
 
 退出清除本地登录标记和安全凭证，并尝试撤销服务器当前会话，不删除资料或其他账号数据。离线时远端撤销可能失败，远端会话按原过期时间失效。
 
@@ -56,18 +64,18 @@ iOS卸载重装：原生层在`UserDefaults`保存安装实例标识。正常升
 
 自动化：`node --test scripts/*.test.mjs`。后端：在后端目录 `./paliro-local.sh test`，服务启动后另运行 `./paliro-local.sh smoke`。浏览器完整联调脚本为 `scripts/paliro-auth-browser.mjs`，需Playwright模块及Chrome；可用 `PALIRO_PLAYWRIGHT_MODULE`指定模块入口，测试只清理自己创建的随机账号。
 
-正式上线前仍需HTTPS、生产数据库、备份、邮件验证、正式协议版本及安全审查，不能直接用本地示例上线。
+账号后端现已改为 MySQL 实现，使用服务器现有实例中的专属 Paliro 数据库，切换步骤见 `../PaliroAccountServer/PALIRO_PRODUCTION_DEPLOYMENT.md`。App 的 HTTPS 域名、接口、字段和测试身份映射均不变。正式开放大量真实用户前仍需完善自动备份、监控告警、邮件验证、密码找回和正式协议版本。
 
 ## 删除账号
 
-设置 > 删除账号，现在是实际删除，不再只是说明弹窗。输入当前密码并点击红色删除按钮后，发送 `DELETE /v1/me`，携带Bearer及 `{ "password": "当前密码" }`。只有HTTP 204才确认为成功。
+设置 > 删除账号，现在是实际删除，不再只是说明弹窗。输入当前密码并点击红色删除按钮后，发送 `DELETE /palirov1/paliro/me/account`，携带Bearer及 `{ "password": "当前密码" }`。只有HTTP 204才确认为成功。
 
 - 取消或点击遮罩：清空密码草稿并关闭，不调用删除接口。
 - 密码错误：保留账号、登录凭证和本地数据，提示重新输入；过期的会话提示重新登录。
 - 网络失败或超时：说明结果尚未确认，不进行本地清理；服务器可能已经收到请求，不能保证远端未删除。可恢复连接后重试或重新登录核对。
 - 成功：服务器删除账号、完整资料及该账号所有会话；App清除当前登录凭证，以及该本地用户ID下的资料、头像数据、关系、消息、动态、视频记录、金币/测试状态和偏好缓存，然后返回欢迎页。不会清空整个localStorage，不影响其他用户或设备级协议同意状态；不会删除用户相册原文件。
 - 本机清理异常：仍退出已删除的账号，明确提示服务器已删除但本机清理不完整，不错误提示“服务器删除失败”。
-- 测试账号也可以被明确删除。后端只保留非个人信息的预置停用标记，避免重启服务又自动创建测试账号；本机也停止自动补入该测试身份。不要用固定测试账号随意做删除验收，请使用新注册的临时账号。
+- 本地开发模式允许明确删除测试账号并记录预置停用标记；生产环境会拒绝删除共享验收账号，避免公开的验收凭证导致该账号永久丢失。普通账号在两种环境中都可正常删除，请用新注册的临时账号做删除验收。
 
 本轮主要文件（相对于工作区）：`ParamoboaxsDak/src/PaliroEntryApp.vue`（确认弹窗、密码、防重复提交和退出）、`src/services/paliroAccountApi.js`（DELETE及204校验）、`src/services/paliroServerSession.js`（凭证与成功后的清理结果）、`src/services/paliroLocalStore.js`（按用户ID清理）、`src/services/paliroI18n.js`（英韩删除文案）、`src/style.css`（可视视口、滚动和安全区）、`scripts/paliro-account-deletion.test.mjs`及`scripts/paliro-auth-browser.mjs`（单测和真实临时账号删除）、本说明，以及`PaliroAccountServer/src/paliroAccounts.ts`、`src/paliroDatabase.ts`、`src/paliroTestAccount.ts`、`test/paliroAccounts.test.ts`（删除事务和预置停用）。更新的API说明在`PaliroAccountServer/PALIRO_API.md`，构建产物同步到前端`dist`及iOS `App/public`。
 
@@ -81,7 +89,7 @@ iOS卸载重装：原生层在`UserDefaults`保存安装实例标识。正常升
 
 支持字段以服务器为准：首次查看时，以前仅在本机编辑且从未上传的字段可能被服务器已有值替换；不自动将旧缓存批量覆盖服务器。自选照片及本地关系、消息、动态不参与覆盖。应用语言偏好仍沿用原有本地设置，不随资料GET改变。
 
-后台核对：App修改昵称/签名并保存后，用同一账号在接口文档登录并授权，再执行GET `/v1/me`，应看到最新值。自选照片不出现在接口响应中。
+后台核对：App修改昵称/签名并保存后，用同一账号在接口文档登录并授权，再执行GET `/palirov1/paliro/me/profile`，应看到最新值。自选照片不出现在接口响应中。
 
 本轮文件清单（相对于工作区）：
 

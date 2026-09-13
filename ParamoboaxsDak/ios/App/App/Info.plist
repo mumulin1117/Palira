@@ -29,16 +29,16 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Paliro uses the camera when you choose to add photos or videos, or start a video call with a mutual friend.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Paliro uses your photo library only when you choose an image or video for a Box, profile, or topic video.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Paliro uses the microphone when you record a video, send a voice message, or start a video call with a mutual friend.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Paliro uses your photo library only when you choose an image or video for a Box, profile, or topic video.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
+	<string>PaliroLaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UIRequiredDeviceCapabilities</key>

@@ -35,7 +35,8 @@ case "$COMMAND" in
   dev) exec "$NODE" --env-file-if-exists=.env --import tsx src/paliroServer.ts ;;
   build) exec "$NODE" node_modules/typescript/bin/tsc -p tsconfig.json ;;
   start) exec "$NODE" --env-file-if-exists=.env dist/paliroServer.js ;;
-  test) exec "$NODE" --import tsx --test --test-concurrency=1 test/*.test.ts ;;
+  test) exec "$NODE" --env-file-if-exists=.env.test --import tsx --test --test-concurrency=1 test/*.test.ts ;;
+  migrate) exec "$NODE" --env-file-if-exists=.env scripts/paliroMysqlMigrate.mjs ;;
   smoke) exec "$NODE" scripts/paliroSmoke.mjs ;;
-  *) printf '%s\n' 'Usage: ./paliro-local.sh [install|dev|build|start|test|smoke]' >&2; exit 1 ;;
+  *) printf '%s\n' 'Usage: ./paliro-local.sh [install|dev|build|migrate|start|test|smoke]' >&2; exit 1 ;;
 esac

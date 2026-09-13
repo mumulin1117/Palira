@@ -7,7 +7,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        // Match the launch artwork while iOS hands off from the launch snapshot to the WebView.
+        window?.backgroundColor = UIColor(red: 5 / 255, green: 11 / 255, blue: 33 / 255, alpha: 1)
         return true
     }
 

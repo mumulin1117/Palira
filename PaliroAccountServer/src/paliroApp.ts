@@ -3,19 +3,23 @@ import cors from '@fastify/cors'
 import rateLimit from '@fastify/rate-limit'
 import swagger from '@fastify/swagger'
 import swaggerUI from '@fastify/swagger-ui'
-import type { PGlite } from '@electric-sql/pglite'
+import type { PaliroDatabase } from './paliroDatabase.js'
 import { PaliroAccounts, PALIRO_TERMS_VERSION, type PaliroRegistration, type PaliroProfilePatch } from './paliroAccounts.js'
 import { PaliroApiError } from './paliroErrors.js'
 import { paliroBearerToken } from './paliroSecurity.js'
 import { paliroAuthSchema, paliroEmailSchema, paliroErrorResponses, paliroErrorSchema, paliroLoginPasswordSchema, paliroProfileProperties, paliroRegistrationSchema, paliroUserSchema } from './paliroSchemas.js'
+import { paliroFromWireProfile, paliroFromWireRegistration, paliroToWireUser, paliroWireAuthSchema, paliroWireProfileProperties, paliroWireRegistrationSchema, paliroWireUserSchema, type PaliroWireRegistration } from './paliroWireContract.js'
 
 interface PaliroAppOptions {
-  database: PGlite
+  database: PaliroDatabase
   sessionHours?: number
   now?: () => Date
   corsOrigins?: string[]
   logLevel?: string
   authLimit?: number
+  mode?: 'development' | 'production'
+  trustProxy?: false | string[]
+  protectTestAccount?: boolean
 }
 
 export async function paliroBuildApp(options: PaliroAppOptions) {
@@ -24,10 +28,10 @@ export async function paliroBuildApp(options: PaliroAppOptions) {
       redact: ['req.headers.authorization', 'req.headers.cookie', 'res.headers["set-cookie"]'],
       serializers: { req: (req) => ({ method: req.method, url: String(req.url).split('?')[0] }) },
     } : false,
-    trustProxy: false, bodyLimit: 16 * 1024, requestTimeout: 15000,
+    trustProxy: options.trustProxy ?? false, bodyLimit: 16 * 1024, requestTimeout: 15000,
     ajv: { customOptions: { coerceTypes: false, removeAdditional: false, useDefaults: false } },
   })
-  const accounts = new PaliroAccounts(options.database, options.sessionHours ?? 24, options.now)
+  const accounts = new PaliroAccounts(options.database, options.sessionHours ?? 24, options.now, options.protectTestAccount)
   const allowedOrigins = options.corsOrigins ?? ['http://localhost:5173', 'http://127.0.0.1:5173', 'capacitor://localhost', 'http://127.0.0.1:3001', 'http://localhost:3001']
   const errorPayload = (request: FastifyRequest, code: string, message: string) => ({ error: { code, message, requestId: request.id } })
 
@@ -53,11 +57,12 @@ export async function paliroBuildApp(options: PaliroAppOptions) {
   await app.register(cors, { origin: allowedOrigins, credentials: false, methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'], allowedHeaders: ['Content-Type', 'Authorization'] })
   await app.register(rateLimit, { max: 120, timeWindow: '1 minute' })
   await app.register(swagger, { openapi: {
-    info: { title: 'Paliro Local Account API', version: '0.1.0', description: `Local development only. No email verification or cloud services. Terms fixture: ${PALIRO_TERMS_VERSION}. Tokens expire; log in again to renew. Do not use real personal data.` },
+    info: { title: 'Paliro Member Account API', version: '0.3.0', description: `Current App contract: /palirov1/paliro with palirov profile fields. /v1 is retained for older clients. Terms fixture: ${PALIRO_TERMS_VERSION}. Tokens expire; log in again to renew.` },
     components: { securitySchemes: { bearerAuth: { type: 'http', scheme: 'bearer' } } },
-    tags: [{ name: 'System' }, { name: 'Account' }],
+    tags: [{ name: 'System' }, { name: 'Paliro Account' }, { name: 'Legacy Account', description: 'Compatibility only; new clients use /palirov1/paliro.' }],
   } })
   app.addSchema(paliroUserSchema)
+  app.addSchema(paliroWireUserSchema)
   app.addSchema(paliroErrorSchema)
   await app.register(swaggerUI, { routePrefix: '/docs', staticCSP: true,
     uiConfig: { persistAuthorization: false, docExpansion: 'list', supportedSubmitMethods: ['get', 'post', 'patch', 'delete'] },
@@ -68,49 +73,63 @@ export async function paliroBuildApp(options: PaliroAppOptions) {
     200: { type: 'object', properties: { status: { type: 'string' }, service: { type: 'string' }, mode: { type: 'string' } } }, ...paliroErrorResponses,
   } } }, async () => {
     await options.database.query('SELECT 1')
-    return { status: 'ok', service: 'paliro-account-server', mode: 'local-only' }
+    return { status: 'ok', service: 'paliro-account-server', mode: options.mode ?? 'development' }
   })
   app.get('/openapi.json', { schema: { hide: true } }, async () => app.swagger())
 
-  const authConfig = { rateLimit: { max: options.authLimit ?? 10, timeWindow: '1 minute' } }
+  // Share each operation's limiter across new and legacy URLs.
+  const authConfig = { rateLimit: false as const }
+  const authGuard = app.rateLimit({ max: options.authLimit ?? 10, timeWindow: '1 minute',
+    keyGenerator: request => `${request.ip}:${request.method === 'DELETE' ? 'delete' : request.routeOptions.url?.split('/').at(-1)}`,
+  })
   const normalizeEmail = async (request: FastifyRequest) => {
     const body = request.body as { email?: unknown } | null
     if (body && typeof body.email === 'string') body.email = body.email.trim().toLowerCase()
   }
-  app.post<{ Body: PaliroRegistration }>('/v1/auth/register', {
-    config: authConfig, preValidation: normalizeEmail,
-    schema: { tags: ['Account'], summary: 'Register a new account and receive a session', body: paliroRegistrationSchema, response: { 201: paliroAuthSchema, ...paliroErrorResponses } },
-  }, async (request, reply) => reply.code(201).send(await accounts.register(request.body)))
-  app.post<{ Body: { email: string; password: string } }>('/v1/auth/login', {
-    config: authConfig, preValidation: normalizeEmail,
-    schema: { tags: ['Account'], summary: 'Log in; unknown emails are not silently registered',
-      body: { type: 'object', additionalProperties: false, required: ['email', 'password'], properties: { email: paliroEmailSchema, password: paliroLoginPasswordSchema } },
-      response: { 200: paliroAuthSchema, ...paliroErrorResponses } },
-  }, async (request) => accounts.login(request.body.email, request.body.password))
+  for (const branded of [true, false]) {
+    const base = branded ? '/palirov1/paliro' : '/v1'
+    const profilePath = branded ? `${base}/me/profile` : `${base}/me`
+    const accountPath = branded ? `${base}/me/account` : `${base}/me`
+    const accountSchema = { tags: [branded ? 'Paliro Account' : 'Legacy Account'], deprecated: !branded }
+    const authSchema = branded ? paliroWireAuthSchema : paliroAuthSchema
+    const userSchema = { $ref: branded ? 'PaliroWireUser#' : 'PaliroUser#' }
+    const encodeUser = (user: Awaited<ReturnType<typeof accounts.me>>) => branded ? paliroToWireUser(user) : user
+    const encodeAuth = (response: Awaited<ReturnType<typeof accounts.login>>) => ({ ...response, user: encodeUser(response.user) })
+    app.post<{ Body: PaliroRegistration | PaliroWireRegistration }>(`${base}/auth/register`, {
+      config: authConfig, onRequest: authGuard, preValidation: normalizeEmail,
+      schema: { ...accountSchema, summary: 'Register a new account and receive a session', body: branded ? paliroWireRegistrationSchema : paliroRegistrationSchema, response: { 201: authSchema, ...paliroErrorResponses } },
+    }, async (request, reply) => reply.code(201).send(encodeAuth(await accounts.register(branded ? paliroFromWireRegistration(request.body as PaliroWireRegistration) : request.body as PaliroRegistration))))
+    app.post<{ Body: { email: string; password: string } }>(`${base}/auth/login`, {
+      config: authConfig, onRequest: authGuard, preValidation: normalizeEmail,
+      schema: { ...accountSchema, summary: 'Log in; unknown emails are not silently registered',
+        body: { type: 'object', additionalProperties: false, required: ['email', 'password'], properties: { email: paliroEmailSchema, password: paliroLoginPasswordSchema } },
+        response: { 200: authSchema, ...paliroErrorResponses } },
+    }, async (request) => encodeAuth(await accounts.login(request.body.email, request.body.password)))
 
-  const protectedSchema = { tags: ['Account'], security: [{ bearerAuth: [] }] }
-  app.get('/v1/me', { schema: { ...protectedSchema, summary: 'Read only your own account and profile', response: { 200: { $ref: 'PaliroUser#' }, ...paliroErrorResponses } } },
-    async (request) => accounts.me(paliroBearerToken(request.headers.authorization)))
-  app.patch<{ Body: PaliroProfilePatch }>('/v1/me', { schema: {
-    ...protectedSchema, summary: 'Complete or update your profile',
-    description: 'First update requires nickname and an adult birthday. Omitted fields remain unchanged. Avatar is an existing asset key, not an uploaded file.',
-    body: { type: 'object', additionalProperties: false, minProperties: 1, properties: paliroProfileProperties,
-      examples: [{ nickname: 'Paliro Demo', avatar: 'violet', birthday: '1998-10-24', bio: 'Coffee and quiet walks.', interests: ['Coffee', 'Nature'], language: 'en' }] },
-    response: { 200: { $ref: 'PaliroUser#' }, ...paliroErrorResponses },
-  } }, async (request) => accounts.updateProfile(paliroBearerToken(request.headers.authorization), request.body))
-  app.post('/v1/auth/logout', { schema: { ...protectedSchema, summary: 'Revoke this session only; repeat calls are safe', response: { 204: { type: 'null' }, ...paliroErrorResponses } } },
-    async (request, reply) => {
-      await accounts.logout(paliroBearerToken(request.headers.authorization))
+    const protectedSchema = { ...accountSchema, security: [{ bearerAuth: [] }] }
+    app.get(profilePath, { schema: { ...protectedSchema, summary: 'Read only your own account and profile', response: { 200: userSchema, ...paliroErrorResponses } } },
+      async (request) => encodeUser(await accounts.me(paliroBearerToken(request.headers.authorization))))
+    app.patch<{ Body: Record<string, unknown> }>(profilePath, { schema: {
+      ...protectedSchema, summary: 'Complete or update your profile',
+      description: 'Send changed profile fields directly, without a profile wrapper. Omitted fields remain unchanged. Avatar is a built-in asset key, not an uploaded file.',
+      body: { type: 'object', additionalProperties: false, minProperties: 1, properties: branded ? paliroWireProfileProperties : paliroProfileProperties,
+        examples: branded ? [{ palirovdisplayName: 'Paliro Demo', palirovaboutMe: 'Coffee and quiet walks.' }] : [{ nickname: 'Paliro Demo', bio: 'Coffee and quiet walks.' }] },
+      response: { 200: userSchema, ...paliroErrorResponses },
+    } }, async (request) => encodeUser(await accounts.updateProfile(paliroBearerToken(request.headers.authorization), branded ? paliroFromWireProfile(request.body) : request.body as PaliroProfilePatch)))
+    app.post(`${base}/auth/logout`, { schema: { ...protectedSchema, summary: 'Revoke this session only; repeat calls are safe', response: { 204: { type: 'null' }, ...paliroErrorResponses } } },
+      async (request, reply) => {
+        await accounts.logout(paliroBearerToken(request.headers.authorization))
+        return reply.code(204).send()
+      })
+    app.delete<{ Body: { password: string } }>(accountPath, { config: authConfig, onRequest: authGuard, schema: {
+      ...protectedSchema, summary: 'Delete this local backend account after password confirmation',
+      body: { type: 'object', additionalProperties: false, required: ['password'], properties: { password: paliroLoginPasswordSchema } },
+      response: { 204: { type: 'null' }, ...paliroErrorResponses },
+    } }, async (request, reply) => {
+      await accounts.deleteAccount(paliroBearerToken(request.headers.authorization), request.body.password)
       return reply.code(204).send()
     })
-  app.delete<{ Body: { password: string } }>('/v1/me', { config: authConfig, schema: {
-    ...protectedSchema, summary: 'Delete this local backend account after password confirmation',
-    body: { type: 'object', additionalProperties: false, required: ['password'], properties: { password: paliroLoginPasswordSchema } },
-    response: { 204: { type: 'null' }, ...paliroErrorResponses },
-  } }, async (request, reply) => {
-    await accounts.deleteAccount(paliroBearerToken(request.headers.authorization), request.body.password)
-    return reply.code(204).send()
-  })
+  }
   await app.ready()
   return app
 }

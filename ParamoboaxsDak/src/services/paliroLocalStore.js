@@ -22,6 +22,7 @@ const PALIRO_BLOCKED_USERS_KEY = 'paliro.blockedUsers'
 const PALIRO_REPORTS_KEY = 'paliro.reports'
 const PALIRO_VIDEO_STATE_KEY = 'paliro.videoState'
 const PALIRO_LANGUAGE_KEY = 'paliro.languagePreference.v2'
+const PALIRO_APP_LANGUAGE_KEY = 'paliro.appLanguage.v1'
 const PALIRO_PUSH_PREFERENCE_KEY = 'paliro.pushPreference'
 const PALIRO_PROFILE_AVATAR_SOURCES = {
   violet: '/assets/paliro-avatar-violet@2x.png',
@@ -314,6 +315,7 @@ const PALIRO_TEST_CONVERSATIONS = [
   { member: PALIRO_MOCK_MEMBERS_BY_LANGUAGE.en[0], unreadCount: 1, messages: [{ id: 'paliro-message-maya-1', sender: 'friend', body: 'I left a song that fits today’s reading Box.', sentAt: '2026-09-10T11:14:00.000Z' }] },
   { member: PALIRO_MOCK_MEMBERS_BY_LANGUAGE.en[1], unreadCount: 0, messages: [{ id: 'paliro-message-luna-1', sender: 'friend', body: 'Want to compare our favorite retro games for the next Box?', sentAt: '2026-09-10T10:05:00.000Z' }] },
 ]
+const PALIRO_SEEDED_MESSAGE_IDS = new Set(PALIRO_TEST_CONVERSATIONS.flatMap(conversation => conversation.messages.map(message => message.id)))
 const PALIRO_DEBUG_LOGIN_COIN_BALANCE = 1000
 const PALIRO_DEMO_COIN_BALANCE = PALIRO_DEBUG_MODE ? PALIRO_DEBUG_LOGIN_COIN_BALANCE : 600
 
@@ -924,6 +926,7 @@ export function paliroCreateVideoPost(userID, video) {
       videoPosts: [],
     },
     source,
+    thumbnail: String(video?.thumbnail ?? ''),
     title: String(video?.title ?? '').trim().slice(0, 64) || caption.slice(0, 64),
     caption,
     baseLikes: 0,
@@ -1088,15 +1091,22 @@ export function paliroUnblockUser(userID, blockedUserID) {
 }
 
 export function paliroGetLanguagePreference(userID) {
-  if (!userID) return 'ko'
-  return readJson(PALIRO_LANGUAGE_KEY, {})[userID] ?? 'ko'
+  const accountLanguage = userID ? readJson(PALIRO_LANGUAGE_KEY, {})?.[userID] : null
+  if (['en', 'ko'].includes(accountLanguage)) return accountLanguage
+  const appLanguage = readJson(PALIRO_APP_LANGUAGE_KEY, null)
+  if (['en', 'ko'].includes(appLanguage)) return appLanguage
+  // Older installations already keep the last App language in the native launch bridge.
+  return window.__paliroLaunchLanguage === 'en' ? 'en' : 'ko'
 }
 
 export function paliroSetLanguagePreference(userID, language) {
-  if (!userID || !['en', 'ko'].includes(language)) return 'ko'
-  const languageByUser = readJson(PALIRO_LANGUAGE_KEY, {})
-  languageByUser[userID] = language
-  writeJson(PALIRO_LANGUAGE_KEY, languageByUser)
+  if (!['en', 'ko'].includes(language)) return paliroGetLanguagePreference(userID)
+  writeJson(PALIRO_APP_LANGUAGE_KEY, language)
+  if (userID) {
+    const languageByUser = readJson(PALIRO_LANGUAGE_KEY, {})
+    languageByUser[userID] = language
+    writeJson(PALIRO_LANGUAGE_KEY, languageByUser)
+  }
   return language
 }
 
@@ -1284,7 +1294,9 @@ export function paliroGetConversations(userID, language = '') {
   const { conversations } = getConversationStateByUser(userID)
   const requests = readJson(PALIRO_FRIEND_REQUESTS_KEY, {})[userID] ?? {}
   const blockedIDs = new Set(paliroGetBlockedUsers(userID).map((member) => member.id))
-  return conversations.filter((conversation) => (!language || conversation.member?.language === language)
+  // Only untouched demo rows follow the discovery language; personal history belongs to the account.
+  return conversations.filter((conversation) => (!language || conversation.member?.language === language
+      || (conversation.messages ?? []).some(message => message.sender === 'self' || !PALIRO_SEEDED_MESSAGE_IDS.has(message.id)))
     && !blockedIDs.has(conversation.member?.id)
     && (paliroCanChatWithMember(userID, conversation.member?.id) || requests[conversation.member?.id]?.status === 'pending'))
     .map((conversation) => {

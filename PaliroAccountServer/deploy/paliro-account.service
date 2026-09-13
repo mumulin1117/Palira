@@ -1,0 +1,23 @@
+[Unit]
+Description=Paliro Member Account API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=paliro
+Group=paliro
+WorkingDirectory=/srv/paliro/current
+EnvironmentFile=/srv/paliro/shared/paliro.env
+ExecStart=/usr/local/bin/node dist/paliroServer.js
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

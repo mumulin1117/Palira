@@ -1,39 +1,61 @@
 import Capacitor
 import Foundation
 import Security
+import WebKit
+
+private enum PaliroLaunchLocale {
+    static let storageKey = "paliro.launchLanguage.v1"
+
+    static var current: String {
+        UserDefaults.standard.string(forKey: storageKey) == "en" ? "en" : "ko"
+    }
+
+    static func save(_ language: String) -> Bool {
+        guard language == "en" || language == "ko" else { return false }
+        UserDefaults.standard.set(language, forKey: storageKey)
+        return true
+    }
+}
 
 final class PaliroBridgeViewController: CAPBridgeViewController {
     private var launchOverlay: UIImageView?
+    private var hasConfiguredLaunchSurface = false
+    private let launchBackgroundColor = UIColor(red: 5 / 255, green: 11 / 255, blue: 33 / 255, alpha: 1)
+
+    private var isKoreanLaunch: Bool {
+        PaliroLaunchLocale.current == "ko"
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(red: 5 / 255, green: 11 / 255, blue: 33 / 255, alpha: 1)
-        showLaunchOverlay()
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(hideLaunchOverlay),
-            name: .paliroWebContentReady,
-            object: nil
-        )
-
-        // Never leave the native cover stuck if JavaScript fails before mounting.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 15) { [weak self] in
-            self?.hideLaunchOverlay()
-        }
+        configureLaunchSurface()
     }
 
     override func capacitorDidLoad() {
         super.capacitorDidLoad()
+        // capacitorDidLoad runs before CAPBridgeViewController starts its first URL load.
+        // Installing the cover here prevents the WebView's unpainted frame from flashing white.
+        configureLaunchSurface()
+        let language = PaliroLaunchLocale.current
+        let launchScript = WKUserScript(
+            source: "window.__paliroLaunchLanguage = '\(language)';",
+            injectionTime: .atDocumentStart,
+            forMainFrameOnly: true
+        )
+        webView?.configuration.userContentController.addUserScript(launchScript)
         bridge?.registerPluginInstance(PaliroAuthStoragePlugin())
         bridge?.registerPluginInstance(PaliroLaunchScreenPlugin())
-        webView?.isOpaque = false
-        webView?.backgroundColor = .clear
-        webView?.scrollView.backgroundColor = .clear
+        webView?.isOpaque = true
+        webView?.backgroundColor = launchBackgroundColor
+        webView?.scrollView.backgroundColor = launchBackgroundColor
+        if #available(iOS 15.0, *) {
+            webView?.underPageBackgroundColor = launchBackgroundColor
+        }
         if #available(iOS 15.0, *) {
             bridge?.registerPluginType(PaliroIapPlugin.self)
-            bridge?.registerPluginType(PaliroMediaPickerPlugin.self)
-            bridge?.registerPluginType(PaliroVoiceRecorderPlugin.self)
-            bridge?.registerPluginType(PaliroCallPermissionsPlugin.self)
+            bridge?.registerPluginInstance(PaliroMediaPickerPlugin())
+            bridge?.registerPluginInstance(PaliroVoiceRecorderPlugin())
+            bridge?.registerPluginInstance(PaliroCallPermissionsPlugin())
         }
     }
 
@@ -42,7 +64,8 @@ final class PaliroBridgeViewController: CAPBridgeViewController {
     }
 
     private func showLaunchOverlay() {
-        guard launchOverlay == nil, let image = UIImage(named: "appaliguaungld") else { return }
+        let assetName = isKoreanLaunch ? "PaliroLaunchKorean" : "appaliguaungld"
+        guard launchOverlay == nil, let image = UIImage(named: assetName) else { return }
         let overlay = UIImageView(image: image)
         overlay.translatesAutoresizingMaskIntoConstraints = false
         overlay.contentMode = .scaleAspectFill
@@ -57,6 +80,26 @@ final class PaliroBridgeViewController: CAPBridgeViewController {
             overlay.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
         launchOverlay = overlay
+    }
+
+    private func configureLaunchSurface() {
+        view.backgroundColor = launchBackgroundColor
+        guard !hasConfiguredLaunchSurface else { return }
+        hasConfiguredLaunchSurface = true
+        showLaunchOverlay()
+        guard launchOverlay != nil else { return }
+        NotificationCenter.default.removeObserver(self, name: .paliroWebContentReady, object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(hideLaunchOverlay),
+            name: .paliroWebContentReady,
+            object: nil
+        )
+
+        // Keep a dark branded surface even if JavaScript fails before mounting.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 15) { [weak self] in
+            self?.hideLaunchOverlay()
+        }
     }
 
     @objc private func hideLaunchOverlay() {
@@ -79,7 +122,8 @@ final class PaliroLaunchScreenPlugin: CAPPlugin, CAPBridgedPlugin {
     let identifier = "PaliroLaunchScreenPlugin"
     let jsName = "PaliroLaunchScreen"
     let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "hide", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "hide", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "setLanguage", returnType: CAPPluginReturnPromise)
     ]
 
     @objc func hide(_ call: CAPPluginCall) {
@@ -87,6 +131,14 @@ final class PaliroLaunchScreenPlugin: CAPPlugin, CAPBridgedPlugin {
             NotificationCenter.default.post(name: .paliroWebContentReady, object: nil)
             call.resolve()
         }
+    }
+
+    @objc func setLanguage(_ call: CAPPluginCall) {
+        guard let language = call.getString("language"), PaliroLaunchLocale.save(language) else {
+            call.reject("Launch language must be en or ko.")
+            return
+        }
+        call.resolve()
     }
 }
 

@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import type { PGlite } from '@electric-sql/pglite'
+import type { PaliroDatabase } from './paliroDatabase.js'
 import { PaliroApiError } from './paliroErrors.js'
 import { paliroHashPassword, paliroNewToken, paliroTokenHash, paliroVerifyPassword } from './paliroSecurity.js'
 
@@ -37,7 +37,7 @@ export function paliroValidateBirthday(value: string, now: Date) {
 }
 
 export class PaliroAccounts {
-  constructor(private db: PGlite, private sessionHours = 24, private now = () => new Date()) {}
+  constructor(private db: PaliroDatabase, private sessionHours = 24, private now = () => new Date(), private protectTestAccount = false) {}
 
   private newSession() {
     const token = paliroNewToken()
@@ -59,41 +59,42 @@ export class PaliroAccounts {
     const session = this.newSession()
     try {
       const user = await this.db.transaction(async (tx) => {
-        const result = await tx.query<PaliroUserRow>(`INSERT INTO paliro_users
+        const id = randomUUID()
+        await tx.query(`INSERT INTO paliro_users
           (id, email, password_hash, terms_version, terms_accepted_at, created_at, updated_at,
             nickname, avatar, birthday, bio, interests, language, mood, gender)
-          VALUES ($1, $2, $3, $4, $5, $5, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *, birthday::text AS birthday`,
-        [randomUUID(), email, passwordHash, PALIRO_TERMS_VERSION, session.createdAt,
+          VALUES ($1, $2, $3, $4, $5, $5, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+        [id, email, passwordHash, PALIRO_TERMS_VERSION, session.createdAt,
           profile.nickname, profile.avatar, profile.birthday, profile.bio, profile.interests, profile.language, profile.mood, profile.gender])
-        const row = result.rows[0]!
+        const row = (await tx.query<PaliroUserRow>('SELECT * FROM paliro_users WHERE id = $1', [id])).rows[0]!
         await tx.query('INSERT INTO paliro_sessions (token_hash, user_id, created_at, expires_at) VALUES ($1, $2, $3, $4)',
           [session.hash, row.id, session.createdAt, session.expiresAt])
         return publicUser(row)
       })
       return { user, accessToken: session.token, tokenType: 'Bearer', expiresAt: session.expiresAt.toISOString() }
     } catch (error) {
-      if ((error as { code?: string }).code === '23505') throw new PaliroApiError(409, 'EMAIL_IN_USE', 'An account with this email already exists.')
+      if ((error as { code?: string }).code === 'ER_DUP_ENTRY') throw new PaliroApiError(409, 'EMAIL_IN_USE', 'An account with this email already exists.')
       throw error
     }
   }
 
   async login(email: string, password: string) {
-    const result = await this.db.query<PaliroUserRow>('SELECT *, birthday::text AS birthday FROM paliro_users WHERE email = $1', [email.trim().toLowerCase()])
+    const result = await this.db.query<PaliroUserRow>('SELECT * FROM paliro_users WHERE email = $1', [email.trim().toLowerCase()])
     const row = result.rows[0]
     const valid = await paliroVerifyPassword(password, row?.password_hash)
     if (!row || !valid || row.status !== 'active') throw new PaliroApiError(401, 'INVALID_CREDENTIALS', 'Email or password is incorrect.')
     const session = this.newSession()
     // A deletion during password verification must not recreate a session.
     const inserted = await this.db.query(`INSERT INTO paliro_sessions (token_hash, user_id, created_at, expires_at)
-      SELECT $1, id, $2, $3 FROM paliro_users WHERE id = $4 AND status = 'active' RETURNING user_id`,
+      SELECT $1, id, $2, $3 FROM paliro_users WHERE id = $4 AND status = 'active'`,
     [session.hash, session.createdAt, session.expiresAt, row.id])
-    if (!inserted.rows.length) throw new PaliroApiError(401, 'INVALID_CREDENTIALS', 'Email or password is incorrect.')
+    if (!inserted.affectedRows) throw new PaliroApiError(401, 'INVALID_CREDENTIALS', 'Email or password is incorrect.')
     await this.db.query('DELETE FROM paliro_sessions WHERE expires_at <= $1', [session.createdAt])
     return { user: publicUser(row), accessToken: session.token, tokenType: 'Bearer', expiresAt: session.expiresAt.toISOString() }
   }
 
   async me(token: string) {
-    const result = await this.db.query<PaliroUserRow>(`SELECT u.*, u.birthday::text AS birthday FROM paliro_users u
+    const result = await this.db.query<PaliroUserRow>(`SELECT u.* FROM paliro_users u
       JOIN paliro_sessions s ON s.user_id = u.id
       WHERE s.token_hash = $1 AND s.expires_at > $2 AND u.status = 'active'`, [paliroTokenHash(token), this.now()])
     if (!result.rows[0]) throw new PaliroApiError(401, 'UNAUTHORIZED', 'Please log in again.')
@@ -116,13 +117,15 @@ export class PaliroAccounts {
     const keys = columns.filter((key) => patch[key] !== undefined)
     const values: unknown[] = keys.map((key) => patch[key])
     values.push(this.now(), user.id, paliroTokenHash(token))
-    const result = await this.db.query<PaliroUserRow>(`UPDATE paliro_users SET
-      ${keys.map((key, index) => `${key} = $${index + 1}`).join(', ')}, updated_at = $${keys.length + 1}
-      WHERE id = $${keys.length + 2} AND status = 'active' AND EXISTS (
-        SELECT 1 FROM paliro_sessions WHERE token_hash = $${keys.length + 3} AND expires_at > $${keys.length + 1}
-      ) RETURNING *, birthday::text AS birthday`, values)
-    if (!result.rows[0]) throw new PaliroApiError(401, 'UNAUTHORIZED', 'Please log in again.')
-    return publicUser(result.rows[0])
+    return this.db.transaction(async tx => {
+      const result = await tx.query(`UPDATE paliro_users SET
+        ${keys.map((key, index) => `${key} = $${index + 1}`).join(', ')}, updated_at = $${keys.length + 1}
+        WHERE id = $${keys.length + 2} AND status = 'active' AND EXISTS (
+          SELECT 1 FROM paliro_sessions WHERE token_hash = $${keys.length + 3} AND expires_at > $${keys.length + 1}
+        )`, values)
+      if (!result.affectedRows) throw new PaliroApiError(401, 'UNAUTHORIZED', 'Please log in again.')
+      return publicUser((await tx.query<PaliroUserRow>('SELECT * FROM paliro_users WHERE id = $1', [user.id])).rows[0]!)
+    })
   }
 
   async logout(token: string) {
@@ -131,6 +134,9 @@ export class PaliroAccounts {
 
   async deleteAccount(token: string, password: string) {
     const user = await this.me(token)
+    if (this.protectTestAccount && user.isTestAccount) {
+      throw new PaliroApiError(403, 'TEST_ACCOUNT_PROTECTED', 'The shared acceptance account cannot be deleted.')
+    }
     const result = await this.db.query<{ password_hash: string }>('SELECT password_hash FROM paliro_users WHERE id = $1', [user.id])
     if (!await paliroVerifyPassword(password, result.rows[0]?.password_hash)) {
       throw new PaliroApiError(401, 'INVALID_CREDENTIALS', 'Email or password is incorrect.')
@@ -138,9 +144,9 @@ export class PaliroAccounts {
     await this.db.transaction(async tx => {
       const deleted = await tx.query(`DELETE FROM paliro_users WHERE id = $1 AND EXISTS (
         SELECT 1 FROM paliro_sessions WHERE token_hash = $2 AND expires_at > $3
-      ) RETURNING id`, [user.id, paliroTokenHash(token), this.now()])
-      if (!deleted.rows.length) throw new PaliroApiError(401, 'UNAUTHORIZED', 'Please log in again.')
-      if (user.isTestAccount) await tx.query("INSERT INTO paliro_retired_seeds (seed_name) VALUES ('test-account') ON CONFLICT DO NOTHING")
+      )`, [user.id, paliroTokenHash(token), this.now()])
+      if (!deleted.affectedRows) throw new PaliroApiError(401, 'UNAUTHORIZED', 'Please log in again.')
+      if (user.isTestAccount) await tx.query("INSERT INTO paliro_retired_seeds (seed_name) VALUES ('test-account') ON DUPLICATE KEY UPDATE seed_name = VALUES(seed_name)")
     })
   }
 }

@@ -1,8 +1,6 @@
 import assert from 'node:assert/strict'
 import { after, before, beforeEach, test } from 'node:test'
-import { mkdtemp, rm } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { paliroOpenTestDatabase, paliroTestConfig } from './paliroMysqlTestDatabase.js'
 import { paliroBuildApp } from '../src/paliroApp.js'
 import { paliroOpenDatabase } from '../src/paliroDatabase.js'
 import { PALIRO_TERMS_VERSION, paliroValidateBirthday } from '../src/paliroAccounts.js'
@@ -23,7 +21,7 @@ async function register(email?: string) {
   return response.json()
 }
 before(async () => {
-  db = await paliroOpenDatabase()
+  db = await paliroOpenTestDatabase()
   app = await paliroBuildApp({ database: db, now: () => now, authLimit: 1000 })
 })
 beforeEach(async () => {
@@ -36,7 +34,7 @@ after(async () => { await app?.close(); await db?.close() })
 test('health and interactive documentation are available without login', async () => {
   const health = await app.inject('/health')
   assert.equal(health.statusCode, 200)
-  assert.equal(health.json().mode, 'local-only')
+  assert.equal(health.json().mode, 'development')
   assert.equal((await app.inject('/docs/')).statusCode, 200)
   const spec = (await app.inject('/openapi.json')).json()
   for (const route of ['/health', '/v1/auth/register', '/v1/auth/login', '/v1/auth/logout', '/v1/me']) assert.ok(spec.paths[route])
@@ -246,9 +244,8 @@ test('auth rate limiting rejects repeated guesses and does not trust spoofed for
   } finally { await limited.close() }
 })
 
-test('disk database survives closing/reopening and does not reapply migrations or reset users', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'paliro-account-test-'))
-  let disk = await paliroOpenDatabase(directory)
+test('MySQL survives reconnecting and does not reapply migrations or reset users', async () => {
+  let disk = await paliroOpenDatabase(paliroTestConfig(), true)
   let server = await paliroBuildApp({ database: disk })
   try {
     const registered = await server.inject({ method: 'POST', url: '/v1/auth/register', payload: registration('disk@example.test') })
@@ -258,7 +255,7 @@ test('disk database survives closing/reopening and does not reapply migrations o
     assert.equal((await server.inject({ method: 'PATCH', url: '/v1/me', headers: auth(session.accessToken), payload: profile })).statusCode, 200)
     await server.close()
     await disk.close()
-    disk = await paliroOpenDatabase(directory)
+    disk = await paliroOpenDatabase(paliroTestConfig(), true)
     server = await paliroBuildApp({ database: disk })
     const restored = await server.inject({ url: '/v1/me', headers: auth(session.accessToken) })
     assert.equal(restored.statusCode, 200)
@@ -266,14 +263,19 @@ test('disk database survives closing/reopening and does not reapply migrations o
     assert.equal(restored.json().profile.nickname, profile.nickname)
     const login = await server.inject({ method: 'POST', url: '/v1/auth/login', payload: { email: 'disk@example.test', password } })
     assert.equal(login.statusCode, 200)
-    assert.equal((await disk.query('SELECT version FROM paliro_schema_migrations')).rows.length, 3)
-  } finally { await server.close(); await disk.close(); await rm(directory, { recursive: true, force: true }) }
+    assert.equal((await disk.query('SELECT version FROM paliro_schema_migrations')).rows.length, 1)
+  } finally { await server.close(); await disk.close() }
 })
 
-test('configuration rejects public binding, production mode and invalid values', () => {
-  assert.equal(paliroReadConfig({}).host, '127.0.0.1')
-  for (const env of [{ NODE_ENV: 'production' }, { HOST: '0.0.0.0' }, { PORT: 'abc' }, { PORT: '0' }, { PALIRO_SESSION_HOURS: '-1' }, { PALIRO_CORS_ORIGINS: '*' }, { PALIRO_DATA_DIR: '' }, { PALIRO_DATA_DIR: '.' }, { PALIRO_DATA_DIR: '/' }]) {
-    assert.throws(() => paliroReadConfig(env))
+test('configuration keeps development local and enables only constrained production mode', () => {
+  const mysqlEnv = { PALIRO_MYSQL_USER: 'paliro_test', PALIRO_MYSQL_PASSWORD: 'config-test-only' }
+  assert.equal(paliroReadConfig(mysqlEnv).host, '127.0.0.1')
+  const production = paliroReadConfig({ ...mysqlEnv, NODE_ENV: 'production', PORT: '3300', PALIRO_PUBLIC_ORIGIN: 'https://mobile.paliroweb.site' })
+  assert.equal(production.mode, 'production')
+  assert.deepEqual(production.corsOrigins, ['https://mobile.paliroweb.site', 'capacitor://localhost'])
+  assert.deepEqual(production.trustProxy, ['127.0.0.1', '::1'])
+  for (const env of [{ NODE_ENV: 'production' }, { NODE_ENV: 'production', PALIRO_PUBLIC_ORIGIN: 'http://mobile.paliroweb.site' }, { NODE_ENV: 'production', PALIRO_PUBLIC_ORIGIN: 'https://mobile.paliroweb.site/path' }, { NODE_ENV: 'staging' }, { HOST: '0.0.0.0' }, { PORT: 'abc' }, { PORT: '0' }, { PALIRO_SESSION_HOURS: '-1' }, { PALIRO_CORS_ORIGINS: '*' }, { PALIRO_MYSQL_DATABASE: 'other_project' }, { PALIRO_MYSQL_PASSWORD: '' }, { PALIRO_MYSQL_PORT: '0' }, { PALIRO_MYSQL_HOST: 'public.example' }]) {
+    assert.throws(() => paliroReadConfig({ ...mysqlEnv, ...env }))
   }
 })
 
@@ -293,6 +295,20 @@ test('the seeded account uses its configured password and retains a stable fixtu
   const restored = await app.inject({ url: '/v1/me', headers: auth(result.accessToken) })
   assert.equal(restored.json().profile.nickname, 'Keep my changes')
   assert.equal((await db.query('SELECT id FROM paliro_users')).rows.length, 1)
+})
+
+test('production protection prevents deletion of the shared acceptance account', async () => {
+  await paliroSeedTestAccount(db)
+  const protectedApp = await paliroBuildApp({ database: db, protectTestAccount: true, authLimit: 1000 })
+  try {
+    const login = await protectedApp.inject({ method: 'POST', url: '/palirov1/paliro/auth/login', payload: { email: 'paliro@gmail.com', password: '67896789' } })
+    assert.equal(login.statusCode, 200)
+    const token = login.json().accessToken
+    const deletion = await protectedApp.inject({ method: 'DELETE', url: '/palirov1/paliro/me/account', headers: auth(token), payload: { password: '67896789' } })
+    assert.equal(deletion.statusCode, 403)
+    assert.equal(deletion.json().error.code, 'TEST_ACCOUNT_PROTECTED')
+    assert.equal((await protectedApp.inject({ url: '/palirov1/paliro/me/profile', headers: auth(token) })).statusCode, 200)
+  } finally { await protectedApp.close() }
 })
 
 test('rotating the existing test password preserves user data, revokes only its sessions and is idempotent', async () => {

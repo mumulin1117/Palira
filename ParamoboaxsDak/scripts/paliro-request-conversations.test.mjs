@@ -28,7 +28,7 @@ test('one request creates one locked conversation with the original message, tim
       assert.equal(row.messages.filter(m => m.type === 'friend-request').length, 1)
       assert.equal(row.messages.at(-1).body, 'Hello 안녕')
       assert.equal(row.messages.at(-1).sentAt, persisted.requestedAt)
-      assert.ok(!paliroGetConversations(userID, language === 'en' ? 'ko' : 'en').some(c => c.member.id === member.id))
+      assert.deepEqual(paliroGetConversations(userID, language === 'en' ? 'ko' : 'en').find(c => c.member.id === member.id), row)
     }
     assert.equal(paliroSendFriendRequest(userID, member.id, 'replacement').type, 'already-pending')
     assert.equal(JSON.parse(values.get('paliro.friendRequests'))[userID][member.id].message, 'Hello 안녕')
@@ -46,6 +46,7 @@ test('older persisted requests without a member snapshot are hydrated without du
   const again = paliroGetConversations(userID).find(c => c.member.id === member.id)
   assert.ok(first.isLocked)
   assert.deepEqual(again, first)
+  assert.deepEqual(paliroGetConversations(userID, 'ko').find(c => c.member.id === member.id), first)
   assert.ok(!paliroGetConversations('different-user').some(c => c.member.id === member.id))
 }))
 
@@ -62,6 +63,10 @@ test('accepting an incoming request unlocks the existing row and retains the sen
   assert.ok(paliroMarkConversationRead(userID, incoming.member.id))
   assert.equal(paliroSendConversationMessage(userID, incoming.member.id, 'Now we can chat').type, 'success')
   assert.equal(paliroGetConversation(userID, incoming.member.id).messages.filter(m => m.type === 'friend-request').length, 1)
+  const original = paliroGetConversations(userID).find(c => c.member.id === incoming.member.id)
+  for (const language of ['en', 'ko', 'en']) {
+    assert.deepEqual(paliroGetConversations(userID, language).find(c => c.member.id === incoming.member.id), original)
+  }
 }))
 
 test('blocking removes a pending conversation and prevents another request', () => withStore((userID) => {
@@ -69,8 +74,21 @@ test('blocking removes a pending conversation and prevents another request', () 
   paliroSendFriendRequest(userID, member.id, 'Hi')
   assert.ok(paliroGetConversations(userID).some(c => c.member.id === member.id))
   paliroBlockMember(userID, member)
-  assert.ok(!paliroGetConversations(userID).some(c => c.member.id === member.id))
+  for (const language of ['', 'en', 'ko']) assert.ok(!paliroGetConversations(userID, language).some(c => c.member.id === member.id))
   assert.equal(paliroSendFriendRequest(userID, member.id, 'Again').type, 'blocked')
+}))
+
+test('untouched demo rows stay localized while personal replies survive repeated language changes', () => withStore(userID => {
+  for (const language of ['en', 'ko']) {
+    const opposite = language === 'en' ? 'ko' : 'en'
+    const conversation = paliroGetConversations(userID, language).find(c => c.member.language === language)
+    assert.ok(!paliroGetConversations(userID, opposite).some(c => c.member.id === conversation.member.id))
+    assert.equal(paliroSendConversationMessage(userID, conversation.member.id, 'Hello! 안녕하세요!').type, 'success')
+    const saved = paliroGetConversations(userID, language).find(c => c.member.id === conversation.member.id)
+    for (const locale of [opposite, language, opposite]) {
+      assert.deepEqual(paliroGetConversations(userID, locale).find(c => c.member.id === conversation.member.id), saved)
+    }
+  }
 }))
 
 const source = readFileSync(new URL('../src/PaliroEntryApp.vue', import.meta.url), 'utf8')

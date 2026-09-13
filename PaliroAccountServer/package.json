@@ -3,22 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22.13" },
+  "engines": {
+    "node": ">=22.13"
+  },
   "packageManager": "pnpm@11.19.0",
   "scripts": {
     "dev": "node --env-file-if-exists=.env --import tsx src/paliroServer.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node --env-file-if-exists=.env dist/paliroServer.js",
-    "test": "node --import tsx --test --test-concurrency=1 test/*.test.ts",
-    "smoke": "node scripts/paliroSmoke.mjs"
+    "test": "node --env-file-if-exists=.env.test --import tsx --test --test-concurrency=1 test/*.test.ts",
+    "smoke": "node scripts/paliroSmoke.mjs",
+    "db:migrate": "node --env-file-if-exists=.env scripts/paliroMysqlMigrate.mjs"
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.3.0",
     "@fastify/cors": "^11.0.0",
     "@fastify/rate-limit": "^10.0.0",
     "@fastify/swagger": "^9.0.0",
     "@fastify/swagger-ui": "^6.1.1",
-    "fastify": "^5.0.0"
+    "fastify": "^5.0.0",
+    "mysql2": "^3.24.4"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

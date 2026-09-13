@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import vm from 'node:vm'
 import { readFileSync } from 'node:fs'
-import { createPaliroAccountApi, createPaliroCredentialStore, PaliroAuthError } from '../src/services/paliroAccountApi.js'
+import { createPaliroAccountApi, createPaliroCredentialStore, PALIRO_AUTH_API_URL, PaliroAuthError, paliroProfileToWire } from '../src/services/paliroAccountApi.js'
 import { createPaliroServerSession } from '../src/services/paliroServerSession.js'
 import { paliroAcceptServerUser, paliroSeedUsers, paliroLogin, paliroGetSocialState, paliroGetConversations, paliroGetPublishedVideos, paliroUpdateProfile } from '../src/services/paliroLocalStore.js'
 
@@ -13,6 +13,10 @@ function storage() {
 const profile = () => ({ nickname: 'New Member', avatar: 'blue', bio: 'Coffee and music.', birthday: '1998-10-24', mood: 'Feeling Happy', gender: 'Other', interests: ['Music', 'Coffee', 'Nature'], language: 'en' })
 const user = () => ({ id: '11111111-1111-4111-8111-111111111111', email: 'new@example.test', isTestAccount: false, profileComplete: true, profile: profile() })
 const response = () => ({ user: user(), accessToken: 'a'.repeat(43), expiresAt: new Date(Date.now() + 3600000).toISOString() })
+
+test('a build without injected Vite environment still defaults to the production API', () => {
+  assert.equal(PALIRO_AUTH_API_URL, 'https://mobile.paliroweb.site')
+})
 
 test('reserved server identity preserves test relationships, messages, profile and zero initial posts across login', () => {
   globalThis.window = { localStorage: storage() }
@@ -64,13 +68,19 @@ test('ordinary remote accounts are isolated; email or a spoofed test flag alone 
 
 test('registration sends all profile fields exactly once to register, never to login', async () => {
   const calls = []
-  const api = createPaliroAccountApi({ fetchImpl: async (url, options) => { calls.push({ url, ...options }); return Response.json(response(), { status: 201 }) } })
+  const reply = { ...response(), user: { ...user(), profile: undefined, palirovmemberProfile: paliroProfileToWire(profile()) } }
+  const api = createPaliroAccountApi({ fetchImpl: async (url, options) => { calls.push({ url, ...options }); return Response.json(reply, { status: 201 }) } })
   await api.register({ email: ' new@example.test ', password: 'Example-123' }, profile(), 'ko', true)
   assert.equal(calls.length, 1)
-  assert.ok(calls[0].url.endsWith('/v1/auth/register'))
+  assert.ok(calls[0].url.endsWith('/palirov1/paliro/auth/register'))
   const body = JSON.parse(calls[0].body)
   assert.equal(body.email, 'new@example.test')
-  assert.deepEqual(body.profile, { ...profile(), language: 'ko' })
+  assert.equal(body.profile, undefined)
+  assert.deepEqual(body.palirovmemberProfile, {
+    palirovdisplayName: 'New Member', palirovavatarKey: 'blue', palirovaboutMe: 'Coffee and music.',
+    palirovbirthDate: '1998-10-24', palirovcurrentMood: 'Feeling Happy', gender: 'Other',
+    palirovinterestTags: ['Music', 'Coffee', 'Nature'], palirovpreferredLanguage: 'ko',
+  })
   assert.equal(body.acceptedTerms, true)
 })
 

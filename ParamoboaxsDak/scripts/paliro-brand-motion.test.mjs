@@ -56,7 +56,7 @@ test('successful publishing rewards once per day and repeated confirm/submit can
   try {
     const userID = paliroSeedUsers()[0].id
     const context = vm.createContext({ session: { value: { userID } }, languagePreference: { value: 'en' },
-      showVideoPublish: { value: true }, videoPublishLoading: { value: false },
+      showVideoPublish: { value: true }, videoPublishLoading: { value: false }, videoSelectionBusy: { value: false },
       videoPublishDraft: { value: { source: '/test.mp4', caption: 'First post' } }, videoPublishError: { value: '' },
       boxState: { value: null }, videoRewardPending: { value: false }, showVideoPublishReward: { value: false },
       paliroCreateVideoPost, paliroAwardVideoBoxAction, loadMeState() {}, loadVideoFeed() {},
@@ -86,7 +86,7 @@ test('successful publishing rewards once per day and repeated confirm/submit can
 
 test('a failed publication never triggers rewards or closes the draft', () => {
   const context = vm.createContext({ session: { value: { userID: 'self' } }, languagePreference: { value: 'ko' },
-    showVideoPublish: { value: true }, videoPublishLoading: { value: false },
+    showVideoPublish: { value: true }, videoPublishLoading: { value: false }, videoSelectionBusy: { value: false },
     videoPublishDraft: { value: { source: '/test.mp4', caption: 'Test' } }, videoPublishError: { value: '' },
     videoRewardPending: { value: false }, showVideoPublishReward: { value: false }, t: (key) => key,
     paliroCreateVideoPost: () => null, paliroAwardVideoBoxAction: () => assert.fail('No reward before persistence'),

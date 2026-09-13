@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24765" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Paliro Launch View Controller-->
+        <scene sceneID="EHf-IW-A2E">
+            <objects>
+                <viewController id="01J-lp-oVM" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="K9G-8m-xh6">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" red="0.019607843137254902" green="0.043137254901960784" blue="0.12941176470588237" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="PaliroLaunchKorean" translatesAutoresizingMaskIntoConstraints="NO" id="snD-IY-ifK">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                            </imageView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="snD-IY-ifK" firstAttribute="leading" secondItem="K9G-8m-xh6" secondAttribute="leading" id="7ck-WP-uO8"/>
+                            <constraint firstAttribute="trailing" secondItem="snD-IY-ifK" secondAttribute="trailing" id="Ifu-hK-L4c"/>
+                            <constraint firstItem="snD-IY-ifK" firstAttribute="top" secondItem="K9G-8m-xh6" secondAttribute="top" id="X2A-4a-VeN"/>
+                            <constraint firstAttribute="bottom" secondItem="snD-IY-ifK" secondAttribute="bottom" id="yVq-OJ-1Dg"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="53" y="375"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="PaliroLaunchKorean" width="375" height="812"/>
+    </resources>
+</document>

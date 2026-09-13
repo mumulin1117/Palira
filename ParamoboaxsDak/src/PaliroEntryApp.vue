@@ -10,9 +10,12 @@ import PaliroVideoCall from './components/PaliroVideoCall.vue'
 import PaliroOverlayTransition from './components/PaliroOverlayTransition.vue'
 import PaliroStateFeedback from './components/PaliroStateFeedback.vue'
 import PaliroPullRefresh from './components/PaliroPullRefresh.vue'
+import PaliroFirstLaunch from './components/PaliroFirstLaunch.vue'
+import { claimPaliroFirstLaunch } from './services/paliroFirstLaunch'
 import { usePaliroListRequest } from './services/paliroListRequest'
 import { PALIRO_BOX_OPENING_MOTION } from './services/paliroBrandMotion'
 import { paliroRequestCallPermissions } from './services/paliroVideoCall'
+import { paliroBrowserVideoCover, paliroMediaErrorKey, paliroSelectVideo } from './services/paliroVideoSelection'
 import { paliroPrimaryTabs, paliroRouteTransition } from './services/paliroNavigation'
 import {
   PALIRO_BOX_ACTION_COST,
@@ -79,6 +82,8 @@ import { PALIRO_LOCALES, paliroGetLegalCopy, paliroTranslate, paliroTranslateMoo
 
 // Keep the WebView visually neutral until local launch state selects a screen.
 const route = ref('boot')
+const showFirstLaunch = ref(claimPaliroFirstLaunch(window.localStorage))
+const launchArtwork = window.paliroLaunchArtwork || { src: '/assets/paliro-launch-screen@2x.png', srcset: '' }
 const errorMessage = ref('')
 const showEula = ref(false)
 const hasAgreed = ref(false)
@@ -94,6 +99,10 @@ let registrationDraft = null
 let incompleteAuth = null
 const accountApi = createPaliroAccountApi()
 const nativeLaunchScreen = Capacitor.isNativePlatform() ? registerPlugin('PaliroLaunchScreen') : null
+function syncNativeLaunchLanguage(language) {
+  paliroSetLanguagePreference(null, language)
+  void nativeLaunchScreen?.setLanguage({ language }).catch(() => {})
+}
 const serverSession = createPaliroServerSession({
   api: accountApi,
   credentials: createPaliroCredentialStore({ nativeStore: Capacitor.isNativePlatform() ? registerPlugin('PaliroAuthStorage') : null }),
@@ -209,7 +218,7 @@ const acceptedFriend = ref(null)
 const showFriendshipCelebration = ref(false)
 const topicTestState = ref(null)
 const blockedUsers = ref([])
-const languagePreference = ref('ko')
+const languagePreference = ref(paliroGetLanguagePreference())
 const videoFeed = ref([])
 const activeVideoIndex = ref(0)
 const videoFeedScroll = ref(null)
@@ -235,6 +244,7 @@ const videoPublishDraft = ref({ source: '', title: '', caption: '' })
 const videoPublishSource = ref('library')
 const videoPublishError = ref('')
 const videoPublishLoading = ref(false)
+const videoSelectionBusy = ref(false)
 const showVideoPublishReward = ref(false)
 const videoRewardPending = ref(false)
 const videoElements = new Map()
@@ -335,6 +345,7 @@ let voiceStartPromise = null
 let voiceSending = false
 const nativeVoiceRecorder = Capacitor.isNativePlatform() ? registerPlugin('PaliroVoiceRecorder') : null
 const nativeCallPermissions = Capacitor.isNativePlatform() ? registerPlugin('PaliroCallPermissions') : null
+const nativeMediaPicker = Capacitor.isNativePlatform() ? registerPlugin('PaliroMediaPicker') : null
 let paliroVideoRestorePending = false
 
 function createDefaultProfile() {
@@ -435,11 +446,20 @@ const reportReasons = ['reportReasonHarassment', 'reportReasonSpam', 'reportReas
 
 async function revealWebContent() {
   await nextTick()
+  const bootImage = document.querySelector('.paliro-boot > img')
+  if (bootImage?.decode) {
+    await Promise.race([bootImage.decode().catch(() => {}), new Promise(resolve => setTimeout(resolve, 800))])
+  }
   window.requestAnimationFrame(() => {
     window.requestAnimationFrame(() => {
       void nativeLaunchScreen?.hide().catch(() => {})
     })
   })
+}
+
+function finishFirstLaunch() {
+  showFirstLaunch.value = false
+  if (!authBusy.value && route.value === 'welcome' && !hasAgreed.value) showEula.value = true
 }
 
 const pageTitle = computed(() => ({
@@ -453,6 +473,7 @@ const pageTitle = computed(() => ({
 onMounted(() => {
   paliroSeedUsers()
   hasAgreed.value = paliroGetEulaAccepted()
+  syncNativeLaunchLanguage(languagePreference.value)
   void restoreServerSession()
   void revealWebContent()
   applyLocale()
@@ -635,7 +656,7 @@ async function restoreServerSession() {
     }
   } finally {
     authBusy.value = false
-    showEula.value = route.value === 'welcome' && !hasAgreed.value
+    showEula.value = !showFirstLaunch.value && route.value === 'welcome' && !hasAgreed.value
   }
 }
 
@@ -800,6 +821,7 @@ function loadBoxState() {
 function loadMeState() {
   const userID = session.value?.userID
   languagePreference.value = paliroGetLanguagePreference(userID)
+  syncNativeLaunchLanguage(languagePreference.value)
   socialState.value = paliroGetSocialState(userID, languagePreference.value)
   profileMeta.value = paliroGetSocialSummary(userID, languagePreference.value)
   topicTestState.value = paliroGetTopicTestState(userID)
@@ -1133,7 +1155,7 @@ function openVideoMemberProfile(video) {
 }
 
 function openVideoPublish() {
-  videoPublishDraft.value = { source: '', title: '', caption: '' }
+  videoPublishDraft.value = { source: '', thumbnail: '', title: '', caption: '' }
   videoPublishSource.value = 'library'
   videoPublishError.value = ''
   showVideoPublishReward.value = false
@@ -1141,6 +1163,7 @@ function openVideoPublish() {
 }
 
 function selectVideoPublishSource(source) {
+  if (videoSelectionBusy.value) return
   videoPublishSource.value = source
   videoPublishError.value = ''
 }
@@ -1150,50 +1173,61 @@ function beginVideoSelection() {
 }
 
 function pickBrowserVideo() {
-  const input = document.createElement('input')
-  input.type = 'file'
-  input.accept = 'video/*'
-  input.onchange = () => {
-    const file = input.files?.[0]
-    if (!file) return
-    if (file.size > 32 * 1024 * 1024) { videoPublishError.value = t('videoTooLarge'); return }
-    videoPublishDraft.value = { ...videoPublishDraft.value, source: URL.createObjectURL(file) }
-  }
-  input.click()
+  return new Promise((resolve, reject) => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'video/*'
+    input.oncancel = () => resolve(null)
+    input.onchange = async () => {
+      const file = input.files?.[0]
+      if (!file) { resolve(null); return }
+      if (file.size > 32 * 1024 * 1024) { reject({ code: 'VIDEO_TOO_LARGE' }); return }
+      const fileUri = URL.createObjectURL(file)
+      try { resolve({ fileUri, thumbnail: await paliroBrowserVideoCover(fileUri) }) }
+      catch (error) { URL.revokeObjectURL(fileUri); reject(error) }
+    }
+    input.click()
+  })
 }
 
 async function pickVideoForPublish(source) {
+  if (videoSelectionBusy.value || videoPublishLoading.value) return
+  videoSelectionBusy.value = true
   videoPublishError.value = ''
-  const picker = getPaliroMediaPicker()
+  const draft = videoPublishDraft.value
   try {
-    if (picker?.pick) {
-      const result = await picker.pick({ source, mediaType: 'video' })
-      if (result?.fileUri) {
-        videoPublishDraft.value = { ...videoPublishDraft.value, source: result.fileUri }
-        return
-      }
-      if (result?.cancelled) return
-      throw new Error('video-picker-failed')
+    const result = await paliroSelectVideo({ source, nativePicker: getPaliroMediaPicker(), browserPicker: pickBrowserVideo })
+    if (!result) return
+    if (!showVideoPublish.value || videoPublishDraft.value !== draft) {
+      if (result.source.startsWith('blob:')) URL.revokeObjectURL(result.source)
+      return
     }
-    if (source === 'camera') throw new Error('native-camera-required')
-    pickBrowserVideo()
-  } catch {
-    videoPublishError.value = source === 'camera' ? t('cameraNativeOnly') : t('videoPickerFailed')
-  }
+    if (draft.source.startsWith('blob:')) URL.revokeObjectURL(draft.source)
+    videoPublishDraft.value = { ...draft, ...result }
+  } catch (error) {
+    if (showVideoPublish.value && videoPublishDraft.value === draft) videoPublishError.value = t(paliroMediaErrorKey(error))
+  } finally { videoSelectionBusy.value = false }
+}
+
+function closeVideoPublish() {
+  if (videoSelectionBusy.value || videoPublishLoading.value) return
+  if (videoPublishDraft.value.source.startsWith('blob:')) URL.revokeObjectURL(videoPublishDraft.value.source)
+  showVideoPublish.value = false
 }
 
 function publishVideo() {
-  if (!showVideoPublish.value || videoPublishLoading.value) return
+  if (!showVideoPublish.value || videoPublishLoading.value || videoSelectionBusy.value) return
   if (!videoPublishDraft.value.source || !videoPublishDraft.value.caption.trim()) {
     videoPublishError.value = t('videoPublishRequired')
     return
   }
   videoPublishLoading.value = true
-  const post = paliroCreateVideoPost(session.value?.userID, {
+  let post
+  try { post = paliroCreateVideoPost(session.value?.userID, {
     ...videoPublishDraft.value,
     language: languagePreference.value,
-  })
-  videoPublishLoading.value = false
+  }) } catch { videoPublishError.value = t('videoPublishFailed'); return }
+  finally { videoPublishLoading.value = false }
   if (!post) { videoPublishError.value = t('videoPublishFailed'); return }
   const reward = paliroAwardVideoBoxAction(session.value?.userID)
   if (reward.state) boxState.value = reward.state
@@ -1720,8 +1754,8 @@ async function pickProfilePhoto(source) {
     }
     if (source === 'camera') throw new Error('native-camera-required')
     addBrowserProfileImage()
-  } catch {
-    editProfileError.value = source === 'camera' ? t('cameraNativeOnly') : t('mediaPickerFailed')
+  } catch (error) {
+    editProfileError.value = t(paliroMediaErrorKey(error, 'mediaPickerFailed'))
   }
 }
 
@@ -1877,6 +1911,7 @@ function selectLanguage(language) {
   const wasBoxSelectedNotice = homeNotice.value === t('boxSelected')
   const wasBoxSelectionRequiredNotice = homeNotice.value === t('boxSelectionRequired')
   languagePreference.value = paliroSetLanguagePreference(session.value?.userID, language)
+  syncNativeLaunchLanguage(languagePreference.value)
   applyLocale()
   loadMeState()
   loadMessageState()
@@ -1975,7 +2010,7 @@ function addComposerImage() {
 }
 
 function getPaliroMediaPicker() {
-  return window.Capacitor?.Plugins?.PaliroMediaPicker ?? window.Capacitor?.Plugins?.PaliroMediaPickerPlugin ?? null
+  return nativeMediaPicker
 }
 
 function loadComposerImage(dataUrl) {
@@ -2031,7 +2066,7 @@ async function pickComposerImage(source) {
       if (result?.dataUrl) await appendComposerImage(result.dataUrl)
       return
     }
-    if (source === 'camera') throw new Error(t('cameraNativeOnly'))
+    if (source === 'camera') throw new Error('native-camera-required')
     const input = document.createElement('input')
     input.type = 'file'
     input.accept = 'image/*'
@@ -2044,7 +2079,7 @@ async function pickComposerImage(source) {
     }
     input.click()
   } catch (error) {
-    composerError.value = t('mediaPickerFailed')
+    composerError.value = t(paliroMediaErrorKey(error, 'mediaPickerFailed'))
   }
 }
 
@@ -2666,7 +2701,8 @@ function finishTopicTest() {
 </script>
 
 <template>
-  <main class="paliro-shell" :inert="showAccountDeletionNotice">
+  <PaliroFirstLaunch v-if="showFirstLaunch" :title="t('appName')" :copy="t('firstLaunchCopy')" @complete="finishFirstLaunch" />
+  <main class="paliro-shell" :class="{ 'is-first-launch': showFirstLaunch }" :inert="showAccountDeletionNotice || showFirstLaunch">
     <div class="paliro-stars" aria-hidden="true"></div>
 
       <section v-if="hasOpenedVideoFeed && session" :class="{ 'is-inactive': route !== 'videos' || isVideoFeedRestoring, 'is-tab-transition': isPrimaryTabTransition }" :aria-hidden="route !== 'videos' || isVideoFeedRestoring" :inert="route !== 'videos' || isVideoFeedRestoring" class="paliro-video-feed paliro-view">
@@ -2721,7 +2757,7 @@ function finishTopicTest() {
 
     <Transition :name="isPrimaryTabTransition ? 'paliro-tab-fade' : 'paliro-route-fade'" :css="!skipVideoRouteAnimation" :mode="isPrimaryTabTransition ? undefined : 'out-in'" @after-enter="handlePageEntered">
       <section v-if="route === 'boot'" key="boot" aria-busy="true" class="paliro-boot paliro-view">
-        <img alt="" src="/assets/paliro-launch-screen@2x.png" />
+        <img alt="" :src="launchArtwork.src" :srcset="launchArtwork.srcset || undefined" />
         <div aria-hidden="true" class="paliro-boot-indicator"><i></i><i></i><i></i></div>
       </section>
 
@@ -3122,7 +3158,7 @@ function finishTopicTest() {
         <main v-if="socialDetail === 'posts'" class="paliro-me-secondary-scroll paliro-profile-posts-scroll">
           <section v-if="socialDetailItems.length" :aria-label="socialDetailTitle" class="paliro-profile-post-grid">
             <article v-for="post in socialDetailItems" :key="post.id" class="paliro-profile-post-card">
-              <video v-if="post.contentType === 'video'" :src="videoSource(post.source)" muted playsinline preload="metadata"></video>
+              <video v-if="post.contentType === 'video'" :src="videoSource(post.source)" :poster="post.thumbnail" muted playsinline preload="metadata"></video>
               <div v-else :class="['paliro-profile-box-post-art', `is-${post.theme?.toLocaleLowerCase().replace(/[^a-z]+/g, '-')}`]" aria-hidden="true"><img v-if="post.coverImage" :src="post.coverImage" /><span v-else>✦</span></div>
               <span aria-hidden="true" class="paliro-profile-post-play">{{ post.contentType === 'video' ? '▶' : '✦' }}</span>
               <button :aria-label="t('deletePost')" class="paliro-profile-post-delete" type="button" @click="deleteProfilePost(post)">⌫</button>
@@ -3162,7 +3198,7 @@ function finishTopicTest() {
         </header>
         <main v-if="publishedVideos.length" class="paliro-me-secondary-scroll paliro-my-videos-grid">
           <article v-for="video in publishedVideos" :key="video.id">
-            <video :src="videoSource(video.source)" muted playsinline preload="metadata"></video>
+            <video :src="videoSource(video.source)" :poster="video.thumbnail" muted playsinline preload="metadata"></video>
             <div><strong>{{ video.title }}</strong><span>{{ video.likes }} {{ t('likes') }}</span></div>
           </article>
         </main>
@@ -3581,18 +3617,19 @@ function finishTopicTest() {
 
     <Teleport to="body">
       <PaliroOverlayTransition kind="sheet">
-      <div v-if="showVideoPublish" class="paliro-video-publish-backdrop" @click.self="showVideoPublish = false">
+      <div v-if="showVideoPublish" class="paliro-video-publish-backdrop" @click.self="closeVideoPublish">
         <form aria-modal="true" class="paliro-video-publish-sheet" role="dialog" :aria-label="t('videoPublishTitle')" @submit.prevent="publishVideo">
-          <header><button :aria-label="t('back')" type="button" @click="showVideoPublish = false">‹</button><h2>{{ t('publish') }}</h2><span aria-hidden="true"></span></header>
+          <header><button :aria-label="t('back')" :disabled="videoSelectionBusy || videoPublishLoading" type="button" @click="closeVideoPublish">‹</button><h2>{{ t('publish') }}</h2><span aria-hidden="true"></span></header>
           <p :class="['paliro-video-reward-banner', { 'is-claimed': !videoRewardAvailable }]">{{ videoRewardAvailable ? t('videoRewardBanner') : t('videoRewardClaimed') }}</p>
           <section class="paliro-video-publish-media">
-            <video v-if="videoPublishDraft.source" :src="videoSource(videoPublishDraft.source)" controls muted playsinline></video>
-            <button v-else :aria-label="videoPublishSource === 'camera' ? t('recordVideo') : t('chooseVideo')" type="button" @click="beginVideoSelection"><span aria-hidden="true">+</span><strong>{{ videoPublishSource === 'camera' ? t('recordVideo') : t('chooseVideo') }}</strong></button>
+            <video v-if="videoPublishDraft.source" :key="videoPublishDraft.source" :src="videoSource(videoPublishDraft.source)" :poster="videoPublishDraft.thumbnail" preload="metadata" controls muted playsinline></video>
+            <button v-else :disabled="videoSelectionBusy" :aria-label="videoPublishSource === 'camera' ? t('recordVideo') : t('chooseVideo')" type="button" @click="beginVideoSelection"><span aria-hidden="true">+</span><strong>{{ videoSelectionBusy ? t('processing') : videoPublishSource === 'camera' ? t('recordVideo') : t('chooseVideo') }}</strong></button>
           </section>
+          <button v-if="videoPublishDraft.source" class="paliro-video-reselect" :disabled="videoSelectionBusy" type="button" @click="beginVideoSelection">{{ videoSelectionBusy ? t('processing') : t('replaceVideo') }}</button>
           <div class="paliro-video-publish-sources"><button :aria-pressed="videoPublishSource === 'library'" :class="{ 'is-selected': videoPublishSource === 'library' }" type="button" @click="selectVideoPublishSource('library')"><span aria-hidden="true">▧</span>{{ t('videoLibrary') }}</button><button :aria-pressed="videoPublishSource === 'camera'" :class="{ 'is-selected': videoPublishSource === 'camera' }" type="button" @click="selectVideoPublishSource('camera')"><span aria-hidden="true">▣</span>{{ t('recordVideo') }}</button></div>
           <label><span>{{ t('videoPublishCaption') }}</span><textarea v-model="videoPublishDraft.caption" :maxlength="180" :placeholder="t('videoPublishCaptionPlaceholder')"></textarea><small>{{ videoPublishDraft.caption.length }}/180</small></label>
           <p v-if="videoPublishError" class="paliro-video-form-error" role="alert">{{ videoPublishError }}</p>
-          <button class="paliro-video-submit" :disabled="videoPublishLoading" type="submit">{{ videoPublishLoading ? t('processing') : t('publish') }}</button>
+          <button class="paliro-video-submit" :disabled="videoPublishLoading || videoSelectionBusy" type="submit">{{ videoPublishLoading || videoSelectionBusy ? t('processing') : t('publish') }}</button>
         </form>
       </div>
       </PaliroOverlayTransition>

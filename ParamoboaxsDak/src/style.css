@@ -450,7 +450,8 @@ button { cursor: pointer; }
 .paliro-video-reward-banner { flex: 0 0 auto; margin: 0 20px 13px; padding: 10px 12px; border-radius: 10px; color: #fff; background: linear-gradient(95deg, #20eee6, #407fd8); font-size: 11px; font-weight: 700; line-height: 1.35; }
 .paliro-video-reward-banner.is-claimed { color: rgba(230, 228, 240, .77); background: rgba(50, 62, 117, .62); }
 .paliro-video-publish-media { display: grid; min-height: min(39dvh, 300px); margin: 0 20px; overflow: hidden; border: 2px dashed rgba(55, 242, 235, .75); border-radius: 16px; background: rgba(20, 21, 61, .68); place-items: center; }
-.paliro-video-publish-media video { width: 100%; height: 100%; object-fit: cover; }
+.paliro-video-publish-media video { width: 100%; height: min(39dvh, 300px); object-fit: cover; }
+.paliro-video-reselect { align-self: center; min-height: 44px; padding: 8px 16px; border: 0; color: #42f2eb; background: transparent; font: inherit; font-size: 12px; }
 .paliro-video-publish-media > button { display: grid; justify-items: center; gap: 10px; border: 0; color: rgba(255, 255, 255, .84); background: transparent; font: inherit; }
 .paliro-video-publish-media > button span { display: grid; width: 51px; height: 51px; border-radius: 50%; color: #42f2eb; background: rgba(37, 126, 157, .66); font-size: 37px; font-weight: 300; place-items: center; }
 .paliro-video-publish-media > button strong { font-size: 12px; }

@@ -11,9 +11,10 @@
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="PaliroBridgeViewController" customModule="App" sceneMemberID="viewController">
-                    <imageView key="view" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="appaliguaungld" id="xrk-uL-alz">
+                    <imageView key="view" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="PaliroLaunchKorean" id="xrk-uL-alz">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" red="0.019607843137254902" green="0.043137254901960784" blue="0.12941176470588237" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </imageView>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -22,6 +23,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="appaliguaungld" width="375" height="812"/>
+        <image name="PaliroLaunchKorean" width="375" height="812"/>
     </resources>
 </document>

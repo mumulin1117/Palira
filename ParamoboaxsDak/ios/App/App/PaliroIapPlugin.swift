@@ -175,14 +175,25 @@ final class PaliroMediaPickerPlugin: CAPPlugin, CAPBridgedPlugin, PHPickerViewCo
         AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
             DispatchQueue.main.async {
                 guard granted else { self?.finish(error: "Camera access was not granted."); return }
-                let picker = UIImagePickerController()
-                picker.sourceType = .camera
-                picker.mediaTypes = [self?.pendingMediaType == "video" ? UTType.movie.identifier : UTType.image.identifier]
-                if self?.pendingMediaType == "video" { picker.cameraCaptureMode = .video }
-                picker.delegate = self
-                self?.bridge?.viewController?.present(picker, animated: true)
+                if self?.pendingMediaType == "video" {
+                    AVCaptureDevice.requestAccess(for: .audio) { microphone in
+                        DispatchQueue.main.async {
+                            guard microphone else { self?.finish(error: "Microphone access was not granted."); return }
+                            self?.presentCamera()
+                        }
+                    }
+                } else { self?.presentCamera() }
             }
         }
+    }
+
+    private func presentCamera() {
+        let picker = UIImagePickerController()
+        picker.sourceType = .camera
+        picker.mediaTypes = [pendingMediaType == "video" ? UTType.movie.identifier : UTType.image.identifier]
+        if pendingMediaType == "video" { picker.cameraCaptureMode = .video }
+        picker.delegate = self
+        bridge?.viewController?.present(picker, animated: true)
     }
 
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
@@ -192,7 +203,7 @@ final class PaliroMediaPickerPlugin: CAPPlugin, CAPBridgedPlugin, PHPickerViewCo
             guard provider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) else { finish(); return }
             provider.loadFileRepresentation(forTypeIdentifier: UTType.movie.identifier) { [weak self] url, error in
                 guard let self, let url, error == nil else { self?.finish(error: "The selected video could not be opened."); return }
-                self.finish(videoURL: self.persistVideo(from: url))
+                self.prepareVideo(from: url)
             }
             return
         }
@@ -205,7 +216,8 @@ final class PaliroMediaPickerPlugin: CAPPlugin, CAPBridgedPlugin, PHPickerViewCo
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         picker.dismiss(animated: true)
         if pendingMediaType == "video" {
-            finish(videoURL: (info[.mediaURL] as? URL).flatMap { persistVideo(from: $0) })
+            guard let url = info[.mediaURL] as? URL else { finish(error: "The recorded video could not be opened."); return }
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in self?.prepareVideo(from: url) }
             return
         }
         finish(image: info[.originalImage] as? UIImage)
@@ -213,15 +225,35 @@ final class PaliroMediaPickerPlugin: CAPPlugin, CAPBridgedPlugin, PHPickerViewCo
 
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) { picker.dismiss(animated: true); finish() }
 
-    private func finish(image: UIImage? = nil, videoURL: URL? = nil, error: String? = nil) {
+    private func finish(image: UIImage? = nil, videoURL: URL? = nil, thumbnail: String? = nil, error: String? = nil) {
         DispatchQueue.main.async { [weak self] in
             guard let self, let call = self.pendingCall else { return }
             self.pendingCall = nil
-            if let error { call.reject(error); return }
-            if let videoURL { call.resolve(["fileUri": videoURL.absoluteString]); return }
+            if let error {
+                let code = error.contains("not granted") ? "PERMISSION_DENIED" : error == "Video exceeds 32 MB." ? "VIDEO_TOO_LARGE" : "MEDIA_FAILED"
+                call.reject(error, code)
+                return
+            }
+            if let videoURL, let thumbnail { call.resolve(["fileUri": videoURL.absoluteString, "thumbnail": thumbnail]); return }
             guard let image, let data = self.scaledImage(image).jpegData(compressionQuality: 0.78) else { call.resolve(["cancelled": true]); return }
             call.resolve(["dataUrl": "data:image/jpeg;base64,\(data.base64EncodedString())"])
         }
+    }
+
+    private func prepareVideo(from sourceURL: URL) {
+        do {
+            let size = try sourceURL.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
+            guard size <= 32 * 1024 * 1024 else { finish(error: "Video exceeds 32 MB."); return }
+            let generator = AVAssetImageGenerator(asset: AVURLAsset(url: sourceURL))
+            generator.appliesPreferredTrackTransform = true
+            generator.maximumSize = CGSize(width: 720, height: 720)
+            let frame = try generator.copyCGImage(at: .zero, actualTime: nil)
+            guard let data = UIImage(cgImage: frame).jpegData(compressionQuality: 0.75),
+                  let videoURL = persistVideo(from: sourceURL) else {
+                finish(error: "The selected video could not be saved."); return
+            }
+            finish(videoURL: videoURL, thumbnail: "data:image/jpeg;base64,\(data.base64EncodedString())")
+        } catch { finish(error: "The selected video could not be opened.") }
     }
 
     private func persistVideo(from sourceURL: URL) -> URL? {

@@ -1,65 +1,127 @@
-import { PGlite } from '@electric-sql/pglite'
+import { createPool, type PoolConnection, type ResultSetHeader } from 'mysql2/promise'
+import type { PaliroMysqlConfig } from './paliroConfig.js'
 
-export const paliroMigrations = [{
-  version: 1,
-  sql: `
-    CREATE TABLE paliro_users (
-      id UUID PRIMARY KEY,
-      email TEXT NOT NULL UNIQUE CHECK (email = lower(trim(email))),
-      password_hash TEXT NOT NULL,
-      email_verified BOOLEAN NOT NULL DEFAULT false,
-      status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'disabled')),
-      nickname TEXT NOT NULL DEFAULT '',
-      avatar TEXT NOT NULL DEFAULT 'violet' CHECK (avatar IN ('violet', 'blue', 'coral', 'mint', 'golden')),
-      birthday DATE,
-      bio TEXT NOT NULL DEFAULT '',
-      interests TEXT[] NOT NULL DEFAULT '{}',
-      language TEXT NOT NULL DEFAULT 'ko' CHECK (language IN ('en', 'ko')),
-      terms_version TEXT NOT NULL,
-      terms_accepted_at TIMESTAMPTZ NOT NULL,
-      created_at TIMESTAMPTZ NOT NULL,
-      updated_at TIMESTAMPTZ NOT NULL
-    );
-    CREATE TABLE paliro_sessions (
-      token_hash TEXT PRIMARY KEY,
-      user_id UUID NOT NULL REFERENCES paliro_users(id) ON DELETE CASCADE,
-      created_at TIMESTAMPTZ NOT NULL,
-      expires_at TIMESTAMPTZ NOT NULL
-    );
-    CREATE INDEX paliro_sessions_user_id ON paliro_sessions(user_id);
-    CREATE INDEX paliro_sessions_expiry ON paliro_sessions(expires_at);
-  `,
-}, {
-  version: 2,
-  sql: `ALTER TABLE paliro_users ADD COLUMN mood TEXT NOT NULL DEFAULT 'Want to Chat';
-    ALTER TABLE paliro_users ADD COLUMN gender TEXT NOT NULL DEFAULT 'Other' CHECK (gender IN ('Male', 'Female', 'Other'));
-    ALTER TABLE paliro_users ADD COLUMN is_test_account BOOLEAN NOT NULL DEFAULT false;`,
-}, {
-  version: 3,
-  sql: 'CREATE TABLE paliro_retired_seeds (seed_name TEXT PRIMARY KEY);',
-}]
+export interface PaliroQuery {
+  query<T = Record<string, unknown>>(sql: string, values?: unknown[]): Promise<{ rows: T[]; affectedRows: number }>
+}
+export interface PaliroDatabase extends PaliroQuery {
+  transaction<T>(callback: (tx: PaliroQuery) => Promise<T>): Promise<T>
+  close(): Promise<void>
+}
 
-export async function paliroOpenDatabase(dataDir?: string) {
-  const db = new PGlite(dataDir)
+export const paliroMigrations = [{ version: 1, statements: [
+  `CREATE TABLE IF NOT EXISTS paliro_users (
+    id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin PRIMARY KEY,
+    email VARCHAR(254) NOT NULL UNIQUE,
+    password_hash VARCHAR(512) CHARACTER SET ascii NOT NULL,
+    email_verified BOOLEAN NOT NULL DEFAULT false,
+    status ENUM('active', 'disabled') NOT NULL DEFAULT 'active',
+    nickname VARCHAR(128) NOT NULL DEFAULT '',
+    avatar ENUM('violet', 'blue', 'coral', 'mint', 'golden') NOT NULL DEFAULT 'violet',
+    birthday DATE NULL,
+    bio VARCHAR(1120) NOT NULL DEFAULT '',
+    interests JSON NOT NULL,
+    language ENUM('en', 'ko') NOT NULL DEFAULT 'ko',
+    mood VARCHAR(64) NOT NULL DEFAULT 'Want to Chat',
+    gender ENUM('Male', 'Female', 'Other') NOT NULL DEFAULT 'Other',
+    is_test_account BOOLEAN NOT NULL DEFAULT false,
+    terms_version VARCHAR(64) NOT NULL,
+    terms_accepted_at DATETIME(3) NOT NULL,
+    created_at DATETIME(3) NOT NULL,
+    updated_at DATETIME(3) NOT NULL
+  ) ENGINE=InnoDB ROW_FORMAT=DYNAMIC DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin`,
+  `CREATE TABLE IF NOT EXISTS paliro_sessions (
+    token_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin PRIMARY KEY,
+    user_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+    created_at DATETIME(3) NOT NULL,
+    expires_at DATETIME(3) NOT NULL,
+    INDEX paliro_sessions_user_id (user_id),
+    INDEX paliro_sessions_expiry (expires_at),
+    CONSTRAINT paliro_session_user FOREIGN KEY (user_id) REFERENCES paliro_users(id) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin`,
+  `CREATE TABLE IF NOT EXISTS paliro_retired_seeds (
+    seed_name VARCHAR(64) PRIMARY KEY
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin`,
+] }]
+
+function queryClient(connection: PoolConnection): PaliroQuery {
+  return { async query<T>(sql: string, values: unknown[] = []) {
+    // Convert repository bindings to mysql2 prepared parameters; values never enter SQL text.
+    const parameters: (string | number | boolean | Date | null)[] = []
+    const statement = sql.replace(/\$(\d+)/g, (_match, index: string) => {
+      const value = values[Number(index) - 1]
+      if (!(value === null || value instanceof Date || Array.isArray(value) || ['string', 'number', 'boolean'].includes(typeof value))) throw new Error('Invalid SQL parameter')
+      parameters.push(Array.isArray(value) ? JSON.stringify(value) : value as string | number | boolean | Date | null)
+      return '?'
+    })
+    const [result] = await connection.execute(statement, parameters)
+    if (!Array.isArray(result)) return { rows: [] as T[], affectedRows: (result as ResultSetHeader).affectedRows }
+    const rows = result.map(value => {
+      const row = { ...value } as Record<string, unknown>
+      for (const field of ['email_verified', 'is_test_account']) {
+        if (field in row) row[field] = Boolean(row[field])
+      }
+      if (typeof row.interests === 'string') row.interests = JSON.parse(row.interests)
+      return row as T
+    })
+    return { rows, affectedRows: 0 }
+  } }
+}
+
+export async function paliroOpenDatabase(config: PaliroMysqlConfig, migrate = false): Promise<PaliroDatabase> {
+  const pool = createPool({ ...config, connectionLimit: 4, maxIdle: 4, idleTimeout: 60000,
+    charset: 'utf8mb4', timezone: 'Z', dateStrings: ['DATE'], multipleStatements: false,
+    connectTimeout: 10000, waitForConnections: true, queueLimit: 64 })
+  async function connection() {
+    const client = await pool.getConnection()
+    try {
+      await client.query("SET time_zone = '+00:00'")
+      await client.query("SET SESSION sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'")
+      return client
+    } catch (error) { client.release(); throw error }
+  }
   try {
-    await db.waitReady
-    await db.exec(`CREATE TABLE IF NOT EXISTS paliro_schema_migrations (
-      version INTEGER PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT now()
-    )`)
-    const applied = await db.query<{ version: number }>('SELECT version FROM paliro_schema_migrations')
-    if (applied.rows.some((row) => row.version > paliroMigrations.at(-1)!.version)) {
-      throw new Error('Database schema is newer than this server. Do not downgrade without a compatible migration.')
-    }
-    for (const migration of paliroMigrations) {
-      if (applied.rows.some((row) => row.version === migration.version)) continue
-      await db.transaction(async (tx) => {
-        await tx.exec(migration.sql)
-        await tx.query('INSERT INTO paliro_schema_migrations (version) VALUES ($1)', [migration.version])
-      })
-    }
-    return db
-  } catch (error) {
-    await db.close()
-    throw error
+    const client = await connection()
+    try {
+      if (migrate) {
+        const tx = queryClient(client)
+        const lockName = `paliro-schema:${config.database}`
+        const lock = await tx.query<{ acquired: number }>('SELECT GET_LOCK($1, 30) AS acquired', [lockName])
+        if (lock.rows[0]?.acquired !== 1) throw new Error('Paliro schema migration is busy')
+        try {
+          await client.query(`CREATE TABLE IF NOT EXISTS paliro_schema_migrations (
+            version INTEGER PRIMARY KEY, applied_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
+          ) ENGINE=InnoDB`)
+          const applied = await tx.query<{ version: number }>('SELECT version FROM paliro_schema_migrations')
+          if (applied.rows.some(row => row.version > paliroMigrations.at(-1)!.version)) throw new Error('Database schema is newer than this server')
+          // MySQL DDL commits implicitly: retry statements before recording the migration version.
+          for (const migration of paliroMigrations) {
+            if (applied.rows.some(row => row.version === migration.version)) continue
+            for (const statement of migration.statements) await client.query(statement)
+            await tx.query('INSERT INTO paliro_schema_migrations (version) VALUES ($1)', [migration.version])
+          }
+        } finally { await tx.query('SELECT RELEASE_LOCK($1)', [lockName]) }
+      }
+      const applied = await queryClient(client).query<{ version: number }>('SELECT version FROM paliro_schema_migrations ORDER BY version')
+      if (JSON.stringify(applied.rows.map(row => row.version)) !== JSON.stringify(paliroMigrations.map(row => row.version))) {
+        throw new Error('Run the Paliro MySQL migrations before starting this release')
+      }
+    } finally { client.release() }
+  } catch (error) { await pool.end(); throw error }
+  return {
+    async query<T>(sql: string, values?: unknown[]) {
+      const client = await connection()
+      try { return await queryClient(client).query<T>(sql, values) } finally { client.release() }
+    },
+    async transaction<T>(callback: (tx: PaliroQuery) => Promise<T>) {
+      const client = await connection()
+      try {
+        await client.beginTransaction()
+        const result = await callback(queryClient(client))
+        await client.commit()
+        return result
+      } catch (error) { await client.rollback(); throw error } finally { client.release() }
+    },
+    close: () => pool.end(),
   }
 }

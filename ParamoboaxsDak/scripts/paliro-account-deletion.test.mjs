@@ -11,7 +11,7 @@ test('deletion uses DELETE with Bearer and password; only 204 confirms success',
   const api = createPaliroAccountApi({ fetchImpl: async (url, options) => { call = { url, ...options }; return new Response(null, { status: 204 }) } })
   await api.deleteAccount('secret-token', 'private-password')
   assert.equal(call.method, 'DELETE')
-  assert.ok(call.url.endsWith('/v1/me'))
+  assert.ok(call.url.endsWith('/palirov1/paliro/me/account'))
   assert.equal(call.headers.Authorization, 'Bearer secret-token')
   assert.deepEqual(JSON.parse(call.body), { password: 'private-password' })
   const invalid = createPaliroAccountApi({ fetchImpl: async () => Response.json(null) })
