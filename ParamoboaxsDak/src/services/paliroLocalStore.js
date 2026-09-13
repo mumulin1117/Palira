@@ -1,9 +1,11 @@
 import { paliroGetMockBoxContent } from './paliroMockBoxContent.js'
 import { paliroVideoIdentityFixtures } from './paliroVideoIdentityFixtures.js'
+import { paliroMergeRemoteProfile } from './paliroProfileSync.js'
 
 const paliroVideoIdentityByOwner = new Map(paliroVideoIdentityFixtures.map((fixture) => [fixture.ownerID, fixture]))
 
 const PALIRO_USERS_KEY = 'paliro.localUsers'
+const PALIRO_RETIRED_TEST_KEY = 'paliro.retiredTestSeed'
 const PALIRO_SESSION_KEY = 'paliro.session'
 const PALIRO_EULA_KEY = 'paliro.eulaAccepted'
 const PALIRO_BOX_USAGE_KEY = 'paliro.boxUsage'
@@ -318,7 +320,7 @@ const PALIRO_DEMO_COIN_BALANCE = PALIRO_DEBUG_MODE ? PALIRO_DEBUG_LOGIN_COIN_BAL
 const testUser = {
   id: 'paliro-test-user',
   email: 'paliro@gmail.com',
-  password: '678678',
+  password: '67896789',
   profile: {
     avatar: 'violet',
     nickname: 'Cosmic Explorer',
@@ -392,8 +394,13 @@ function ensureDebugLoginBalance(userID) {
 
 export function paliroSeedUsers() {
   const users = readJson(PALIRO_USERS_KEY, [])
+  if (window.localStorage.getItem(PALIRO_RETIRED_TEST_KEY) === 'true') return users
   const existingTestUser = users.find((user) => user.email === testUser.email)
   if (existingTestUser) {
+    if (existingTestUser.id === testUser.id && !existingTestUser.serverUserID && existingTestUser.password !== testUser.password) {
+      existingTestUser.password = testUser.password
+      writeJson(PALIRO_USERS_KEY, users)
+    }
     const profile = existingTestUser.profile
     if (profile && (!profile.nickname || !profile.avatar || profile.avatar === 'cosmic')) {
       existingTestUser.profile = {
@@ -436,15 +443,60 @@ export function paliroSignOut() {
   window.localStorage.removeItem(PALIRO_SESSION_KEY)
 }
 
+export function paliroDeleteLocalAccount(localID, serverID) {
+  const users = readJson(PALIRO_USERS_KEY, [])
+  const user = users.find(value => value.id === localID)
+  if (user && user.serverUserID !== serverID) throw new Error('Account identity mismatch')
+  const keys = [PALIRO_BOX_USAGE_KEY, PALIRO_OPENED_MATCHES_KEY, PALIRO_BOX_RULES_KEY,
+    PALIRO_TEST_KEY, PALIRO_IAP_TRANSACTIONS_KEY, PALIRO_FRIEND_REQUESTS_KEY,
+    PALIRO_INCOMING_FRIEND_REQUESTS_KEY, PALIRO_MESSAGES_KEY, PALIRO_PROFILE_META_KEY,
+    PALIRO_SOCIAL_STATE_KEY, PALIRO_BLOCKED_USERS_KEY, PALIRO_REPORTS_KEY,
+    PALIRO_VIDEO_STATE_KEY, PALIRO_LANGUAGE_KEY, PALIRO_PUSH_PREFERENCE_KEY]
+  if (!localID || !serverID) throw new Error('Missing account identity')
+  if (localID === testUser.id) window.localStorage.setItem(PALIRO_RETIRED_TEST_KEY, 'true')
+  for (const key of keys) {
+    const byUser = readJson(key, {})
+    if (Object.hasOwn(byUser, localID)) {
+      delete byUser[localID]
+      writeJson(key, byUser)
+    }
+  }
+  writeJson(PALIRO_USERS_KEY, users.filter(value => value.id !== localID))
+  if (readJson(PALIRO_SESSION_KEY, null)?.userID === localID) paliroSignOut()
+}
+
 function createSession(user) {
   const session = {
     userID: user.id,
-    Token: `paliro-local-${user.id}`,
+    Token: user.serverUserID ? 'paliro-server-session' : `paliro-local-${user.id}`,
+    ...(user.serverUserID ? { serverUserID: user.serverUserID, authProvider: 'server' } : {}),
     email: user.email,
     profile: user.profile,
   }
   writeJson(PALIRO_SESSION_KEY, session)
   return session
+}
+
+// Preserve local business keys, but only associate the demo fixture with the server's reserved identity.
+export function paliroAcceptServerUser(serverUser) {
+  if (!serverUser?.id || !serverUser.email || !serverUser.profileComplete || !serverUser.profile) throw new Error('Invalid server user')
+  const isTest = serverUser.isTestAccount === true && serverUser.id === '80962768-0000-4000-8000-000000000001'
+  const localID = isTest ? testUser.id : serverUser.id
+  const users = paliroSeedUsers()
+  const previous = users.find((user) => user.id === localID && (isTest || user.serverUserID === serverUser.id))
+  const serverProfile = { ...serverUser.profile }
+  delete serverProfile.language
+  const profile = { ...serverProfile, ...(previous?.profile ?? {}) }
+  const user = { id: localID, serverUserID: serverUser.id, email: serverUser.email, profile }
+  const index = users.findIndex((item) => item.id === localID)
+  const next = [...users]
+  if (index < 0) next.push(user)
+  else next[index] = user
+  writeJson(PALIRO_USERS_KEY, next)
+  const languageByUser = readJson(PALIRO_LANGUAGE_KEY, {})
+  if (!languageByUser[localID]) paliroSetLanguagePreference(localID, serverUser.profile.language)
+  ensureDebugLoginBalance(localID)
+  return createSession(user)
 }
 
 function isAdultBirthday(birthday) {
@@ -507,6 +559,15 @@ export function paliroUpdateProfile(userId, profile) {
   if (!user) return null
 
   user.profile = profile
+  writeJson(PALIRO_USERS_KEY, users)
+  return createSession(user)
+}
+
+export function paliroCacheServerProfile(serverUser, localID) {
+  const users = readJson(PALIRO_USERS_KEY, [])
+  const user = users.find(item => item.id === localID && item.serverUserID === serverUser?.id)
+  if (!user || !serverUser.profileComplete || !serverUser.profile) throw new Error('Profile identity mismatch')
+  user.profile = paliroMergeRemoteProfile(user.profile, serverUser.profile)
   writeJson(PALIRO_USERS_KEY, users)
   return createSession(user)
 }

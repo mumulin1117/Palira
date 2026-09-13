@@ -697,6 +697,11 @@ button { cursor: pointer; }
 .paliro-settings-toggle-row i.is-on::after { transform: translateX(14px); }
 .paliro-settings-scroll .paliro-me-sign-out { margin-top: auto; min-height: 44px; }
 .paliro-account-deletion-copy { margin: 0 2px 7px; color: rgba(218, 215, 234, .68); font-size: 12px; line-height: 1.48; text-align: center; }
+.paliro-media-source-backdrop.paliro-delete-backdrop { min-height: 0; bottom: auto; height: 100dvh; overflow-y: auto; }
+.paliro-delete-dialog { max-height: 100%; overflow-y: auto; overscroll-behavior: contain; }
+.paliro-delete-dialog .paliro-field { margin: 0; }
+.paliro-delete-dialog .paliro-field input { font-size: 16px; }
+.paliro-delete-dialog .paliro-delete-confirm { border-color: #ef4968; background: #a72240; }
 
 @media (max-height: 680px) {
   .paliro-profile-edit-scroll { gap: 9px; padding-top: 2px; }

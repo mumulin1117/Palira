@@ -56,12 +56,12 @@ test('My Posts derives its cover from the first selected image', async () => {
 test('test account starts with zero posts and retains new posts after signing back in', async () => {
   globalThis.window = { localStorage: createLocalStorage() }
   const store = await import('../src/services/paliroLocalStore.js?empty-test-account')
-  const userID = store.paliroLogin('paliro@gmail.com', '678678').session.userID
+  const userID = store.paliroLogin('paliro@gmail.com', '67896789').session.userID
   assert.equal(store.paliroGetSocialSummary(userID).posts, 0)
   assert.deepEqual(store.paliroGetSocialState(userID).posts, [])
   const post = store.paliroCreateBoxPost(userID, { title: 'My own post', images: ['data:image/jpeg;base64,cGhvdG8='] })
   store.paliroSignOut()
-  store.paliroLogin('paliro@gmail.com', '678678')
+  store.paliroLogin('paliro@gmail.com', '67896789')
   assert.equal(store.paliroGetSocialSummary(userID).posts, 1)
   assert.deepEqual(store.paliroGetSocialState(userID).posts, [post])
 })

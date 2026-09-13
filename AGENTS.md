@@ -58,7 +58,7 @@ Open Pandora Box and turn every moment of curiosity into a new connection.
 本项目登录注册模块采用**本地状态闭环方案**。
 
 ### 6.1 固定测试账号
-账号：paliro@gmail.com    密码：678678
+账号：paliro@gmail.com    密码：67896789
 
 ### 6.2 欢迎页面与合规 EULA 规则
 

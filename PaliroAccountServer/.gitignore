@@ -1,0 +1,11 @@
+node_modules/
+.paliro-pnpm-store/
+dist/
+.paliro-data/
+.paliro-data.lock
+.env
+.env.*
+!.env.example
+coverage/
+*.log
+.DS_Store

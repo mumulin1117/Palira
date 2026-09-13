@@ -1,6 +1,9 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Capacitor, registerPlugin } from '@capacitor/core'
+import { createPaliroAccountApi, createPaliroCredentialStore, paliroAuthErrorKey } from './services/paliroAccountApi'
+import { createPaliroServerSession } from './services/paliroServerSession'
+import { paliroProfilePatch } from './services/paliroProfileSync'
 import { createPaliroVoiceSession, PALIRO_VOICE_MAX_SECONDS } from './services/paliroVoiceSession'
 import PaliroChatIcon from './components/PaliroChatIcon.vue'
 import PaliroVideoCall from './components/PaliroVideoCall.vue'
@@ -19,11 +22,12 @@ import {
   paliroAwardVideoBoxAction,
   paliroBlockMember,
   paliroCanChatWithMember,
-  paliroCompleteProfile,
+  paliroAcceptServerUser,
+  paliroCacheServerProfile,
+  paliroDeleteLocalAccount,
   paliroCompleteTopicTest,
   paliroCreditCoinsFromIap,
   paliroCreateBoxPost,
-  paliroCreateUser,
   paliroCreateVideoPost,
   paliroDeleteBoxPost,
   paliroDeletePublishedVideo,
@@ -43,11 +47,9 @@ import {
   paliroGetPushPreference,
   paliroGetSocialState,
   paliroGetSocialSummary,
-  paliroGetSession,
   paliroHasSeenBoxRules,
   paliroGetTopicTestState,
   paliroGetVideoFeed,
-  paliroLogin,
   paliroMarkConversationRead,
   paliroFollowMember,
   paliroHideVideo,
@@ -80,6 +82,17 @@ const showEula = ref(false)
 const hasAgreed = ref(false)
 const session = ref(null)
 const authForm = ref({ email: '', password: '', confirmPassword: '' })
+const authBusy = ref(false)
+let authController = null
+let registrationDraft = null
+let incompleteAuth = null
+const accountApi = createPaliroAccountApi()
+const serverSession = createPaliroServerSession({
+  api: accountApi,
+  credentials: createPaliroCredentialStore({ nativeStore: Capacitor.isNativePlatform() ? registerPlugin('PaliroAuthStorage') : null }),
+  acceptUser: paliroAcceptServerUser,
+  clearLocalSession: paliroSignOut,
+})
 const showAuthPassword = ref(false)
 const showConfirmPassword = ref(false)
 const signupUser = ref(null)
@@ -104,9 +117,22 @@ const walletOrigin = ref('home')
 const editableProfile = ref(null)
 const editProfileError = ref('')
 const editProfileNotice = ref('')
+const profileLoading = ref(false)
+const profileSaving = ref(false)
+const profileReadNotice = ref('')
+const profileSessionExpired = ref(false)
+let profileController = null
+let profileEditBase = null
 const showProfilePhotoSourcePicker = ref(false)
 const pushNotificationsEnabled = ref(true)
 const showAccountDeletionNotice = ref(false)
+const accountDeletionPassword = ref('')
+const accountDeletionError = ref('')
+const accountDeletionBusy = ref(false)
+const accountDeletionExpired = ref(false)
+const accountNotice = ref('')
+const accountDeletionInput = ref(null)
+const accountDeletionDialog = ref(null)
 const pendingBoxAction = ref(null)
 const coinPromptError = ref('')
 const homeNotice = ref('')
@@ -210,6 +236,10 @@ let videoFeedObserver = null
 let videoPlaybackRevision = 0
 
 watch(route, (nextRoute, previousRoute) => {
+  if (showAccountDeletionNotice.value && nextRoute !== 'settings') closeAccountDeletion()
+  profileController?.abort()
+  profileLoading.value = false
+  if (nextRoute === 'me' || nextRoute === 'edit-profile') void refreshCurrentProfile(nextRoute)
   homePageReady.value = false
   if (nextRoute !== 'home') boxSelectionAnimating.value = null
   if (previousRoute === 'video-call' && nextRoute !== 'video-call') videoCallMember.value = null
@@ -404,18 +434,8 @@ const pageTitle = computed(() => ({
 
 onMounted(() => {
   paliroSeedUsers()
-  session.value = paliroGetSession()
   hasAgreed.value = paliroGetEulaAccepted()
-  syncRouteFromLocation()
-  if (session.value) {
-    route.value = 'home'
-    loadBoxState()
-    loadMeState()
-    loadMessageState()
-  } else {
-    route.value = 'welcome'
-    showEula.value = !hasAgreed.value
-  }
+  void restoreServerSession()
   applyLocale()
   void setupNativeIapBridge()
   window.addEventListener('popstate', syncRouteFromLocation)
@@ -426,6 +446,8 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  profileController?.abort()
+  authController?.abort()
   window.removeEventListener('popstate', syncRouteFromLocation)
   document.removeEventListener('visibilitychange', handleDocumentVisibilityChange)
   window.visualViewport?.removeEventListener('resize', updateChatViewport)
@@ -441,7 +463,12 @@ onBeforeUnmount(() => {
 })
 
 function syncRouteFromLocation() {
+  if (authBusy.value || profileSaving.value || accountDeletionBusy.value) {
+    window.history.replaceState({ route: route.value }, '', `#/${route.value}`)
+    return
+  }
   let nextRoute = window.location.hash.replace(/^#\//, '')
+  if (!session.value && !['welcome', 'login', 'signup', 'privacy', 'terms'].includes(nextRoute)) nextRoute = 'welcome'
   if (nextRoute === 'video-call' && !videoCallMember.value) nextRoute = session.value ? 'messages' : 'welcome'
   if (nextRoute === 'conversation' && !paliroCanChatWithMember(session.value?.userID, activeConversation.value?.member?.id)) nextRoute = session.value ? 'messages' : 'welcome'
   if (route.value === 'videos' && nextRoute !== 'videos') {
@@ -458,6 +485,8 @@ function syncRouteFromLocation() {
 }
 
 function openRoute(nextRoute) {
+  if (authBusy.value || profileSaving.value || accountDeletionBusy.value) return
+  if (!session.value && !['welcome', 'login', 'signup', 'privacy', 'terms', 'setup'].includes(nextRoute)) nextRoute = 'welcome'
   if (nextRoute === 'conversation' && !paliroCanChatWithMember(session.value?.userID, activeConversation.value?.member?.id)) nextRoute = 'messages'
   errorMessage.value = ''
   if (route.value === 'videos' && nextRoute !== 'videos') {
@@ -558,35 +587,58 @@ function validateAuth() {
   return true
 }
 
-function submitLogin() {
-  if (!validateAuth()) return
-  const result = paliroLogin(authForm.value.email.trim(), authForm.value.password)
-  if (result.type === 'invalid-password') {
-    errorMessage.value = t('authInvalidPassword')
-    return
-  }
-  if (result.type === 'new-user') {
-    const created = paliroCreateUser(authForm.value.email.trim(), authForm.value.password)
-    beginProfileSetup(created.user, 'login')
-    return
-  }
-  if (result.type === 'profile-incomplete') {
-    beginProfileSetup(result.user, 'login')
-    return
-  }
-  if (result.type === 'age-restricted') {
-    errorMessage.value = t('authAdultOnly')
-    return
-  }
-  session.value = result.session
-  route.value = 'home'
+function enterMain(localSession, nextRoute = 'home') {
+  accountNotice.value = ''
+  session.value = localSession
+  registrationDraft = null
+  incompleteAuth = null
+  authForm.value = { email: '', password: '', confirmPassword: '' }
+  route.value = nextRoute
+  window.history.replaceState({ route: nextRoute }, '', `#/${nextRoute}`)
   loadBoxState()
   loadMeState()
   loadMessageState()
 }
 
+async function restoreServerSession() {
+  authBusy.value = true
+  authController = new AbortController()
+  try {
+    const restored = await serverSession.restore(authController.signal)
+    if (restored) enterMain(restored)
+    else route.value = 'welcome'
+  } catch (error) {
+    if (error.code !== 'CANCELLED') {
+      route.value = 'welcome'
+      errorMessage.value = t(paliroAuthErrorKey(error))
+    }
+  } finally {
+    authBusy.value = false
+    showEula.value = route.value === 'welcome' && !hasAgreed.value
+  }
+}
+
+async function submitLogin() {
+  if (authBusy.value || !validateAuth()) return
+  authBusy.value = true
+  errorMessage.value = ''
+  authController = new AbortController()
+  try {
+    const result = await accountApi.login(authForm.value.email, authForm.value.password, authController.signal)
+    if (!result.user.profileComplete) {
+      incompleteAuth = result
+      authBusy.value = false
+      beginProfileSetup(result.user, 'login')
+      return
+    }
+    enterMain(await serverSession.accept(result, authController.signal))
+  } catch (error) {
+    if (error.code !== 'CANCELLED') errorMessage.value = t(paliroAuthErrorKey(error))
+  } finally { authBusy.value = false }
+}
+
 function submitSignup() {
-  if (!validateAuth()) return
+  if (authBusy.value || !validateAuth()) return
   if (authForm.value.password.length < 8) {
     errorMessage.value = t('authPasswordMinLength')
     return
@@ -595,23 +647,20 @@ function submitSignup() {
     errorMessage.value = t('authPasswordsMismatch')
     return
   }
-  const result = paliroCreateUser(authForm.value.email.trim(), authForm.value.password)
-  if (result.type === 'existing-user') {
-    errorMessage.value = t('authExistingAccount')
-    return
-  }
-  beginProfileSetup(result.user, 'signup')
+  registrationDraft = { email: authForm.value.email.trim(), password: authForm.value.password }
+  beginProfileSetup(null, 'signup')
 }
 
 function beginProfileSetup(user, origin) {
   signupUser.value = user
   setupOrigin.value = origin
-  profile.value = createDefaultProfile()
+  profile.value = { ...createDefaultProfile(), ...(user?.profile ?? {}) }
   profileStep.value = 1
   openRoute('setup')
 }
 
 function goBackFromProfile() {
+  if (authBusy.value) return
   errorMessage.value = ''
   if (profileStep.value > 1) {
     profileStep.value -= 1
@@ -622,6 +671,7 @@ function goBackFromProfile() {
 }
 
 function toggleInterest(interest) {
+  if (authBusy.value) return
   const selected = profile.value.interests
   if (selected.includes(interest)) {
     profile.value.interests = selected.filter((item) => item !== interest)
@@ -654,7 +704,8 @@ function getBirthdayIssue(birthday) {
     : ''
 }
 
-function nextProfileStep() {
+async function nextProfileStep() {
+  if (authBusy.value) return
   if (document.activeElement instanceof HTMLElement) {
     document.activeElement.blur()
   }
@@ -677,13 +728,22 @@ function nextProfileStep() {
       errorMessage.value = t('interestsRequired')
       return
     }
-    session.value = setupOrigin.value === 'me'
-      ? paliroUpdateProfile(signupUser.value.id, profile.value)
-      : paliroCompleteProfile(signupUser.value.id, profile.value)
-    route.value = setupOrigin.value === 'me' ? 'me' : 'home'
-    loadBoxState()
-    loadMeState()
-    loadMessageState()
+    if (setupOrigin.value === 'me') {
+      enterMain(paliroUpdateProfile(signupUser.value.id, profile.value), 'me')
+      return
+    }
+    if (!hasAgreed.value) { errorMessage.value = t('authTermsRequired'); return }
+    authBusy.value = true
+    errorMessage.value = ''
+    authController = new AbortController()
+    try {
+      const result = setupOrigin.value === 'login' && incompleteAuth
+        ? { ...incompleteAuth, user: await accountApi.updateProfile(incompleteAuth.accessToken, { ...profile.value, language: languagePreference.value }, authController.signal) }
+        : await accountApi.register(registrationDraft, profile.value, languagePreference.value, hasAgreed.value, authController.signal)
+      enterMain(await serverSession.accept(result, authController.signal))
+    } catch (error) {
+      if (error.code !== 'CANCELLED') errorMessage.value = t(paliroAuthErrorKey(error))
+    } finally { authBusy.value = false }
     return
   }
   errorMessage.value = ''
@@ -691,11 +751,21 @@ function nextProfileStep() {
   scheduleScrollReset()
 }
 
-function leaveHome() {
-  paliroSignOut()
+async function leaveHome() {
+  if (authBusy.value || profileSaving.value || accountDeletionBusy.value) return
+  closeAccountDeletion()
+  profileController?.abort()
+  authBusy.value = true
   session.value = null
+  registrationDraft = null
+  incompleteAuth = null
   authForm.value = { email: '', password: '', confirmPassword: '' }
+  showBoxRules.value = false
   route.value = 'welcome'
+  window.history.replaceState({ route: 'welcome' }, '', '#/welcome')
+  try { await serverSession.logout() }
+  catch (error) { errorMessage.value = t(paliroAuthErrorKey(error)) }
+  finally { authBusy.value = false }
 }
 
 function loadBoxState() {
@@ -1131,12 +1201,12 @@ function scrollConversationToEnd(smooth = true) {
 }
 
 function updateChatViewport() {
-  if (route.value !== 'conversation') return
+  if (route.value !== 'conversation' && !showAccountDeletionNotice.value) return
   const viewport = window.visualViewport
   const height = viewport?.height ?? window.innerHeight
   const wasNearEnd = !conversationScroll.value || conversationScroll.value.scrollHeight - conversationScroll.value.scrollTop - conversationScroll.value.clientHeight < 80
   chatViewport.value = { height, top: viewport?.offsetTop ?? 0, keyboard: window.innerHeight - height > 100 }
-  if (wasNearEnd || document.activeElement === conversationInput.value) scrollConversationToEnd(false)
+  if (route.value === 'conversation' && (wasNearEnd || document.activeElement === conversationInput.value)) scrollConversationToEnd(false)
 }
 
 function dismissConversationKeyboard(event) {
@@ -1533,12 +1603,14 @@ function beginProfileEdit() {
     ...session.value.profile,
     interests: [...(session.value.profile?.interests ?? [])],
   }
+  profileEditBase = JSON.parse(JSON.stringify(editableProfile.value))
   editProfileError.value = ''
   editProfileNotice.value = ''
   openRoute('edit-profile')
 }
 
 function closeProfileEdit() {
+  if (profileSaving.value) return
   showProfilePhotoSourcePicker.value = false
   editProfileError.value = ''
   editProfileNotice.value = ''
@@ -1546,10 +1618,12 @@ function closeProfileEdit() {
 }
 
 function selectProfilePhotoSource() {
-  if (editableProfile.value) showProfilePhotoSourcePicker.value = true
+  if (editableProfile.value && !profileLoading.value && !profileSaving.value) showProfilePhotoSourcePicker.value = true
 }
 
 function addBrowserProfileImage() {
+  const localID = session.value?.userID
+  const draft = editableProfile.value
   const input = document.createElement('input')
   input.type = 'file'
   input.accept = 'image/*'
@@ -1558,6 +1632,7 @@ function addBrowserProfileImage() {
     if (!file) return
     const reader = new FileReader()
     reader.onload = () => {
+      if (session.value?.userID !== localID || editableProfile.value !== draft || route.value !== 'edit-profile') return
       if (typeof reader.result !== 'string' || reader.result.length > 1_200_000) {
         editProfileError.value = t('mediaPickerFailed')
         return
@@ -1570,24 +1645,29 @@ function addBrowserProfileImage() {
 }
 
 function persistProfileAvatar(photoDataUrl) {
-  if (!session.value?.userID || !editableProfile.value || typeof photoDataUrl !== 'string') return
+  if (route.value !== 'edit-profile' || profileLoading.value || profileSaving.value || !session.value?.userID || !editableProfile.value || typeof photoDataUrl !== 'string') return
   const savedProfile = session.value.profile ?? createDefaultProfile()
-  const nextSession = paliroUpdateProfile(session.value.userID, {
-    ...savedProfile,
-    interests: [...(savedProfile.interests ?? [])],
-    photoDataUrl,
-  })
+  let nextSession
+  try {
+    nextSession = paliroUpdateProfile(session.value.userID, {
+      ...savedProfile,
+      interests: [...(savedProfile.interests ?? [])],
+      photoDataUrl,
+    })
+  } catch { editProfileError.value = t('authStorageError'); return }
   if (!nextSession) {
     editProfileError.value = t('mediaPickerFailed')
     return
   }
   session.value = nextSession
   editableProfile.value = { ...editableProfile.value, photoDataUrl }
-  editProfileNotice.value = t('profilePhotoUpdated')
+  editProfileNotice.value = t('profilePhotoLocalOnly')
   loadMeState()
 }
 
 async function pickProfilePhoto(source) {
+  const localID = session.value?.userID
+  const draft = editableProfile.value
   showProfilePhotoSourcePicker.value = false
   editProfileError.value = ''
   editProfileNotice.value = ''
@@ -1595,6 +1675,7 @@ async function pickProfilePhoto(source) {
   try {
     if (picker?.pick) {
       const result = await picker.pick({ source })
+      if (session.value?.userID !== localID || editableProfile.value !== draft || route.value !== 'edit-profile') return
       if (typeof result?.dataUrl === 'string' && result.dataUrl.length <= 1_200_000) {
         persistProfileAvatar(result.dataUrl)
       } else if (result?.dataUrl) {
@@ -1609,7 +1690,32 @@ async function pickProfilePhoto(source) {
   }
 }
 
-function saveEditedProfile() {
+async function refreshCurrentProfile(targetRoute) {
+  if (!session.value?.serverUserID) return
+  profileController?.abort()
+  const controller = new AbortController()
+  profileController = controller
+  const localID = session.value.userID
+  profileLoading.value = true
+  profileReadNotice.value = ''
+  profileSessionExpired.value = false
+  try {
+    const user = await serverSession.readProfile(controller.signal)
+    if (controller.signal.aborted || route.value !== targetRoute || session.value?.userID !== localID) return
+    session.value = paliroCacheServerProfile(user, localID)
+    if (targetRoute === 'edit-profile') {
+      editableProfile.value = JSON.parse(JSON.stringify(session.value.profile))
+      profileEditBase = JSON.parse(JSON.stringify(editableProfile.value))
+    }
+  } catch (error) {
+    if (controller.signal.aborted || session.value?.userID !== localID) return
+    profileSessionExpired.value = error.status === 401 || error.code === 'UNAUTHORIZED'
+    profileReadNotice.value = profileSessionExpired.value ? t('authSessionExpired') : t('profileCachedNotice')
+  } finally { if (profileController === controller) profileLoading.value = false }
+}
+
+async function saveEditedProfile() {
+  if (profileSaving.value || profileLoading.value) return
   const nextProfile = editableProfile.value
   if (!session.value?.userID || !nextProfile) return
   if (!nextProfile.nickname.trim()) { editProfileError.value = t('nicknameRequired'); return }
@@ -1617,17 +1723,30 @@ function saveEditedProfile() {
   const issue = getBirthdayIssue(nextProfile.birthday)
   if (issue) { editProfileError.value = issue; return }
 
-  session.value = paliroUpdateProfile(session.value.userID, {
-    ...nextProfile,
-    nickname: nextProfile.nickname.trim(),
-    bio: nextProfile.bio.trim(),
-    interests: [...(nextProfile.interests ?? [])],
-  })
-  editableProfile.value = null
+  document.activeElement?.blur?.()
+  const localID = session.value.userID
+  const controller = new AbortController()
+  profileController?.abort()
+  profileController = controller
+  const patch = paliroProfilePatch(nextProfile, profileEditBase)
+  profileSaving.value = true
   editProfileError.value = ''
-  editProfileNotice.value = ''
-  loadMeState()
-  openRoute('me')
+  try {
+    if (Object.keys(patch).length) {
+      const updated = await serverSession.saveProfile(patch, controller.signal)
+      if (controller.signal.aborted || session.value?.userID !== localID) return
+      session.value = paliroCacheServerProfile(updated, localID)
+    }
+    editableProfile.value = null
+    editProfileNotice.value = ''
+    loadMeState()
+    profileSaving.value = false
+    openRoute('me')
+  } catch (error) {
+    if (controller.signal.aborted || session.value?.userID !== localID) return
+    profileSessionExpired.value = error.status === 401 || error.code === 'UNAUTHORIZED'
+    editProfileError.value = t(paliroAuthErrorKey(error))
+  } finally { profileSaving.value = false }
 }
 
 function togglePushNotifications() {
@@ -1635,7 +1754,65 @@ function togglePushNotifications() {
 }
 
 function openAccountDeletionNotice() {
+  if (!session.value?.serverUserID || accountDeletionBusy.value) return
+  accountDeletionPassword.value = ''
+  accountDeletionError.value = ''
+  accountDeletionExpired.value = false
   showAccountDeletionNotice.value = true
+  nextTick(() => { updateChatViewport(); accountDeletionInput.value?.focus() })
+}
+
+function trapAccountDeletionFocus(event) {
+  const controls = [...(accountDeletionDialog.value?.querySelectorAll('input:not(:disabled), button:not(:disabled)') ?? [])]
+  if (!controls.length) { event.preventDefault(); return }
+  if (event.shiftKey && document.activeElement === controls[0]) { event.preventDefault(); controls.at(-1).focus() }
+  else if (!event.shiftKey && document.activeElement === controls.at(-1)) { event.preventDefault(); controls[0].focus() }
+}
+
+function closeAccountDeletion() {
+  if (accountDeletionBusy.value) return
+  showAccountDeletionNotice.value = false
+  accountDeletionPassword.value = ''
+  accountDeletionError.value = ''
+  accountDeletionExpired.value = false
+  document.activeElement?.blur?.()
+}
+
+async function confirmAccountDeletion() {
+  if (accountDeletionBusy.value || !showAccountDeletionNotice.value || !session.value?.serverUserID) return
+  if (!accountDeletionPassword.value) { accountDeletionError.value = t('deletePasswordRequired'); return }
+  const { userID, serverUserID } = session.value
+  accountDeletionBusy.value = true
+  accountDeletionError.value = ''
+  profileController?.abort()
+  document.activeElement?.blur?.()
+  accountDeletionDialog.value?.focus()
+  try {
+    const result = await serverSession.deleteAccount(accountDeletionPassword.value)
+    let cleanupFailed = result.cleanupFailed
+    try { paliroDeleteLocalAccount(userID, serverUserID) } catch { cleanupFailed = true }
+    session.value = null
+    editableProfile.value = null
+    signupUser.value = null
+    profile.value = createDefaultProfile()
+    activeConversation.value = null
+    conversations.value = []
+    incomingFriendRequests.value = []
+    registrationDraft = null
+    incompleteAuth = null
+    authForm.value = { email: '', password: '', confirmPassword: '' }
+    showBoxRules.value = false
+    accountDeletionBusy.value = false
+    closeAccountDeletion()
+    route.value = 'welcome'
+    window.history.replaceState({ route: 'welcome' }, '', '#/welcome')
+    accountNotice.value = t('accountDeleted')
+    errorMessage.value = cleanupFailed ? t('accountDeleteCleanupFailed') : ''
+  } catch (error) {
+    accountDeletionExpired.value = error.code === 'UNAUTHORIZED'
+    accountDeletionError.value = error.code === 'INVALID_CREDENTIALS' ? t('deletePasswordWrong')
+      : ['TIMEOUT', 'NETWORK_ERROR'].includes(error.code) ? t('accountDeleteUnconfirmed') : t(paliroAuthErrorKey(error))
+  } finally { accountDeletionBusy.value = false }
 }
 
 function openMeMenu(item) {
@@ -2454,7 +2631,7 @@ function finishTopicTest() {
 </script>
 
 <template>
-  <main class="paliro-shell">
+  <main class="paliro-shell" :inert="showAccountDeletionNotice">
     <div class="paliro-stars" aria-hidden="true"></div>
 
       <section v-if="hasOpenedVideoFeed && session" :class="{ 'is-inactive': route !== 'videos' || isVideoFeedRestoring, 'is-tab-transition': isPrimaryTabTransition }" :aria-hidden="route !== 'videos' || isVideoFeedRestoring" :inert="route !== 'videos' || isVideoFeedRestoring" class="paliro-video-feed paliro-view">
@@ -2508,8 +2685,10 @@ function finishTopicTest() {
         <img alt="" src="/assets/paliro-welcome-hero@2x.png" />
       </div>
       <div class="paliro-welcome-actions">
-        <button :disabled="!hasAgreed" class="paliro-primary-button" @click="openRoute('login')">{{ t('logIn') }}</button>
-        <button :disabled="!hasAgreed" class="paliro-secondary-button" @click="openRoute('signup')">{{ t('signUp') }}</button>
+        <p v-if="accountNotice" class="paliro-profile-edit-notice" role="status">{{ accountNotice }}</p>
+        <p v-if="errorMessage" class="paliro-error" role="alert">{{ errorMessage }}</p>
+        <button :disabled="!hasAgreed || authBusy" class="paliro-primary-button" @click="openRoute('login')">{{ t('logIn') }}</button>
+        <button :disabled="!hasAgreed || authBusy" class="paliro-secondary-button" @click="openRoute('signup')">{{ t('signUp') }}</button>
         <button class="paliro-eula-button" @click="showEula = true">{{ t('readEula') }}</button>
         <label class="paliro-consent">
           <input :checked="hasAgreed" type="checkbox" @change="saveAgreement($event.target.checked)" />
@@ -2536,7 +2715,7 @@ function finishTopicTest() {
         ]"
       >
       <header class="paliro-auth-nav">
-        <button :aria-label="t('back')" class="paliro-back" @click="openRoute('welcome')">‹</button>
+        <button :disabled="authBusy" :aria-label="t('back')" class="paliro-back" @click="openRoute('welcome')">‹</button>
         <h1 v-if="route === 'login'" class="paliro-login-title">{{ t('logIn') }}</h1>
         <h1 v-else class="paliro-signup-title">{{ t('createAccount') }}</h1>
       </header>
@@ -2572,19 +2751,19 @@ function finishTopicTest() {
           </span>
         </label>
         <p v-if="errorMessage" class="paliro-error" role="alert">{{ errorMessage }}</p>
-        <button class="paliro-primary-button" @click="route === 'login' ? submitLogin() : submitSignup()">
-          {{ route === 'login' ? t('logIn') : t('signUp') }}
+        <button :disabled="authBusy" :aria-busy="authBusy" class="paliro-primary-button" @click="route === 'login' ? submitLogin() : submitSignup()">
+          {{ authBusy ? t('authProcessing') : route === 'login' ? t('logIn') : t('signUp') }}
         </button>
         <p class="paliro-switch-copy">
           {{ route === 'login' ? t('noAccount') : t('existingAccount') }}
-          <button @click="openRoute(route === 'login' ? 'signup' : 'login')">{{ route === 'login' ? t('signUp') : t('logIn') }}</button>
+          <button :disabled="authBusy" @click="openRoute(route === 'login' ? 'signup' : 'login')">{{ route === 'login' ? t('signUp') : t('logIn') }}</button>
         </p>
       </div>
     </section>
 
       <section v-else-if="route === 'setup'" key="setup" :class="['paliro-setup', 'paliro-view', `paliro-setup-step-${profileStep}`, { 'has-birthday-issue': profileStep === 2 && Boolean(birthdayIssue) }]">
         <header class="paliro-setup-nav">
-          <button :aria-label="t('back')" class="paliro-back" @click="goBackFromProfile">‹</button>
+          <button :disabled="authBusy" :aria-label="t('back')" class="paliro-back" @click="goBackFromProfile">‹</button>
           <h1>{{ profileStep === 3 ? t('interests') : t('setupProfile') }}</h1>
           <span aria-hidden="true"></span>
         </header>
@@ -2641,7 +2820,7 @@ function finishTopicTest() {
           </div>
         </div>
         <p v-if="errorMessage" class="paliro-error paliro-setup-error" role="alert">{{ errorMessage }}</p>
-        <button :disabled="profileStep === 2 && Boolean(birthdayIssue)" class="paliro-primary-button paliro-setup-next" @click="nextProfileStep">{{ profileStep === 3 ? t('done') : t('continue') }}</button>
+        <button :disabled="authBusy || (profileStep === 2 && Boolean(birthdayIssue))" :aria-busy="authBusy" class="paliro-primary-button paliro-setup-next" @click="nextProfileStep">{{ authBusy ? t('authProcessing') : profileStep === 3 ? t('done') : t('continue') }}</button>
       </section>
 
       <section v-else-if="route === 'home'" key="home" class="paliro-home paliro-view">
@@ -2803,6 +2982,9 @@ function finishTopicTest() {
         </header>
 
         <main class="paliro-me-scroll">
+          <p v-if="profileLoading" class="paliro-profile-edit-notice" role="status">{{ t('authProcessing') }}</p>
+          <p v-else-if="profileReadNotice" class="paliro-error" role="status">{{ profileReadNotice }}</p>
+          <button v-if="profileSessionExpired" class="paliro-profile-edit-save" type="button" @click="leaveHome">{{ t('logIn') }}</button>
           <section class="paliro-me-identity" aria-labelledby="paliro-me-name">
             <div class="paliro-me-avatar-ring">
               <img :alt="`${currentMemberProfile.nickname || 'Paliro member'} avatar`" :src="currentMemberAvatar.src" />
@@ -2831,48 +3013,51 @@ function finishTopicTest() {
 
       <section v-else-if="route === 'edit-profile'" key="edit-profile" class="paliro-me-secondary paliro-view">
         <header class="paliro-me-secondary-nav">
-          <button :aria-label="t('backToMe')" class="paliro-back" type="button" @click="closeProfileEdit">‹</button>
+          <button :disabled="profileSaving" :aria-label="t('backToMe')" class="paliro-back" type="button" @click="closeProfileEdit">‹</button>
           <h1>{{ t('editProfile') }}</h1>
           <span aria-hidden="true"></span>
         </header>
-        <main v-if="editableProfile" class="paliro-me-secondary-scroll paliro-profile-edit-scroll">
+        <main v-if="editableProfile" :inert="profileLoading || profileSaving" :aria-busy="profileLoading || profileSaving" class="paliro-me-secondary-scroll paliro-profile-edit-scroll">
+          <p v-if="profileLoading" class="paliro-profile-edit-notice" role="status">{{ t('authProcessing') }}</p>
+          <p v-else-if="profileReadNotice" class="paliro-error" role="status">{{ profileReadNotice }}</p>
           <section class="paliro-profile-edit-identity">
-            <button :aria-label="t('changeProfilePhoto')" class="paliro-profile-edit-avatar" type="button" @click="selectProfilePhotoSource">
+            <button :disabled="profileLoading || profileSaving" :aria-label="t('changeProfilePhoto')" class="paliro-profile-edit-avatar" type="button" @click="selectProfilePhotoSource">
               <img :alt="t('selectedPhoto')" :src="avatarForProfile(editableProfile).src" />
               <span aria-hidden="true"><img alt="" src="/assets/paliro-profile-camera@2x.png" /></span>
             </button>
-            <button class="paliro-profile-edit-photo-link" type="button" @click="selectProfilePhotoSource">{{ t('changeProfilePhoto') }}</button>
+            <button :disabled="profileLoading || profileSaving" class="paliro-profile-edit-photo-link" type="button" @click="selectProfilePhotoSource">{{ t('changeProfilePhoto') }}</button>
           </section>
 
           <label class="paliro-profile-edit-field">
             <span>{{ t('nickname') }}</span>
-            <input v-model.trim="editableProfile.nickname" autocomplete="nickname" maxlength="32" :placeholder="t('nicknamePlaceholder')" type="text" />
+            <input :disabled="profileLoading || profileSaving" v-model.trim="editableProfile.nickname" autocomplete="nickname" maxlength="32" :placeholder="t('nicknamePlaceholder')" type="text" />
           </label>
           <label class="paliro-profile-edit-field paliro-profile-edit-bio">
             <span>{{ t('bio') }}</span>
-            <textarea v-model="editableProfile.bio" maxlength="150" :placeholder="t('bioPlaceholder')"></textarea>
+            <textarea :disabled="profileLoading || profileSaving" v-model="editableProfile.bio" maxlength="150" :placeholder="t('bioPlaceholder')"></textarea>
             <small>{{ editableProfile.bio.length }}/150</small>
           </label>
           <section :aria-label="t('gender')" class="paliro-profile-edit-section">
             <span>{{ t('gender') }}</span>
             <div class="paliro-profile-edit-gender">
-              <button v-for="option in ['Male', 'Female', 'Other']" :key="option" :class="{ 'is-selected': editableProfile.gender === option }" type="button" @click="editableProfile.gender = option">{{ localizedGender(option) }}</button>
+              <button :disabled="profileLoading || profileSaving" v-for="option in ['Male', 'Female', 'Other']" :key="option" :class="{ 'is-selected': editableProfile.gender === option }" type="button" @click="editableProfile.gender = option">{{ localizedGender(option) }}</button>
             </div>
           </section>
           <label class="paliro-profile-edit-field">
             <span>{{ t('birthday') }}</span>
-            <span class="paliro-profile-edit-date"><input v-model="editableProfile.birthday" :aria-label="t('birthday')" type="date" /><img alt="" src="/assets/paliro-profile-calendar@2x.png" /></span>
+            <span class="paliro-profile-edit-date"><input :disabled="profileLoading || profileSaving" v-model="editableProfile.birthday" :aria-label="t('birthday')" type="date" /><img alt="" src="/assets/paliro-profile-calendar@2x.png" /></span>
           </label>
           <p v-if="getBirthdayIssue(editableProfile.birthday)" class="paliro-age-notice" role="alert"><strong>18+</strong>{{ getBirthdayIssue(editableProfile.birthday) }}</p>
           <section :aria-label="t('currentStatus')" class="paliro-profile-edit-section">
             <span>{{ t('currentStatus') }}</span>
             <div class="paliro-profile-edit-moods">
-              <button v-for="mood in moods" :key="mood.label" :class="{ 'is-selected': editableProfile.mood === mood.label }" type="button" @click="editableProfile.mood = mood.label"><i aria-hidden="true">{{ mood.icon }}</i>{{ localizedMood(mood.label) }}</button>
+              <button :disabled="profileLoading || profileSaving" v-for="mood in moods" :key="mood.label" :class="{ 'is-selected': editableProfile.mood === mood.label }" type="button" @click="editableProfile.mood = mood.label"><i aria-hidden="true">{{ mood.icon }}</i>{{ localizedMood(mood.label) }}</button>
             </div>
           </section>
           <p v-if="editProfileError" class="paliro-error" role="alert">{{ editProfileError }}</p>
           <p v-if="editProfileNotice" class="paliro-profile-edit-notice" role="status">{{ editProfileNotice }}</p>
-          <button class="paliro-profile-edit-save" type="button" @click="saveEditedProfile">{{ t('save') }}</button>
+          <button v-if="profileSessionExpired" class="paliro-profile-edit-save" type="button" @click="leaveHome">{{ t('logIn') }}</button>
+          <button :disabled="profileLoading || profileSaving || profileSessionExpired" class="paliro-profile-edit-save" type="button" @click="saveEditedProfile">{{ profileSaving ? t('authProcessing') : t('save') }}</button>
         </main>
       </section>
 
@@ -3436,13 +3621,16 @@ function finishTopicTest() {
 
     <Teleport to="body">
       <PaliroOverlayTransition kind="sheet">
-      <div v-if="showAccountDeletionNotice" class="paliro-media-source-backdrop" @click.self="showAccountDeletionNotice = false">
-        <section aria-modal="true" class="paliro-media-source" role="dialog">
-          <h2>{{ t('deleteAccount') }}</h2>
-          <p class="paliro-account-deletion-copy">{{ t('deleteAccountNotice') }}</p>
-          <button type="button" @click="showAccountDeletionNotice = false">{{ t('ok') }}</button>
-          <button type="button" @click="showAccountDeletionNotice = false">{{ t('cancel') }}</button>
-        </section>
+      <div v-if="showAccountDeletionNotice" class="paliro-media-source-backdrop paliro-delete-backdrop" :style="chatViewport.height ? { height: chatViewport.height + 'px', top: chatViewport.top + 'px' } : {}" @click.self="closeAccountDeletion" @keydown.esc="closeAccountDeletion">
+        <form ref="accountDeletionDialog" tabindex="-1" aria-modal="true" aria-labelledby="paliro-delete-title" aria-describedby="paliro-delete-copy" :aria-busy="accountDeletionBusy" class="paliro-media-source paliro-delete-dialog" role="dialog" @keydown.tab="trapAccountDeletionFocus" @submit.prevent="confirmAccountDeletion">
+          <h2 id="paliro-delete-title">{{ t('deleteAccount') }}</h2>
+          <p id="paliro-delete-copy" class="paliro-account-deletion-copy">{{ t('deleteAccountNotice') }}</p>
+          <label class="paliro-field"><span>{{ t('password') }}</span><input ref="accountDeletionInput" v-model="accountDeletionPassword" :disabled="accountDeletionBusy" type="password" autocomplete="current-password" maxlength="128" :placeholder="t('enterPassword')" /></label>
+          <p v-if="accountDeletionError" class="paliro-error" role="alert">{{ accountDeletionError }}</p>
+          <button v-if="accountDeletionExpired" type="button" @click="leaveHome">{{ t('logIn') }}</button>
+          <button class="paliro-delete-confirm" :disabled="accountDeletionBusy || accountDeletionExpired" type="submit">{{ accountDeletionBusy ? t('authProcessing') : t('deleteAccount') }}</button>
+          <button :disabled="accountDeletionBusy" type="button" @click="closeAccountDeletion">{{ t('cancel') }}</button>
+        </form>
       </div>
       </PaliroOverlayTransition>
     </Teleport>
