@@ -12,9 +12,17 @@ pnpm ios:sync
 open ../PaDlroliroBox/PaDlroliroBox.xcodeproj
 ```
 
-Select the `App` scheme and an actual connected iPhone or a named iPhone simulator. A generic `Any iOS Device` destination is for building/archiving, not running. Simulator builds cannot be installed on a physical iPhone. Keep the existing signing team and provisioning configuration for device/archive builds.
+Select the `PaDlroliroBox` scheme and an actual connected iPhone or a named iPhone simulator. A generic `Any iOS Device` destination is for building/archiving, not running. Simulator builds cannot be installed on a physical iPhone. Keep the existing signing team and provisioning configuration for device/archive builds.
 
 After changing Vue files, run `pnpm ios:sync` before rebuilding in Xcode. The sync script replaces only generated `../PaDlroliroBox/PaDlroliroBox/public` resources, never app user data. No `pod install` or `cap sync` is needed. The standalone workspace is also usable and contains only the app project.
+
+During synchronization, resources are not encrypted as individual files. They are packed first, compressed as a whole, and then protected with two independent AES-256-GCM layers:
+
+- `PaliroWebVault/paliro-bootstrap.pwb` is one complete archive for HTML, JavaScript, CSS and related Web code. It is authenticated, decrypted and decompressed into memory during bootstrap.
+- `PaliroWebVault/paliro-assets-<version>.pwb` is one complete archive for all non-auth images, GIFs, audio and video. On first demand, the whole archive is authenticated, decrypted and decompressed into `Application Support/PaliroWebCache/<version>`. The cache uses iOS complete-until-first-authentication file protection, is excluded from backup, and is reused on later launches. An app build carrying a new archive version replaces the old cache.
+- Launch, first-transition, welcome, login, signup and profile-setup artwork plus bundled fonts stay as ordinary bundle resources, so the first launch and authentication flow never waits for the large main archive.
+
+The two archives are a startup/main split, not per-file encrypted output. The main archive is deliberately extracted as a unit so video and audio can continue using byte-range reads after the first preparation. A first visit to the authenticated main experience may therefore spend time preparing the full asset cache; subsequent launches reuse it. The embedded keys and encrypted bundle deter casual inspection but cannot provide server-grade secrecy against a determined reverse engineer because the native app must contain decryption material and the reusable cache is readable after the device has been unlocked.
 
 ## Bridge contract
 
@@ -32,6 +40,8 @@ The `@main` AppDelegate creates the UIWindow and PaliroBridgeViewController in c
 | PaliroIap | getProducts, purchase; purchaseResult event |
 
 Native validates the main frame, local origin, service and method allowlist. External pages cannot navigate inside the privileged WebView. Only bundled Web resources and files inside PaliroVideos/PaliroVoiceMessages are served; symlink/path traversal outside these locations is rejected. Video/audio byte-range requests are supported.
+
+`PaliroAuthStorage` keeps server credentials in Keychain when it is available. If Security.framework rejects Keychain access because of a device, simulator, signature or provisioning condition, it switches this installation to an atomic Application Support file protected with `completeFileProtectionUntilFirstUserAuthentication` and excluded from backup. It never falls back to Web storage. Logout/account deletion clear both locations; uninstall removes the protected fallback and the installation marker, while a clean launch also attempts to remove any Keychain item left by an earlier install.
 
 ## Upgrade and data compatibility
 

@@ -75,3 +75,14 @@ test('native host validates origin, allowlists methods and restricts readable me
   const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
   assert.ok(!Object.keys({ ...pkg.dependencies, ...pkg.devDependencies }).some(name => name.startsWith('@capacitor/')))
 })
+
+test('native credentials fall back only to an iOS-protected install-local file when Keychain fails', () => {
+  const swift = readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroBridgeViewController.swift', import.meta.url), 'utf8')
+  assert.match(swift, /case protectedFile/)
+  assert.match(swift, /completeFileProtectionUntilFirstUserAuthentication/)
+  assert.match(swift, /isExcludedFromBackup = true/)
+  assert.match(swift, /if status == errSecItemNotFound \{ call\.resolve\(\[:\]\); return \}/)
+  assert.match(swift, /SecItemDelete\(query as CFDictionary\)/)
+  assert.match(swift, /try removeProtectedFile\(\)/)
+  assert.doesNotMatch(swift, /localStorage|sessionStorage/)
+})

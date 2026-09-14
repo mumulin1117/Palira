@@ -1,5 +1,6 @@
 import { access, cp, readdir, rm } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
+import { paliroProtectWebAssets } from './paliro-protect-web-assets.mjs'
 
 const source = new URL('../dist/', import.meta.url)
 const destination = new URL('../../PaDlroliroBox/PaDlroliroBox/public/', import.meta.url)
@@ -10,4 +11,5 @@ for (const entry of await readdir(destination).catch(() => [])) {
   await rm(new URL(entry, destination), { recursive: true, force: true })
 }
 await cp(source, destination, { recursive: true })
-console.log(`Paliro Web assets synced to ${fileURLToPath(destination)}`)
+const protection = await paliroProtectWebAssets(fileURLToPath(destination))
+console.log(`Paliro Web assets synced as whole archives (${protection.bootstrapCount} bootstrap files, ${protection.assetCount} main assets) to ${fileURLToPath(destination)}`)

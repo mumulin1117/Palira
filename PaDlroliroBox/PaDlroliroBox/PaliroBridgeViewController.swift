@@ -51,8 +51,8 @@ final class PaliroBridgeViewController: UIViewController, WKNavigationDelegate {
         configuration.setURLSchemeHandler(PaliroLocalResources(), forURLScheme: "capacitor")
         configuration.userContentController.add(bridge, name: "paliro")
         let language = PaliroLaunchLocale.current
-        let scriptURL = Bundle.main.resourceURL?.appendingPathComponent("public/paliro-native.js")
-        let nativeScript = scriptURL.flatMap { try? String(contentsOf: $0, encoding: .utf8) } ?? ""
+        let nativeScriptData = try? PaliroLocalResources.bundledData(for: "paliro-native.js")
+        let nativeScript = nativeScriptData.flatMap { String(data: $0, encoding: .utf8) } ?? ""
         let launchScript = WKUserScript(
             source: "window.__paliroLaunchLanguage = '\(language)';\n" + nativeScript,
             injectionTime: .atDocumentStart,
@@ -204,6 +204,11 @@ final class PaliroAuthStoragePlugin: PaliroNativeService, PaliroNativeMethods {
     let jsName = "PaliroAuthStorage"
     let methods = ["read", "write", "remove"]
 
+    private enum StorageMode: String {
+        case keychain
+        case protectedFile
+    }
+
     private var query: [String: Any] {
         [kSecClass as String: kSecClassGenericPassword,
          kSecAttrService as String: "\(Bundle.main.bundleIdentifier ?? "com.paliro.paramoboaxsdak").auth",
@@ -211,62 +216,141 @@ final class PaliroAuthStoragePlugin: PaliroNativeService, PaliroNativeMethods {
     }
 
     private let installationMarkerKey = "paliro.installationMarker.v1"
+    private let storageModeKey = "paliro.authStorageMode.v1"
 
-    private func prepareInstallation(preserveExistingInstallation: Bool) throws {
-        let defaults = UserDefaults.standard
-        guard defaults.object(forKey: installationMarkerKey) == nil else { return }
-        if !preserveExistingInstallation {
-            let status = SecItemDelete(query as CFDictionary)
-            guard status == errSecSuccess || status == errSecItemNotFound else {
-                throw NSError(domain: NSOSStatusErrorDomain, code: Int(status))
-            }
-        }
-        defaults.set(UUID().uuidString, forKey: installationMarkerKey)
+    private var storageMode: StorageMode {
+        get { StorageMode(rawValue: UserDefaults.standard.string(forKey: storageModeKey) ?? "") ?? .keychain }
+        set { UserDefaults.standard.set(newValue.rawValue, forKey: storageModeKey) }
     }
 
-    @objc func read(_ call: PaliroNativeCall) {
-        do {
-            try prepareInstallation(preserveExistingInstallation: call.getBool("preserveExistingInstallation") == true)
-        } catch {
-            call.reject("Unable to prepare account storage for this installation."); return
+    private func credentialFile(createDirectory: Bool) throws -> URL {
+        let manager = FileManager.default
+        let support = try manager.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: createDirectory)
+        let directory = support.appendingPathComponent("PaliroSecureSession", isDirectory: true)
+        if createDirectory {
+            try manager.createDirectory(at: directory, withIntermediateDirectories: true)
+            var values = URLResourceValues()
+            values.isExcludedFromBackup = true
+            var mutableDirectory = directory
+            try? mutableDirectory.setResourceValues(values)
         }
-        var lookup = query
-        lookup[kSecReturnData as String] = true
-        lookup[kSecMatchLimit as String] = kSecMatchLimitOne
-        var result: CFTypeRef?
-        let status = SecItemCopyMatching(lookup as CFDictionary, &result)
-        if status == errSecItemNotFound { call.resolve([:]); return }
-        guard status == errSecSuccess, let data = result as? Data,
-              let value = String(data: data, encoding: .utf8) else {
-            call.reject("Unable to read the account credential."); return
+        return directory.appendingPathComponent("credential.v1")
+    }
+
+    private func removeProtectedFile() throws {
+        let file = try credentialFile(createDirectory: true)
+        if FileManager.default.fileExists(atPath: file.path) { try FileManager.default.removeItem(at: file) }
+    }
+
+    private func writeProtectedFile(_ data: Data) throws {
+        let file = try credentialFile(createDirectory: true)
+        try data.write(to: file, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+    }
+
+    private func readProtectedFile() throws -> Data? {
+        let file = try credentialFile(createDirectory: true)
+        guard FileManager.default.fileExists(atPath: file.path) else { return nil }
+        return try Data(contentsOf: file)
+    }
+
+    private func logKeychainFailure(_ operation: String, status: OSStatus) {
+        let detail = SecCopyErrorMessageString(status, nil) as String? ?? "Unknown Security error"
+        NSLog("Paliro auth storage: Keychain %@ failed (%d): %@. Using protected app storage.", operation, status, detail)
+    }
+
+    private func resolveCredential(_ data: Data?, call: PaliroNativeCall) {
+        guard let data else { call.resolve([:]); return }
+        guard let value = String(data: data, encoding: .utf8) else {
+            call.reject("Invalid account credential.", "INVALID_SECURE_CREDENTIAL"); return
         }
         call.resolve(["value": value])
     }
 
-    @objc func write(_ call: PaliroNativeCall) {
-        do {
-            try prepareInstallation(preserveExistingInstallation: false)
-        } catch {
-            call.reject("Unable to prepare account storage for this installation."); return
-        }
-        guard let value = call.getString("value"), let data = value.data(using: .utf8), data.count <= 4096 else {
-            call.reject("Invalid account credential."); return
-        }
+    private func writeKeychain(_ data: Data) -> OSStatus {
         let attributes: [String: Any] = [kSecValueData as String: data,
             kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly]
         var status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
         if status == errSecItemNotFound {
             status = SecItemAdd(query.merging(attributes) { _, new in new } as CFDictionary, nil)
         }
-        guard status == errSecSuccess else { call.reject("Unable to save the account credential."); return }
-        call.resolve()
+        return status
+    }
+
+    private func prepareInstallation(preserveExistingInstallation: Bool) {
+        let defaults = UserDefaults.standard
+        guard defaults.object(forKey: installationMarkerKey) == nil else { return }
+        if preserveExistingInstallation {
+            storageMode = .keychain
+        } else {
+            try? removeProtectedFile()
+            let status = SecItemDelete(query as CFDictionary)
+            if status == errSecSuccess || status == errSecItemNotFound {
+                storageMode = .keychain
+            } else {
+                logKeychainFailure("clean install", status: status)
+                storageMode = .protectedFile
+            }
+        }
+        defaults.set(UUID().uuidString, forKey: installationMarkerKey)
+    }
+
+    @objc func read(_ call: PaliroNativeCall) {
+        prepareInstallation(preserveExistingInstallation: call.getBool("preserveExistingInstallation") == true)
+        if storageMode == .protectedFile {
+            do { resolveCredential(try readProtectedFile(), call: call) }
+            catch { call.reject("Unable to read the protected account credential.", "PROTECTED_FILE_READ_FAILED") }
+            return
+        }
+        var lookup = query
+        lookup[kSecReturnData as String] = true
+        lookup[kSecMatchLimit as String] = kSecMatchLimitOne
+        var result: CFTypeRef?
+        let status = SecItemCopyMatching(lookup as CFDictionary, &result)
+        if status == errSecSuccess {
+            resolveCredential(result as? Data, call: call)
+            return
+        }
+        if status == errSecItemNotFound { call.resolve([:]); return }
+        logKeychainFailure("read", status: status)
+        storageMode = .protectedFile
+        do { resolveCredential(try readProtectedFile(), call: call) }
+        catch { call.reject("Unable to read the protected account credential.", "PROTECTED_FILE_READ_FAILED") }
+    }
+
+    @objc func write(_ call: PaliroNativeCall) {
+        prepareInstallation(preserveExistingInstallation: false)
+        guard let value = call.getString("value"), let data = value.data(using: .utf8), data.count <= 4096 else {
+            call.reject("Invalid account credential.", "INVALID_SECURE_CREDENTIAL"); return
+        }
+        if storageMode == .keychain {
+            let status = writeKeychain(data)
+            if status == errSecSuccess {
+                try? removeProtectedFile()
+                call.resolve()
+                return
+            }
+            logKeychainFailure("write", status: status)
+            storageMode = .protectedFile
+        }
+        do {
+            try writeProtectedFile(data)
+            call.resolve()
+        } catch {
+            call.reject("Unable to save the protected account credential.", "PROTECTED_FILE_WRITE_FAILED")
+        }
     }
 
     @objc func remove(_ call: PaliroNativeCall) {
         let status = SecItemDelete(query as CFDictionary)
-        guard status == errSecSuccess || status == errSecItemNotFound else {
-            call.reject("Unable to clear the account credential."); return
+        if status != errSecSuccess && status != errSecItemNotFound {
+            logKeychainFailure("remove", status: status)
+            storageMode = .protectedFile
         }
-        call.resolve()
+        do {
+            try removeProtectedFile()
+            call.resolve()
+        } catch {
+            call.reject("Unable to clear the protected account credential.", "PROTECTED_FILE_REMOVE_FAILED")
+        }
     }
 }
