@@ -1,6 +1,6 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { Capacitor, registerPlugin } from '@capacitor/core'
+import { paliroNativeService, paliroNativeFileSource } from './services/paliroNativeBridge'
 import { createPaliroAccountApi, createPaliroCredentialStore, paliroAuthErrorKey } from './services/paliroAccountApi'
 import { createPaliroServerSession } from './services/paliroServerSession'
 import { paliroProfilePatch } from './services/paliroProfileSync'
@@ -98,14 +98,14 @@ let authController = null
 let registrationDraft = null
 let incompleteAuth = null
 const accountApi = createPaliroAccountApi()
-const nativeLaunchScreen = Capacitor.isNativePlatform() ? registerPlugin('PaliroLaunchScreen') : null
+const nativeLaunchScreen = paliroNativeService('PaliroLaunchScreen')
 function syncNativeLaunchLanguage(language) {
   paliroSetLanguagePreference(null, language)
   void nativeLaunchScreen?.setLanguage({ language }).catch(() => {})
 }
 const serverSession = createPaliroServerSession({
   api: accountApi,
-  credentials: createPaliroCredentialStore({ nativeStore: Capacitor.isNativePlatform() ? registerPlugin('PaliroAuthStorage') : null }),
+  credentials: createPaliroCredentialStore({ nativeStore: paliroNativeService('PaliroAuthStorage') }),
   acceptUser: paliroAcceptServerUser,
   clearLocalSession: paliroSignOut,
 })
@@ -343,9 +343,9 @@ let voiceRevision = 0
 let voicePointer = null
 let voiceStartPromise = null
 let voiceSending = false
-const nativeVoiceRecorder = Capacitor.isNativePlatform() ? registerPlugin('PaliroVoiceRecorder') : null
-const nativeCallPermissions = Capacitor.isNativePlatform() ? registerPlugin('PaliroCallPermissions') : null
-const nativeMediaPicker = Capacitor.isNativePlatform() ? registerPlugin('PaliroMediaPicker') : null
+const nativeVoiceRecorder = paliroNativeService('PaliroVoiceRecorder')
+const nativeCallPermissions = paliroNativeService('PaliroCallPermissions')
+const nativeMediaPicker = paliroNativeService('PaliroMediaPicker')
 let paliroVideoRestorePending = false
 
 function createDefaultProfile() {
@@ -857,7 +857,7 @@ async function requestVideoList() {
 
 function videoSource(source) {
   if (!source?.startsWith?.('file://')) return source
-  return window.Capacitor?.convertFileSrc?.(source) ?? source
+  return paliroNativeFileSource(source)
 }
 
 function loadVideoFeed(preferredVideoID = activeVideo.value?.id) {
@@ -2514,9 +2514,7 @@ function confirmBlockMatchedFriend() {
 }
 
 function getPaliroIapPlugin() {
-  // CAPBridgedPlugin exposes the plugin using its jsName; retain the class-name
-  // fallback so an older cached native shell still provides a useful path.
-  return window.Capacitor?.Plugins?.PaliroIap ?? window.Capacitor?.Plugins?.PaliroIapPlugin ?? null
+  return paliroNativeService('PaliroIap')
 }
 
 async function setupNativeIapBridge() {

@@ -66,7 +66,7 @@ test('published videos keep the selected cover after rereading persisted data', 
 test('native media plugins use instance registration, and video capture waits for audio permission', () => {
   const bridge = readFileSync(new URL('../ios/App/App/PaliroBridgeViewController.swift', import.meta.url), 'utf8')
   for (const plugin of ['PaliroMediaPicker', 'PaliroVoiceRecorder', 'PaliroCallPermissions']) {
-    assert.ok(bridge.includes(`registerPluginInstance(${plugin}Plugin())`))
+    assert.ok(bridge.includes(`bridge.register(${plugin}Plugin())`))
   }
   const native = readFileSync(new URL('../ios/App/App/PaliroIapPlugin.swift', import.meta.url), 'utf8')
   const camera = native.slice(native.indexOf('private func openCamera()'), native.indexOf('private func presentCamera()'))

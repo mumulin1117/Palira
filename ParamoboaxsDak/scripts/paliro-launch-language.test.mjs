@@ -33,7 +33,7 @@ test('saved App language overrides browser and device language', () => {
   const native = read('../ios/App/App/PaliroBridgeViewController.swift')
   assert.match(native, /paliro\.launchLanguage\.v1/)
   assert.match(native, /string\(forKey: storageKey\) == "en" \? "en" : "ko"/)
-  assert.match(native, /CAPPluginMethod\(name: "setLanguage"/)
+  assert.match(native, /let methods = \["hide", "setLanguage"\]/)
   assert.match(native, /injectionTime: .atDocumentStart/)
   assert.match(native, /isKoreanLaunch \? "PaliroLaunchKorean" : "appaliguaungld"/)
   const entry = read('../src/PaliroEntryApp.vue')

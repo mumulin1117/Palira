@@ -1,4 +1,3 @@
-import Capacitor
 import AVFoundation
 import Foundation
 import Photos
@@ -9,13 +8,10 @@ import UniformTypeIdentifiers
 
 @available(iOS 15.0, *)
 @objc(PaliroIapPlugin)
-final class PaliroIapPlugin: CAPPlugin, CAPBridgedPlugin {
+final class PaliroIapPlugin: PaliroNativeService, PaliroNativeMethods {
     let identifier = "PaliroIapPlugin"
     let jsName = "PaliroIap"
-    let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "getProducts", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "purchase", returnType: CAPPluginReturnPromise)
-    ]
+    let methods = ["getProducts", "purchase"]
 
     private let coinAmounts = [
         "bbdiylyghcvmvmts": 100,
@@ -41,7 +37,7 @@ final class PaliroIapPlugin: CAPPlugin, CAPBridgedPlugin {
         transactionUpdatesTask?.cancel()
     }
 
-    @objc func getProducts(_ call: CAPPluginCall) {
+    @objc func getProducts(_ call: PaliroNativeCall) {
         Task {
             let requestedIDs = call.getArray("productIDs", String.self) ?? Array(coinAmounts.keys)
             let validIDs = requestedIDs.filter { coinAmounts[$0] != nil }
@@ -63,7 +59,7 @@ final class PaliroIapPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    @objc func purchase(_ call: CAPPluginCall) {
+    @objc func purchase(_ call: PaliroNativeCall) {
         guard let productID = call.getString("productID"), coinAmounts[productID] != nil else {
             call.reject("The selected coin pack is unavailable.")
             return
@@ -139,14 +135,14 @@ final class PaliroIapPlugin: CAPPlugin, CAPBridgedPlugin {
 }
 
 @objc(PaliroMediaPickerPlugin)
-final class PaliroMediaPickerPlugin: CAPPlugin, CAPBridgedPlugin, PHPickerViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+final class PaliroMediaPickerPlugin: PaliroNativeService, PaliroNativeMethods, PHPickerViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     let identifier = "PaliroMediaPickerPlugin"
     let jsName = "PaliroMediaPicker"
-    let pluginMethods: [CAPPluginMethod] = [CAPPluginMethod(name: "pick", returnType: CAPPluginReturnPromise)]
-    private var pendingCall: CAPPluginCall?
+    let methods = ["pick"]
+    private var pendingCall: PaliroNativeCall?
     private var pendingMediaType = "image"
 
-    @objc func pick(_ call: CAPPluginCall) {
+    @objc func pick(_ call: PaliroNativeCall) {
         guard pendingCall == nil else { call.reject("A media picker is already open."); return }
         pendingCall = call
         let source = call.getString("source") ?? "library"
@@ -280,14 +276,12 @@ final class PaliroMediaPickerPlugin: CAPPlugin, CAPBridgedPlugin, PHPickerViewCo
 }
 
 @objc(PaliroCallPermissionsPlugin)
-final class PaliroCallPermissionsPlugin: CAPPlugin, CAPBridgedPlugin {
+final class PaliroCallPermissionsPlugin: PaliroNativeService, PaliroNativeMethods {
     let identifier = "PaliroCallPermissionsPlugin"
     let jsName = "PaliroCallPermissions"
-    let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "request", returnType: CAPPluginReturnPromise)
-    ]
+    let methods = ["request"]
 
-    @objc func request(_ call: CAPPluginCall) {
+    @objc func request(_ call: PaliroNativeCall) {
         requestAccess(for: .video) { [weak self] camera in
             guard camera else {
                 call.resolve(["camera": false, "microphone": false])
@@ -314,28 +308,33 @@ final class PaliroCallPermissionsPlugin: CAPPlugin, CAPBridgedPlugin {
 }
 
 @objc(PaliroVoiceRecorderPlugin)
-final class PaliroVoiceRecorderPlugin: CAPPlugin, CAPBridgedPlugin {
+final class PaliroVoiceRecorderPlugin: PaliroNativeService, PaliroNativeMethods {
     let identifier = "PaliroVoiceRecorderPlugin"
     let jsName = "PaliroVoiceRecorder"
-    let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "start", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "pause", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "resume", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "stop", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "cancel", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "discard", returnType: CAPPluginReturnPromise)
-    ]
+    let methods = ["start", "pause", "resume", "stop", "cancel", "discard"]
 
     private var recorder: AVAudioRecorder?
     private var recordingURL: URL?
     private var recordingStartedAt: Date?
     private var pauseStartedAt: Date?
     private var pausedDuration: TimeInterval = 0
+    private var requestGeneration = 0
 
-    @objc func start(_ call: CAPPluginCall) {
+    override func resetPage() {
+        requestGeneration += 1
+        recorder?.stop()
+        resetRecorder(removeFile: true)
+    }
+
+    @objc func start(_ call: PaliroNativeCall) {
         guard recorder == nil else { call.reject("A voice recording is already active."); return }
+        requestGeneration += 1
+        let generation = requestGeneration
         let session = AVAudioSession.sharedInstance()
-        let beginRecording: () -> Void = { [weak self] in self?.beginRecording(call) }
+        let beginRecording: () -> Void = { [weak self] in
+            guard let self, self.requestGeneration == generation else { call.reject("Recording cancelled.", "CANCELLED"); return }
+            self.beginRecording(call)
+        }
         switch session.recordPermission {
         case .granted:
             DispatchQueue.main.async(execute: beginRecording)
@@ -350,7 +349,7 @@ final class PaliroVoiceRecorderPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    private func beginRecording(_ call: CAPPluginCall) {
+    private func beginRecording(_ call: PaliroNativeCall) {
         do {
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playAndRecord, mode: .spokenAudio, options: [.defaultToSpeaker, .allowBluetoothHFP])
@@ -379,14 +378,14 @@ final class PaliroVoiceRecorderPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    @objc func pause(_ call: CAPPluginCall) {
+    @objc func pause(_ call: PaliroNativeCall) {
         guard let recorder, recorder.isRecording else { call.reject("No active voice recording."); return }
         recorder.pause()
         pauseStartedAt = Date()
         call.resolve(["paused": true])
     }
 
-    @objc func resume(_ call: CAPPluginCall) {
+    @objc func resume(_ call: PaliroNativeCall) {
         guard let recorder, !recorder.isRecording, recordingURL != nil else { call.reject("No paused voice recording."); return }
         if let pauseStartedAt { pausedDuration += Date().timeIntervalSince(pauseStartedAt) }
         self.pauseStartedAt = nil
@@ -394,7 +393,7 @@ final class PaliroVoiceRecorderPlugin: CAPPlugin, CAPBridgedPlugin {
         call.resolve(["recording": true])
     }
 
-    @objc func stop(_ call: CAPPluginCall) {
+    @objc func stop(_ call: PaliroNativeCall) {
         guard let recorder, let url = recordingURL else { call.reject("No active voice recording."); return }
         let duration = recordingDuration()
         recorder.stop()
@@ -402,13 +401,14 @@ final class PaliroVoiceRecorderPlugin: CAPPlugin, CAPBridgedPlugin {
         call.resolve(["fileUri": url.absoluteString, "durationSeconds": duration])
     }
 
-    @objc func cancel(_ call: CAPPluginCall) {
+    @objc func cancel(_ call: PaliroNativeCall) {
+        requestGeneration += 1
         recorder?.stop()
         resetRecorder(removeFile: true)
         call.resolve(["cancelled": true])
     }
 
-    @objc func discard(_ call: CAPPluginCall) {
+    @objc func discard(_ call: PaliroNativeCall) {
         do {
             let directory = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
                 .appendingPathComponent("PaliroVoiceMessages", isDirectory: true).resolvingSymlinksInPath()

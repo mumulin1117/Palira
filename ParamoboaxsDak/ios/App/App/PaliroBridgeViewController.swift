@@ -1,7 +1,7 @@
-import Capacitor
 import Foundation
 import Security
 import WebKit
+import UIKit
 
 private enum PaliroLaunchLocale {
     static let storageKey = "paliro.launchLanguage.v1"
@@ -17,7 +17,10 @@ private enum PaliroLaunchLocale {
     }
 }
 
-final class PaliroBridgeViewController: CAPBridgeViewController {
+final class PaliroBridgeViewController: UIViewController, WKNavigationDelegate {
+    private var webView: WKWebView!
+    private let bridge = PaliroNativeBridge()
+    private var keyboardBottom: NSLayoutConstraint!
     private var launchOverlay: UIImageView?
     private var hasConfiguredLaunchSurface = false
     private let launchBackgroundColor = UIColor(red: 5 / 255, green: 11 / 255, blue: 33 / 255, alpha: 1)
@@ -26,37 +29,89 @@ final class PaliroBridgeViewController: CAPBridgeViewController {
         PaliroLaunchLocale.current == "ko"
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        configureLaunchSurface()
+    override func loadView() {
+        view = UIView()
+        view.backgroundColor = launchBackgroundColor
     }
 
-    override func capacitorDidLoad() {
-        super.capacitorDidLoad()
-        // capacitorDidLoad runs before CAPBridgeViewController starts its first URL load.
-        // Installing the cover here prevents the WebView's unpainted frame from flashing white.
-        configureLaunchSurface()
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = .default()
+        configuration.allowsInlineMediaPlayback = true
+        configuration.mediaTypesRequiringUserActionForPlayback = []
+        configuration.setURLSchemeHandler(PaliroLocalResources(), forURLScheme: "capacitor")
+        configuration.userContentController.add(bridge, name: "paliro")
         let language = PaliroLaunchLocale.current
+        let scriptURL = Bundle.main.resourceURL?.appendingPathComponent("public/paliro-native.js")
+        let nativeScript = scriptURL.flatMap { try? String(contentsOf: $0, encoding: .utf8) } ?? ""
         let launchScript = WKUserScript(
-            source: "window.__paliroLaunchLanguage = '\(language)';",
+            source: "window.__paliroLaunchLanguage = '\(language)';\n" + nativeScript,
             injectionTime: .atDocumentStart,
             forMainFrameOnly: true
         )
-        webView?.configuration.userContentController.addUserScript(launchScript)
-        bridge?.registerPluginInstance(PaliroAuthStoragePlugin())
-        bridge?.registerPluginInstance(PaliroLaunchScreenPlugin())
-        webView?.isOpaque = true
-        webView?.backgroundColor = launchBackgroundColor
-        webView?.scrollView.backgroundColor = launchBackgroundColor
-        if #available(iOS 15.0, *) {
-            webView?.underPageBackgroundColor = launchBackgroundColor
+        configuration.userContentController.addUserScript(launchScript)
+        webView = WKWebView(frame: .zero, configuration: configuration)
+        webView.navigationDelegate = self
+        webView.translatesAutoresizingMaskIntoConstraints = false
+        webView.isOpaque = true
+        webView.backgroundColor = launchBackgroundColor
+        webView.scrollView.backgroundColor = launchBackgroundColor
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
+        webView.scrollView.bounces = false
+        webView.scrollView.keyboardDismissMode = .interactive
+        webView.underPageBackgroundColor = launchBackgroundColor
+        #if DEBUG
+        if #available(iOS 16.4, *) { webView.isInspectable = true }
+        #endif
+        view.addSubview(webView)
+        keyboardBottom = webView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        NSLayoutConstraint.activate([
+            webView.topAnchor.constraint(equalTo: view.topAnchor),
+            webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            webView.trailingAnchor.constraint(equalTo: view.trailingAnchor), keyboardBottom,
+        ])
+        bridge.webView = webView
+        bridge.viewController = self
+        bridge.register(PaliroAuthStoragePlugin())
+        bridge.register(PaliroLaunchScreenPlugin())
+        bridge.register(PaliroIapPlugin())
+        bridge.register(PaliroMediaPickerPlugin())
+        bridge.register(PaliroVoiceRecorderPlugin())
+        bridge.register(PaliroCallPermissionsPlugin())
+        NotificationCenter.default.addObserver(self, selector: #selector(updateKeyboard(_:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateKeyboard(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        configureLaunchSurface()
+        webView.load(URLRequest(url: URL(string: "capacitor://localhost/index.html")!))
+    }
+
+    @objc private func updateKeyboard(_ notification: Notification) {
+        guard let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        let local = view.convert(frame, from: nil)
+        let overlap = notification.name == UIResponder.keyboardWillHideNotification || local.maxY < view.bounds.maxY ? 0 : max(0, view.bounds.maxY - local.minY)
+        keyboardBottom.constant = -overlap
+        webView.scrollView.contentInset = .zero
+        webView.scrollView.scrollIndicatorInsets = .zero
+        let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.25
+        UIView.animate(withDuration: duration) { self.view.layoutIfNeeded() }
+    }
+
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        guard let url = navigationAction.request.url else { decisionHandler(.cancel); return }
+        if url.scheme == "capacitor", url.host == "localhost", ["/", "/index.html"].contains(url.path) {
+            decisionHandler(.allow)
+        } else {
+            decisionHandler(.cancel)
+            if navigationAction.navigationType == .linkActivated, ["https", "mailto", "tel"].contains(url.scheme ?? "") {
+                UIApplication.shared.open(url)
+            }
         }
-        if #available(iOS 15.0, *) {
-            bridge?.registerPluginType(PaliroIapPlugin.self)
-            bridge?.registerPluginInstance(PaliroMediaPickerPlugin())
-            bridge?.registerPluginInstance(PaliroVoiceRecorderPlugin())
-            bridge?.registerPluginInstance(PaliroCallPermissionsPlugin())
-        }
+    }
+
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        bridge.resetPage()
+        showLaunchOverlay()
+        webView.reload()
     }
 
     deinit {
@@ -96,10 +151,6 @@ final class PaliroBridgeViewController: CAPBridgeViewController {
             object: nil
         )
 
-        // Keep a dark branded surface even if JavaScript fails before mounting.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 15) { [weak self] in
-            self?.hideLaunchOverlay()
-        }
     }
 
     @objc private func hideLaunchOverlay() {
@@ -118,22 +169,19 @@ private extension Notification.Name {
 }
 
 @objc(PaliroLaunchScreenPlugin)
-final class PaliroLaunchScreenPlugin: CAPPlugin, CAPBridgedPlugin {
+final class PaliroLaunchScreenPlugin: PaliroNativeService, PaliroNativeMethods {
     let identifier = "PaliroLaunchScreenPlugin"
     let jsName = "PaliroLaunchScreen"
-    let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "hide", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "setLanguage", returnType: CAPPluginReturnPromise)
-    ]
+    let methods = ["hide", "setLanguage"]
 
-    @objc func hide(_ call: CAPPluginCall) {
+    @objc func hide(_ call: PaliroNativeCall) {
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: .paliroWebContentReady, object: nil)
             call.resolve()
         }
     }
 
-    @objc func setLanguage(_ call: CAPPluginCall) {
+    @objc func setLanguage(_ call: PaliroNativeCall) {
         guard let language = call.getString("language"), PaliroLaunchLocale.save(language) else {
             call.reject("Launch language must be en or ko.")
             return
@@ -143,14 +191,10 @@ final class PaliroLaunchScreenPlugin: CAPPlugin, CAPBridgedPlugin {
 }
 
 @objc(PaliroAuthStoragePlugin)
-final class PaliroAuthStoragePlugin: CAPPlugin, CAPBridgedPlugin {
+final class PaliroAuthStoragePlugin: PaliroNativeService, PaliroNativeMethods {
     let identifier = "PaliroAuthStoragePlugin"
     let jsName = "PaliroAuthStorage"
-    let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "read", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "write", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "remove", returnType: CAPPluginReturnPromise)
-    ]
+    let methods = ["read", "write", "remove"]
 
     private var query: [String: Any] {
         [kSecClass as String: kSecClassGenericPassword,
@@ -172,7 +216,7 @@ final class PaliroAuthStoragePlugin: CAPPlugin, CAPBridgedPlugin {
         defaults.set(UUID().uuidString, forKey: installationMarkerKey)
     }
 
-    @objc func read(_ call: CAPPluginCall) {
+    @objc func read(_ call: PaliroNativeCall) {
         do {
             try prepareInstallation(preserveExistingInstallation: call.getBool("preserveExistingInstallation") == true)
         } catch {
@@ -191,7 +235,7 @@ final class PaliroAuthStoragePlugin: CAPPlugin, CAPBridgedPlugin {
         call.resolve(["value": value])
     }
 
-    @objc func write(_ call: CAPPluginCall) {
+    @objc func write(_ call: PaliroNativeCall) {
         do {
             try prepareInstallation(preserveExistingInstallation: false)
         } catch {
@@ -210,7 +254,7 @@ final class PaliroAuthStoragePlugin: CAPPlugin, CAPBridgedPlugin {
         call.resolve()
     }
 
-    @objc func remove(_ call: CAPPluginCall) {
+    @objc func remove(_ call: PaliroNativeCall) {
         let status = SecItemDelete(query as CFDictionary)
         guard status == errSecSuccess || status == errSecItemNotFound else {
             call.reject("Unable to clear the account credential."); return

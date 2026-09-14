@@ -24,7 +24,7 @@ cd /Users/linqian/Documents/Palira/ParamoboaxsDak
 npm run dev -- --host 127.0.0.1 --port 5173
 ```
 
-开发接口默认 `http://127.0.0.1:3001`，示例见 `.env.example`；生产构建由 `.env.production` 固定使用 `https://mobile.paliroweb.site`。修改环境变量后必须重新构建，iOS还要重新执行 Capacitor copy。服务器上的 Node 服务仍只监听 `127.0.0.1:3300`，公网只能通过该子域的独立 Nginx HTTPS 反向代理访问。
+开发接口默认 `http://127.0.0.1:3001`，示例见 `.env.example`；生产构建由 `.env.production` 固定使用 `https://mobile.paliroweb.site`。修改环境变量后执行 `pnpm ios:sync`，再使用 `ios/App/App.xcodeproj` 构建原生 WKWebView App，详见 `PALIRO_NATIVE_WEBVIEW.md`。服务器上的 Node 服务仍只监听 `127.0.0.1:3300`，公网只能通过该子域的独立 Nginx HTTPS 反向代理访问。
 
 iOS打包：`npm run build` 后运行 `npx cap copy ios`，再在Xcode运行 `ios/App/App.xcworkspace`。原有build脚本已修正为真正执行 `vite build`。
 
