@@ -14,6 +14,7 @@ const PALIRO_OPENED_MATCHES_KEY = 'paliro.openedMatchMembers'
 const PALIRO_BOX_RULES_KEY = 'paliro.boxRulesSeen'
 const PALIRO_TEST_KEY = 'paliro.topicDiscoveryTest'
 const PALIRO_IAP_TRANSACTIONS_KEY = 'paliro.iapTransactions'
+const PALIRO_ZERO_COIN_MIGRATION_KEY = 'paliro.zeroInitialCoinsMigrated'
 const PALIRO_FRIEND_REQUESTS_KEY = 'paliro.friendRequests'
 const PALIRO_INCOMING_FRIEND_REQUESTS_KEY = 'paliro.incomingFriendRequests'
 const PALIRO_MESSAGES_KEY = 'paliro.conversations'
@@ -44,8 +45,7 @@ function paliroMockMemberPhotoSource(language, userID) {
 
 export const PALIRO_DAILY_BOX_LIMIT = 3
 export const PALIRO_BOX_ACTION_COST = 200
-// Local-only test switch. Set to false before a production release.
-export const PALIRO_DEBUG_MODE = true
+const PALIRO_INITIAL_COIN_BALANCE = 0
 export const PALIRO_COIN_PACKS = [
   { productID: 'bbdiylyghcvmvmts', coins: 100, fallbackPrice: '$0.99' },
   { productID: 'iyksmadvinojrplp', coins: 200, fallbackPrice: '$1.99' },
@@ -317,9 +317,6 @@ const PALIRO_TEST_CONVERSATIONS = [
   { member: PALIRO_MOCK_MEMBERS_BY_LANGUAGE.en[1], unreadCount: 0, messages: [{ id: 'paliro-message-luna-1', sender: 'friend', body: 'Want to compare our favorite retro games for the next Box?', sentAt: '2026-09-10T10:05:00.000Z' }] },
 ]
 const PALIRO_SEEDED_MESSAGE_IDS = new Set(PALIRO_TEST_CONVERSATIONS.flatMap(conversation => conversation.messages.map(message => message.id)))
-const PALIRO_DEBUG_LOGIN_COIN_BALANCE = 1000
-const PALIRO_DEMO_COIN_BALANCE = PALIRO_DEBUG_MODE ? PALIRO_DEBUG_LOGIN_COIN_BALANCE : 600
-
 const testUser = {
   id: 'paliro-test-user',
   email: 'paliro@gmail.com',
@@ -355,13 +352,28 @@ function getLocalDayKey() {
   return `${today.getFullYear()}-${month}-${day}`
 }
 
+function migrateLegacyInitialCoins(userID, usageByUser, state) {
+  const migratedByUser = readJson(PALIRO_ZERO_COIN_MIGRATION_KEY, {})
+  if (migratedByUser[userID]) return state
+
+  const creditedTransactions = readJson(PALIRO_IAP_TRANSACTIONS_KEY, {})[userID] ?? {}
+  const nextState = Object.keys(creditedTransactions).length === 0
+    ? { ...state, coins: PALIRO_INITIAL_COIN_BALANCE }
+    : state
+  usageByUser[userID] = nextState
+  migratedByUser[userID] = true
+  writeJson(PALIRO_BOX_USAGE_KEY, usageByUser)
+  writeJson(PALIRO_ZERO_COIN_MIGRATION_KEY, migratedByUser)
+  return nextState
+}
+
 function getBoxUsageByUser(userID) {
   const usageByUser = readJson(PALIRO_BOX_USAGE_KEY, {})
   const today = getLocalDayKey()
   const stored = usageByUser[userID]
 
   if (stored?.day === today) {
-    return { usageByUser, state: stored }
+    return { usageByUser, state: migrateLegacyInitialCoins(userID, usageByUser, stored) }
   }
 
   const state = {
@@ -370,29 +382,17 @@ function getBoxUsageByUser(userID) {
     bonusActions: stored?.bonusActions ?? 0,
     videoRewardDay: '',
     videoBonusActions: 0,
-    coins: stored?.coins ?? PALIRO_DEMO_COIN_BALANCE,
+    coins: stored?.coins ?? PALIRO_INITIAL_COIN_BALANCE,
   }
   usageByUser[userID] = state
   writeJson(PALIRO_BOX_USAGE_KEY, usageByUser)
-  return { usageByUser, state }
+  return { usageByUser, state: migrateLegacyInitialCoins(userID, usageByUser, state) }
 }
 
 function saveBoxUsage(userID, usageByUser, state) {
   usageByUser[userID] = state
   writeJson(PALIRO_BOX_USAGE_KEY, usageByUser)
   return state
-}
-
-function ensureDebugLoginBalance(userID) {
-  if (!PALIRO_DEBUG_MODE || !userID) return
-
-  const { usageByUser, state } = getBoxUsageByUser(userID)
-  if (state.coins >= PALIRO_DEBUG_LOGIN_COIN_BALANCE) return
-
-  saveBoxUsage(userID, usageByUser, {
-    ...state,
-    coins: PALIRO_DEBUG_LOGIN_COIN_BALANCE,
-  })
 }
 
 export function paliroSeedUsers() {
@@ -438,7 +438,6 @@ export function paliroGetSession() {
     paliroSignOut()
     return null
   }
-  ensureDebugLoginBalance(user.id)
   return createSession(user)
 }
 
@@ -451,7 +450,7 @@ export function paliroDeleteLocalAccount(localID, serverID) {
   const user = users.find(value => value.id === localID)
   if (user && user.serverUserID !== serverID) throw new Error('Account identity mismatch')
   const keys = [PALIRO_BOX_USAGE_KEY, PALIRO_OPENED_MATCHES_KEY, PALIRO_BOX_RULES_KEY,
-    PALIRO_TEST_KEY, PALIRO_IAP_TRANSACTIONS_KEY, PALIRO_FRIEND_REQUESTS_KEY,
+    PALIRO_TEST_KEY, PALIRO_IAP_TRANSACTIONS_KEY, PALIRO_ZERO_COIN_MIGRATION_KEY, PALIRO_FRIEND_REQUESTS_KEY,
     PALIRO_INCOMING_FRIEND_REQUESTS_KEY, PALIRO_MESSAGES_KEY, PALIRO_PROFILE_META_KEY,
     PALIRO_SOCIAL_STATE_KEY, PALIRO_BLOCKED_USERS_KEY, PALIRO_REPORTS_KEY,
     PALIRO_VIDEO_STATE_KEY, PALIRO_LANGUAGE_KEY, PALIRO_PUSH_PREFERENCE_KEY]
@@ -497,7 +496,6 @@ export function paliroAcceptServerUser(serverUser) {
   else next[index] = user
   writeJson(PALIRO_USERS_KEY, next)
   // Language belongs to this installation, not to a restored account or server profile.
-  ensureDebugLoginBalance(localID)
   return createSession(user)
 }
 
@@ -525,7 +523,6 @@ export function paliroLogin(email, password) {
   if (user.password !== password) return { type: 'invalid-password' }
   if (!user.profile) return { type: 'profile-incomplete', user }
   if (!isAdultBirthday(user.profile.birthday)) return { type: 'age-restricted' }
-  ensureDebugLoginBalance(user.id)
   return { type: 'success', session: createSession(user) }
 }
 
@@ -551,7 +548,6 @@ export function paliroCompleteProfile(userId, profile) {
   if (!user) return null
   user.profile = profile
   writeJson(PALIRO_USERS_KEY, users)
-  ensureDebugLoginBalance(user.id)
   return createSession(user)
 }
 

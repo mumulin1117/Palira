@@ -69,11 +69,10 @@ Paths below are relative to this project directory.
 | `ios/App/App/Assets.xcassets/PaliroLaunchLogo.imageset/Contents.json`, `paliro-launch-logo.pdf` | Reuse the existing logo with a vector rounded-rectangle clip: 20pt radius at the 70pt reference width. No runtime attributes in LaunchScreen. |
 | `scripts/paliro-build-launch-logo.swift` | Rebuild the clipped launch asset with `xcrun swift scripts/paliro-build-launch-logo.swift`; preserves the original AppIcon image and existing launch layout. |
 | `scripts/paliro-language-persistence.test.mjs`, `scripts/paliro-launch-language.test.mjs`, `scripts/paliro-launch-transition.test.mjs` | Language priority, reinstall, account/server isolation, data language, first frame and neutral launch checks. |
-| `ios/App/PaliroNativeTests/PaliroNativeBridgeTests.swift` | Native locale persistence, primary-language fallback, bridge alignment, localized name/permission resources and existing keyboard regression. |
 | `dist/index.html`, `dist/paliro-launch.js`, `dist/assets/index-*.js`, generated `ios/App/App/public/` | Rebuilt and synchronized distribution resources. |
 | `PALIRO_NATIVE_WEBVIEW.md` | Rules, limitations, file inventory and verification record. |
 
-Verification: 112 Node tests and 13 native tests passed; Release device compilation passed without signing. On a newly created, isolated iPhone SE simulator, launch arguments simulated Chinese/English and Korean language preferences: fresh Chinese-primary launch displayed English; restarting with Korean retained English; deleting only this test installation and reinstalling with Korean displayed Korean. Native saved preferences were checked alongside screenshots. Native locale-unit tests use isolated UserDefaults suites and do not clear the user's preferences. Existing conversation/relationship preservation is covered by Node tests. Physical-device system permission dialogs and large-screen visual checks were not repeated in this change.
+Verification uses the Node regression suite plus Debug and Release compilation of the `App` target. Existing conversation and relationship preservation is covered by Node tests. Physical-device system permission dialogs and large-screen visual checks remain manual checks.
 
 - Selecting an upload category only changes the selection. Tapping upload opens the native flow.
 - Photo/video library selection requests Photos access and accepts limited access.
@@ -87,10 +86,8 @@ Verification: 112 Node tests and 13 native tests passed; Release device compilat
 
 ```sh
 node --test scripts/*.test.mjs
-xcodebuild -project ios/App/App.xcodeproj -scheme PaliroNativeTests \
-  -destination 'platform=iOS Simulator,id=YOUR_TEST_SIMULATOR_ID' test
+xcodebuild -project ios/App/App.xcodeproj -scheme App \
+  -configuration Debug -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO build
 ```
-
-Run the native suite on a dedicated test simulator. It verifies actual JavaScript/native replies, Keychain reads, resource byte ranges, file isolation, method allowlists, video playback and keyboard resizing. It does not grant microphone/camera access, start purchases, or send messages. Use a separate test account for manual permission and publishing checks.
 
 Manual device checklist: library allow/limited/deny/cancel; camera and microphone allow/deny; video cover and playback; recording pause/resume/cancel and minimum duration; leaving chat releases recording; keyboard open/close on login and chat; English/Korean cold launches; logout/relogin; StoreKit sandbox callbacks.

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2DBDD4447882C5A3A7121EE5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A961C386092156148D26B086 /* Foundation.framework */; };
 		504EC3081FED79650016851F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504EC3071FED79650016851F /* AppDelegate.swift */; };
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* PaliroLaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* PaliroLaunchScreen.storyboard */; };
@@ -16,23 +15,9 @@
 		A14F8A710000000000000003 /* PaliroBridgeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14F8A710000000000000004 /* PaliroBridgeViewController.swift */; };
 		A14F8A710000000000000005 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A14F8A710000000000000006 /* InfoPlist.strings */; };
 		A14F8A710000000000000009 /* PaliroNativeBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14F8A71000000000000000A /* PaliroNativeBridge.swift */; };
-		D557F0BE69F2C6E36B475DD3 /* PaliroNativeBridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB1117C463E10EC1A6FE080 /* PaliroNativeBridgeTests.swift */; };
-		F55708A130528CF300484F80 /* 0.storekit in Resources */ = {isa = PBXBuildFile; fileRef = F55708A030528CF300484F80 /* 0.storekit */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		563B1EC7D972ABDD51D624A5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 504EC3031FED79650016851F;
-			remoteInfo = App;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
-		1CB1117C463E10EC1A6FE080 /* PaliroNativeBridgeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PaliroNativeBridgeTests.swift; sourceTree = "<group>"; };
-		31333DC2528583AA291CA783 /* PaliroNativeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PaliroNativeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		504EC3041FED79650016851F /* App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = App.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		504EC3071FED79650016851F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		504EC30E1FED79650016851F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -44,8 +29,6 @@
 		A14F8A710000000000000007 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A14F8A710000000000000008 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A14F8A71000000000000000A /* PaliroNativeBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroNativeBridge.swift; sourceTree = "<group>"; };
-		A961C386092156148D26B086 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		F55708A030528CF300484F80 /* 0.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = 0.storekit; sourceTree = "<group>"; };
 		F55708A230529DD900484F80 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -57,48 +40,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AA16299E0985DB202021E3A9 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				2DBDD4447882C5A3A7121EE5 /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		12389454354F4B5FA062B425 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				1550BB551BE3AF39A3B891E4 /* iOS */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		1550BB551BE3AF39A3B891E4 /* iOS */ = {
-			isa = PBXGroup;
-			children = (
-				A961C386092156148D26B086 /* Foundation.framework */,
-			);
-			name = iOS;
-			sourceTree = "<group>";
-		};
-		1D5A10CAA2359569CE896797 /* PaliroNativeTests */ = {
-			isa = PBXGroup;
-			children = (
-				1CB1117C463E10EC1A6FE080 /* PaliroNativeBridgeTests.swift */,
-			);
-			path = PaliroNativeTests;
-			sourceTree = "<group>";
-		};
 		504EC2FB1FED79650016851F = {
 			isa = PBXGroup;
 			children = (
 				504EC3061FED79650016851F /* App */,
 				504EC3051FED79650016851F /* Products */,
-				12389454354F4B5FA062B425 /* Frameworks */,
-				1D5A10CAA2359569CE896797 /* PaliroNativeTests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -106,7 +55,6 @@
 			isa = PBXGroup;
 			children = (
 				504EC3041FED79650016851F /* App.app */,
-				31333DC2528583AA291CA783 /* PaliroNativeTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -124,7 +72,6 @@
 				504EC3131FED79650016851F /* Info.plist */,
 				A14F8A710000000000000006 /* InfoPlist.strings */,
 				50B271D01FEDC1A000F3C39B /* public */,
-				F55708A030528CF300484F80 /* 0.storekit */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -132,24 +79,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2834EBEB3F1CA39C7445E3DE /* PaliroNativeTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 889B8D459FED4AB5C50328D1 /* Build configuration list for PBXNativeTarget "PaliroNativeTests" */;
-			buildPhases = (
-				DB82A046B393F27CB83A2113 /* Sources */,
-				AA16299E0985DB202021E3A9 /* Frameworks */,
-				E8A7EA5B3D693C3145231D24 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				402EF4164B80DC032269645B /* PBXTargetDependency */,
-			);
-			name = PaliroNativeTests;
-			productName = PaliroNativeTests;
-			productReference = 31333DC2528583AA291CA783 /* PaliroNativeTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 		504EC3031FED79650016851F /* App */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 504EC3161FED79650016851F /* Build configuration list for PBXNativeTarget "App" */;
@@ -176,9 +105,6 @@
 				LastSwiftUpdateCheck = 0920;
 				LastUpgradeCheck = 0920;
 				TargetAttributes = {
-					2834EBEB3F1CA39C7445E3DE = {
-						ProvisioningStyle = Automatic;
-					};
 					504EC3031FED79650016851F = {
 						CreatedOnToolsVersion = 9.2;
 						LastSwiftMigration = 1100;
@@ -201,7 +127,6 @@
 			projectRoot = "";
 			targets = (
 				504EC3031FED79650016851F /* App */,
-				2834EBEB3F1CA39C7445E3DE /* PaliroNativeTests */,
 			);
 		};
 /* End PBXProject section */
@@ -214,15 +139,7 @@
 				504EC3121FED79650016851F /* PaliroLaunchScreen.storyboard in Resources */,
 				50B271D11FEDC1A000F3C39B /* public in Resources */,
 				504EC30F1FED79650016851F /* Assets.xcassets in Resources */,
-				F55708A130528CF300484F80 /* 0.storekit in Resources */,
 				A14F8A710000000000000005 /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E8A7EA5B3D693C3145231D24 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -240,24 +157,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DB82A046B393F27CB83A2113 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D557F0BE69F2C6E36B475DD3 /* PaliroNativeBridgeTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		402EF4164B80DC032269645B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = App;
-			target = 504EC3031FED79650016851F /* App */;
-			targetProxy = 563B1EC7D972ABDD51D624A5 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		504EC3101FED79650016851F /* PaliroLaunchScreen.storyboard */ = {
@@ -280,41 +180,6 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		4A392DA0B823C5DD6A68B155 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_STYLE = Automatic;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
-				PRODUCT_BUNDLE_IDENTIFIER = "site.paliro.native-tests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/App.app/App";
-			};
-			name = Debug;
-		};
-		4D97C6E299AC3E362A5525B4 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_STYLE = Automatic;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
-				PRODUCT_BUNDLE_IDENTIFIER = "site.paliro.native-tests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/App.app/App";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
 		504EC3141FED79650016851F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -499,15 +364,6 @@
 			buildConfigurations = (
 				504EC3171FED79650016851F /* Debug */,
 				504EC3181FED79650016851F /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		889B8D459FED4AB5C50328D1 /* Build configuration list for PBXNativeTarget "PaliroNativeTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4D97C6E299AC3E362A5525B4 /* Release */,
-				4A392DA0B823C5DD6A68B155 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -108,8 +108,7 @@ final class PaliroNativeBridge: NSObject, WKScriptMessageHandler {
     }
 }
 
-// Preserve the legacy origin so existing WKWebsiteDataStore/localStorage stays accessible.
-// The scheme is served entirely here; no third-party WebView runtime is linked.
+
 final class PaliroLocalResources: NSObject, WKURLSchemeHandler {
     private var tasks = Set<ObjectIdentifier>()
     private let queue = DispatchQueue(label: "site.paliro.local-resources", qos: .userInitiated, attributes: .concurrent)

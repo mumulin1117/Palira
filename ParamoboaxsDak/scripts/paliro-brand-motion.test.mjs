@@ -10,6 +10,7 @@ import {
   paliroCreateVideoPost,
   paliroGetBoxState,
   paliroGetPublishedVideos,
+  paliroLogin,
   paliroSeedUsers,
   paliroUseFreeBoxAction,
 } from '../src/services/paliroLocalStore.js'
@@ -80,6 +81,25 @@ test('the real daily free-action state decreases to zero and survives a reread',
     }
     assert.equal(paliroUseFreeBoxAction(userID).type, 'coins-required')
     assert.equal(remaining(), 0)
+  } finally { delete globalThis.window }
+})
+
+test('every account starts with zero coins without debug login top-ups', () => {
+  const storeSource = readFileSync(new URL('../src/services/paliroLocalStore.js', import.meta.url), 'utf8')
+  const values = new Map()
+  globalThis.window = { localStorage: { getItem: (key) => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) } }
+  try {
+    assert.equal(paliroLogin('paliro@gmail.com', '67896789').type, 'success')
+    assert.equal(paliroGetBoxState('paliro-test-user').coins, 0)
+    assert.equal(paliroGetBoxState('paliro-new-user').coins, 0)
+    const today = new Date()
+    const day = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+    values.set('paliro.boxUsage', JSON.stringify({ legacy: { day, freeActionsUsed: 0, bonusActions: 0, videoBonusActions: 0, coins: 1000 } }))
+    assert.equal(paliroGetBoxState('legacy').coins, 0)
+    values.set('paliro.boxUsage', JSON.stringify({ purchased: { day, freeActionsUsed: 0, bonusActions: 0, videoBonusActions: 0, coins: 1000 } }))
+    values.set('paliro.iapTransactions', JSON.stringify({ purchased: { transaction: { coins: 1000 } } }))
+    assert.equal(paliroGetBoxState('purchased').coins, 1000)
+    assert.doesNotMatch(storeSource, /PALIRO_DEBUG_LOGIN_COIN_BALANCE|PALIRO_DEMO_COIN_BALANCE|ensureDebugLoginBalance/)
   } finally { delete globalThis.window }
 })
 
