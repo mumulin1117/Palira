@@ -1,11 +1,13 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import vm from 'node:vm'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { parse } from 'vue/compiler-sfc'
 import { paliroSeedUsers, paliroGetSocialState, paliroGetSocialSummary, paliroToggleFollowMember, paliroCanChatWithMember } from '../src/services/paliroLocalStore.js'
+import { paliroTranslate } from '../src/services/paliroI18n.js'
 
 const source = readFileSync(new URL('../src/PaliroEntryApp.vue', import.meta.url), 'utf8')
+const styles = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8')
 test('profile follow toggles persist and mutual permissions update in both languages', () => {
   const values = new Map()
   globalThis.window = { localStorage: {
@@ -54,4 +56,23 @@ test('followed profile button remains clickable and announces the unfollow actio
   assert.equal(binding('disabled'), 'isMatchedBlocked')
   assert.equal(binding('aria-pressed'), 'isMatchedFollowing')
   assert.match(binding('aria-label'), /t\('unfollow'\)/)
+})
+
+test('a non-mutual profile message opens the localized Lanhu reminder', () => {
+  const context = vm.createContext({
+    isMatchedMutualFriend: { value: false },
+    profileReminder: { value: '' },
+  })
+  vm.runInContext(source.match(/function openMatchedConversation\([^]*?\n}/)[0], context)
+  context.openMatchedConversation()
+
+  assert.equal(context.profileReminder.value, 'message')
+  assert.match(source, /'is-mutual-only': profileReminder === 'message'/)
+  assert.match(source, /paliro-mutual-friend-reminder@2x\.png/)
+  assert.match(styles, /\.paliro-profile-reminder\.is-mutual-only \{[^}]*width: min\(100%, 312px\)[^}]*min-height: 330px/)
+  assert.ok(existsSync(new URL('../public/assets/paliro-mutual-friend-reminder@2x.png', import.meta.url)))
+  assert.ok(existsSync(new URL('../public/assets/paliro-mutual-friend-reminder@3x.png', import.meta.url)))
+  assert.equal(paliroTranslate('en', 'messageMutualOnlyTitle'), 'Reminder')
+  assert.equal(paliroTranslate('en', 'messageMutualOnlyCopy'), 'You need to add each other as friends before you can chat or video call.')
+  assert.equal(paliroTranslate('ko', 'messageMutualOnlyCopy'), '서로 친구가 되어야 채팅이나 영상 통화를 할 수 있습니다.')
 })

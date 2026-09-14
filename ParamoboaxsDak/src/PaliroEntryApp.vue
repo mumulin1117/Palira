@@ -1,6 +1,7 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { paliroNativeService, paliroNativeFileSource } from './services/paliroNativeBridge'
+import { paliroLaunchArtworkForLanguage } from './services/paliroLanguage'
 import { createPaliroAccountApi, createPaliroCredentialStore, paliroAuthErrorKey } from './services/paliroAccountApi'
 import { createPaliroServerSession } from './services/paliroServerSession'
 import { paliroProfilePatch } from './services/paliroProfileSync'
@@ -83,7 +84,7 @@ import { PALIRO_LOCALES, paliroGetLegalCopy, paliroTranslate, paliroTranslateMoo
 // Keep the WebView visually neutral until local launch state selects a screen.
 const route = ref('boot')
 const showFirstLaunch = ref(claimPaliroFirstLaunch(window.localStorage))
-const launchArtwork = window.paliroLaunchArtwork || { src: '/assets/paliro-launch-screen@2x.png', srcset: '' }
+const launchArtwork = paliroLaunchArtworkForLanguage()
 const errorMessage = ref('')
 const showEula = ref(false)
 const hasAgreed = ref(false)
@@ -184,6 +185,11 @@ const videoCallStarting = ref(false)
 const friendProfileOrigin = ref('box')
 const showFriendProfileActions = ref(false)
 const showFriendProfileBlockConfirm = ref(false)
+const friendProfileBlockDialog = ref(null)
+const friendProfileBlockConfirm = ref(null)
+watch(showFriendProfileBlockConfirm, (value) => {
+  if (value) nextTick(() => friendProfileBlockConfirm.value?.focus({ preventScroll: true }))
+})
 const selectedWalletProductID = ref('')
 const walletPurchaseLoading = ref(false)
 const walletSelectionRequired = ref(false)
@@ -388,6 +394,10 @@ const isMatchedMutualFriend = computed(() => {
   return paliroCanChatWithMember(session.value?.userID, matchedFriend.value.id)
 })
 const isMatchedBlocked = computed(() => blockedUsers.value.some((member) => member.id === matchedFriend.value.id))
+const blockMemberDialogTitle = computed(() => {
+  const handle = String(matchedFriend.value?.nickname || matchedFriend.value?.name || t('appName')).replace(/^@+/, '')
+  return t('blockMemberTitle').replace('{name}', handle)
+})
 const matchedAbout = computed(() => matchedFriend.value.about || matchedFriend.value.bio)
 const matchedMemberPosts = computed(() => paliroGetMemberPosts(matchedFriend.value))
 const matchedBoxPost = computed(() => matchedMemberPosts.value.find((post) => post.contentType === 'box') ?? null)
@@ -584,6 +594,8 @@ function applyLocale() {
   const isKorean = languagePreference.value === 'ko'
   document.documentElement.lang = isKorean ? 'ko' : 'en'
   document.title = isKorean ? '팔리로: 미스터리 박스' : 'Paliro: Mystery Box, Meet People'
+  document.documentElement.style.setProperty('--paliro-launch-image', `url("${launchArtwork.src}")`)
+  document.documentElement.style.setProperty('--paliro-launch-logo-image', `url("${launchArtwork.logoSrc}")`)
 }
 
 function openPolicy(policyRoute, origin = 'welcome') {
@@ -2505,7 +2517,24 @@ function reportMatchedFriendFromProfile() {
   openReportUser(route.value === 'conversation' ? 'conversation' : 'friend-profile')
 }
 
+function openFriendProfileBlockConfirm() {
+  showFriendProfileActions.value = false
+  showFriendProfileBlockConfirm.value = true
+}
+
+function closeFriendProfileBlockConfirm() {
+  showFriendProfileBlockConfirm.value = false
+}
+
+function trapFriendProfileBlockFocus(event) {
+  const controls = [...(friendProfileBlockDialog.value?.querySelectorAll('button:not(:disabled)') ?? [])]
+  if (!controls.length) { event.preventDefault(); return }
+  if (event.shiftKey && document.activeElement === controls[0]) { event.preventDefault(); controls.at(-1).focus() }
+  else if (!event.shiftKey && document.activeElement === controls.at(-1)) { event.preventDefault(); controls[0].focus() }
+}
+
 function confirmBlockMatchedFriend() {
+  if (!showFriendProfileBlockConfirm.value) return
   const result = paliroBlockMember(session.value?.userID, matchedFriend.value)
   if (result.type !== 'success') return
   blockedUsers.value = result.blockedUsers
@@ -2700,7 +2729,7 @@ function finishTopicTest() {
 </script>
 
 <template>
-  <PaliroFirstLaunch v-if="showFirstLaunch" :title="t('appName')" :copy="t('firstLaunchCopy')" @complete="finishFirstLaunch" />
+  <PaliroFirstLaunch v-if="showFirstLaunch" :artwork="launchArtwork" :label="t('appName')" @complete="finishFirstLaunch" />
   <main class="paliro-shell" :class="{ 'is-first-launch': showFirstLaunch }" :inert="showAccountDeletionNotice || showFirstLaunch">
     <div class="paliro-stars" aria-hidden="true"></div>
 
@@ -2756,8 +2785,8 @@ function finishTopicTest() {
 
     <Transition :name="isPrimaryTabTransition ? 'paliro-tab-fade' : 'paliro-route-fade'" :css="!skipVideoRouteAnimation" :mode="isPrimaryTabTransition ? undefined : 'out-in'" @after-enter="handlePageEntered">
       <section v-if="route === 'boot'" key="boot" aria-busy="true" class="paliro-boot paliro-view">
-        <img alt="" :src="launchArtwork.src" :srcset="launchArtwork.srcset || undefined" />
-        <div aria-hidden="true" class="paliro-boot-indicator"><i></i><i></i><i></i></div>
+        <img alt="" class="paliro-boot-background" :src="launchArtwork.src" />
+        <img alt="" class="paliro-boot-logo" :src="launchArtwork.logoSrc" :srcset="launchArtwork.logoSrcset" />
       </section>
 
       <section v-else-if="route === 'welcome'" key="welcome" class="paliro-welcome paliro-view">
@@ -2881,7 +2910,7 @@ function finishTopicTest() {
           <div class="paliro-segmented-control">
             <button v-for="option in ['Male', 'Female', 'Other']" :key="option" :class="{ 'is-selected': profile.gender === option }" type="button" @click="profile.gender = option">{{ localizedGender(option) }}</button>
           </div>
-          <label class="paliro-field">
+          <label class="paliro-field paliro-birthday-field">
             <span>{{ t('birthday') }}</span>
             <span class="paliro-date-field"><input v-model="profile.birthday" :aria-label="t('birthday')" type="date" /><img alt="" src="/assets/paliro-profile-calendar@2x.png" /></span>
           </label>
@@ -3241,7 +3270,7 @@ function finishTopicTest() {
         <main class="paliro-me-secondary-scroll">
           <p class="paliro-me-secondary-intro">{{ t('languageIntro') }}</p>
           <button v-for="option in languageOptions" :key="option.code" :class="['paliro-me-language-option', { 'is-selected': languagePreference === option.code }]" type="button" @click="selectLanguage(option.code)">
-            <span><strong>{{ option.label }}</strong><small>{{ option.detail }}</small></span><i aria-hidden="true">✓</i>
+            <span><strong>{{ t(option.labelKey) }}</strong><small>{{ option.detail }}</small></span><i aria-hidden="true">✓</i>
           </button>
           <p class="paliro-me-secondary-note">{{ t('languageFuture') }}</p>
         </main>
@@ -3528,8 +3557,9 @@ function finishTopicTest() {
     <Teleport to="body">
       <PaliroOverlayTransition kind="dialog">
       <div v-if="profileReminder" class="paliro-profile-reminder-backdrop" @click.self="profileReminder = ''">
-        <section aria-modal="true" class="paliro-profile-reminder" role="dialog" aria-labelledby="paliro-profile-reminder-title" @keydown.esc="profileReminder = ''" @keydown.tab.prevent="profileReminderConfirm?.focus()">
-          <span aria-hidden="true" class="paliro-profile-reminder-art">✦</span>
+        <section aria-modal="true" :class="['paliro-profile-reminder', { 'is-mutual-only': profileReminder === 'message' }]" role="dialog" aria-labelledby="paliro-profile-reminder-title" @keydown.esc="profileReminder = ''" @keydown.tab.prevent="profileReminderConfirm?.focus()">
+          <img v-if="profileReminder === 'message'" aria-hidden="true" class="paliro-profile-reminder-art-image" src="/assets/paliro-mutual-friend-reminder@2x.png" srcset="/assets/paliro-mutual-friend-reminder@2x.png 2x, /assets/paliro-mutual-friend-reminder@3x.png 3x" alt="" />
+          <span v-else aria-hidden="true" class="paliro-profile-reminder-art">✦</span>
           <h2 id="paliro-profile-reminder-title">{{ t(profileReminder === 'request-sent' ? 'friendRequestSentTitle' : profileReminder === 'request-pending' ? 'friendRequestPendingTitle' : 'messageMutualOnlyTitle') }}</h2>
           <p>{{ t(profileReminder === 'request-sent' ? 'friendRequestSentNotice' : profileReminder === 'request-pending' ? 'friendRequestPendingCopy' : 'messageMutualOnlyCopy') }}</p>
           <button ref="profileReminderConfirm" class="paliro-home-modal-button" type="button" @click="profileReminder = ''">{{ t('ok') }}</button>
@@ -3543,7 +3573,7 @@ function finishTopicTest() {
       <div v-if="showFriendProfileActions" class="paliro-profile-safety-backdrop" @click.self="showFriendProfileActions = false">
         <section aria-modal="true" class="paliro-profile-safety-actions" role="dialog" :aria-label="t('moreActions')">
           <button type="button" @click="reportMatchedFriendFromProfile"><span aria-hidden="true">!</span>{{ t('reportUser') }}</button>
-          <button type="button" @click="showFriendProfileActions = false; showFriendProfileBlockConfirm = true"><span aria-hidden="true">⊘</span>{{ t('blockUser') }}</button>
+          <button type="button" @click="openFriendProfileBlockConfirm"><span aria-hidden="true">⊘</span>{{ t('blockUser') }}</button>
           <button type="button" @click="showFriendProfileActions = false">{{ t('cancel') }}</button>
         </section>
       </div>
@@ -3552,13 +3582,13 @@ function finishTopicTest() {
 
     <Teleport to="body">
       <PaliroOverlayTransition kind="dialog">
-      <div v-if="showFriendProfileBlockConfirm" class="paliro-profile-safety-backdrop" @click.self="showFriendProfileBlockConfirm = false">
-        <section aria-describedby="paliro-profile-block-copy" aria-labelledby="paliro-profile-block-title" aria-modal="true" class="paliro-profile-block-dialog" role="dialog">
-          <span aria-hidden="true" class="paliro-profile-block-symbol">!</span>
-          <h2 id="paliro-profile-block-title">{{ t('blockMemberTitle') }}</h2>
+      <div v-if="showFriendProfileBlockConfirm" class="paliro-profile-safety-backdrop paliro-profile-block-backdrop" @click.self="closeFriendProfileBlockConfirm">
+        <section ref="friendProfileBlockDialog" aria-describedby="paliro-profile-block-copy" aria-labelledby="paliro-profile-block-title" aria-modal="true" class="paliro-profile-block-dialog" role="dialog" @keydown.esc="closeFriendProfileBlockConfirm" @keydown.tab="trapFriendProfileBlockFocus">
+          <span aria-hidden="true" class="paliro-profile-block-symbol"><PaliroChatIcon name="alert" /></span>
+          <h2 id="paliro-profile-block-title">{{ blockMemberDialogTitle }}</h2>
           <p id="paliro-profile-block-copy">{{ t('blockMemberCopy') }}</p>
-          <button type="button" @click="confirmBlockMatchedFriend">{{ t('blockConfirm') }}</button>
-          <button type="button" @click="showFriendProfileBlockConfirm = false">{{ t('cancel') }}</button>
+          <button ref="friendProfileBlockConfirm" type="button" @click="confirmBlockMatchedFriend">{{ t('blockConfirm') }}</button>
+          <button type="button" @click="closeFriendProfileBlockConfirm">{{ t('cancel') }}</button>
         </section>
       </div>
       </PaliroOverlayTransition>

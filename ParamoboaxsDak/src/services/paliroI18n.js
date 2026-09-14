@@ -1,10 +1,12 @@
 export const PALIRO_LOCALES = [
-  { code: 'ko', label: '한국어', detail: '한국어 (대한민국)' },
-  { code: 'en', label: 'English', detail: 'English (United States)' },
+  { code: 'ko', labelKey: 'languageKorean', detail: '한국어' },
+  { code: 'en', labelKey: 'languageEnglish', detail: 'English' },
 ]
 
 const copy = {
   ko: {
+    languageKorean: '한국어',
+    languageEnglish: '영어',
     firstLaunchCopy: '작은 설렘으로 시작되는 새로운 인연.',
     listLoading: '불러오는 중...',
     listRefreshing: '새로 고치는 중...',
@@ -37,9 +39,9 @@ const copy = {
     reportVideo: '비디오 신고',
     blockUser: '사용자 차단',
     moreActions: '더보기',
-    blockMemberTitle: '이 사용자를 차단할까요?',
-    blockMemberCopy: '이 사용자는 내 프로필, 게시물 또는 메시지를 더 이상 볼 수 없으며, 이 사용자의 콘텐츠도 더 이상 표시되지 않습니다.',
-    blockConfirm: '차단하기',
+    blockMemberTitle: '@{name}님을 차단할까요?',
+    blockMemberCopy: '이 사용자는 더 이상 내 프로필이나 게시물을 찾거나 메시지를 보낼 수 없습니다.',
+    blockConfirm: '차단',
     memberBlockedNotice: '사용자를 차단했습니다. 더 이상 추천되지 않습니다.',
     videoReportTitle: '비디오 신고',
     videoBlockNotice: '이 사용자의 비디오는 더 이상 표시되지 않습니다.',
@@ -136,7 +138,7 @@ const copy = {
     blockedUsers: '차단한 사용자',
     settings: '설정',
     languageIntro: '팔리로 앱에서 사용할 언어를 선택하세요.',
-    languageFuture: '현지화된 콘텐츠와 지원이 준비되면 더 많은 언어를 추가할 수 있습니다.',
+    languageFuture: '선택한 언어는 이 기기에 저장되며, 다시 시작하거나 로그인해도 유지됩니다.',
     noVideosTitle: '아직 주제 비디오가 없어요',
     noVideosCopy: '공유한 상자의 주제 순간이 이곳에 표시됩니다.',
     noBlockedTitle: '차단 목록이 비어 있어요',
@@ -184,7 +186,7 @@ const copy = {
     followed: '팔로우함',
     memberPosts: '게시물',
     messageMutualOnlyTitle: '안내',
-    messageMutualOnlyCopy: '메시지와 비디오는 서로 친구가 된 후에만 이용할 수 있습니다.',
+    messageMutualOnlyCopy: '서로 친구가 되어야 채팅이나 영상 통화를 할 수 있습니다.',
     videoMoments: '비디오 순간',
     videoMomentsCopy: '서로 친구가 되면 관심사와 관련된 비디오 순간을 함께 볼 수 있습니다.',
     reportUser: '사용자 신고',
@@ -315,6 +317,8 @@ const copy = {
     openingBox: '주제 상자 여는 중', meetMember: '만나 보세요', ruleOne: '하루에 최대 3회의 무료 상자 행동을 사용할 수 있습니다. 횟수는 매일 00:00에 초기화되며 Topic Test 완료 시 추가 열기 1회를 받을 수 있습니다.', ruleTwo: '상자 텍스트는 100자 이내여야 합니다. 공유 상자는 최대 3장의 이미지를 포함할 수 있으며 긍정적이고 존중하는 주제여야 합니다.', ruleThree: '팔리로는 존중하는 커뮤니티를 위해 신고, 차단 및 검토 기능을 제공합니다.', ruleFour: '위반 시 콘텐츠 삭제, 기능 제한, 정지 또는 계정 해지가 이루어질 수 있습니다. 상호 연결 전에는 추가 메시지나 통화를 이용할 수 없습니다.', exampleBoxCard: '예시 상자 카드', coinPromptArt: '미스터리 상자와 코인', spendCoinsPrompt: '다음 행동에 코인을 사용할까요?', createBoxAction: '새 상자 만들기', openBoxAction: '주제 상자 열기',
   },
   en: {
+    languageKorean: 'Korean',
+    languageEnglish: 'English',
     firstLaunchCopy: 'A little mystery. A new connection.',
     listLoading: 'Loading...',
     listRefreshing: 'Refreshing...',
@@ -347,8 +351,8 @@ const copy = {
     reportVideo: 'Report Video',
     blockUser: 'Block User',
     moreActions: 'More actions',
-    blockMemberTitle: 'Block this member?',
-    blockMemberCopy: 'They will no longer be able to find your profile, see your posts, or message you. Their content will no longer appear for you.',
+    blockMemberTitle: 'Block @{name}?',
+    blockMemberCopy: "They won't be able to find your profile, see your posts, or message you.",
     blockConfirm: 'Block',
     memberBlockedNotice: 'Member blocked. They will no longer be recommended.',
     videoReportTitle: 'Report Video',
@@ -446,7 +450,7 @@ const copy = {
     blockedUsers: 'Blocked Users',
     settings: 'Settings',
     languageIntro: 'Choose the language used throughout Paliro.',
-    languageFuture: 'More languages can be added when localized content and support are available.',
+    languageFuture: 'Your choice is saved on this device and kept when you restart or sign in again.',
     noVideosTitle: 'No topic videos yet',
     noVideosCopy: 'Box moments you share will appear here.',
     noBlockedTitle: 'Your list is clear',
@@ -494,7 +498,7 @@ const copy = {
     followed: 'Followed',
     memberPosts: 'Posts',
     messageMutualOnlyTitle: 'Reminder',
-    messageMutualOnlyCopy: 'You need to become mutual friends before you can message or use video together.',
+    messageMutualOnlyCopy: 'You need to add each other as friends before you can chat or video call.',
     videoMoments: 'Video Moments',
     videoMomentsCopy: 'Mutual friends can explore topic videos and shared interests together.',
     reportUser: 'Report User',
@@ -636,7 +640,7 @@ const moodKeys = {
 }
 
 export function paliroTranslate(locale, key) {
-  return copy[locale]?.[key] ?? copy.ko[key] ?? key
+  return copy[locale]?.[key] ?? copy.en[key] ?? key
 }
 
 export function paliroTranslateMood(locale, mood) {
@@ -721,5 +725,5 @@ const legalCopy = {
 }
 
 export function paliroGetLegalCopy(locale, kind) {
-  return legalCopy[locale]?.[kind] ?? legalCopy.ko[kind]
+  return legalCopy[locale]?.[kind] ?? legalCopy.en[kind]
 }

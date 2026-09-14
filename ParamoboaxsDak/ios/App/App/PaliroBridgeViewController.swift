@@ -3,16 +3,24 @@ import Security
 import WebKit
 import UIKit
 
-private enum PaliroLaunchLocale {
+enum PaliroLaunchLocale {
     static let storageKey = "paliro.launchLanguage.v1"
 
     static var current: String {
-        UserDefaults.standard.string(forKey: storageKey) == "en" ? "en" : "ko"
+        resolve()
     }
 
-    static func save(_ language: String) -> Bool {
+    static func resolve(defaults: UserDefaults = .standard, preferredLanguages: [String] = Locale.preferredLanguages) -> String {
+        if let saved = defaults.string(forKey: storageKey), ["en", "ko"].contains(saved) { return saved }
+        let primary = (preferredLanguages.first ?? "").lowercased().split(whereSeparator: { $0 == "-" || $0 == "_" }).first
+        let language = primary == "ko" ? "ko" : "en"
+        defaults.set(language, forKey: storageKey)
+        return language
+    }
+
+    static func save(_ language: String, defaults: UserDefaults = .standard) -> Bool {
         guard language == "en" || language == "ko" else { return false }
-        UserDefaults.standard.set(language, forKey: storageKey)
+        defaults.set(language, forKey: storageKey)
         return true
     }
 }
@@ -21,13 +29,9 @@ final class PaliroBridgeViewController: UIViewController, WKNavigationDelegate {
     private var webView: WKWebView!
     private let bridge = PaliroNativeBridge()
     private var keyboardBottom: NSLayoutConstraint!
-    private var launchOverlay: UIImageView?
+    private var launchOverlay: UIView?
     private var hasConfiguredLaunchSurface = false
-    private let launchBackgroundColor = UIColor(red: 5 / 255, green: 11 / 255, blue: 33 / 255, alpha: 1)
-
-    private var isKoreanLaunch: Bool {
-        PaliroLaunchLocale.current == "ko"
-    }
+    private let launchBackgroundColor = UIColor(red: 0.02, green: 0.04, blue: 0.13, alpha: 1)
 
     override func loadView() {
         view = UIView()
@@ -119,20 +123,41 @@ final class PaliroBridgeViewController: UIViewController, WKNavigationDelegate {
     }
 
     private func showLaunchOverlay() {
-        let assetName = isKoreanLaunch ? "PaliroLaunchKorean" : "appaliguaungld"
-        guard launchOverlay == nil, let image = UIImage(named: assetName) else { return }
-        let overlay = UIImageView(image: image)
+        guard launchOverlay == nil else { return }
+        let overlay = UIView()
         overlay.translatesAutoresizingMaskIntoConstraints = false
-        overlay.contentMode = .scaleAspectFill
         overlay.clipsToBounds = true
+        overlay.backgroundColor = launchBackgroundColor
         overlay.isUserInteractionEnabled = false
         overlay.accessibilityElementsHidden = true
+
+        let background = UIImageView(image: UIImage(named: "PaliroLaunchSpace"))
+        background.translatesAutoresizingMaskIntoConstraints = false
+        background.contentMode = .scaleAspectFill
+        background.clipsToBounds = true
+        background.alpha = 0.22
+        overlay.addSubview(background)
+
+        let logo = UIImageView(image: UIImage(named: "PaliroLaunchLogo"))
+        logo.translatesAutoresizingMaskIntoConstraints = false
+        logo.contentMode = .scaleAspectFit
+        logo.clipsToBounds = true
+        overlay.addSubview(logo)
+
         view.addSubview(overlay)
         NSLayoutConstraint.activate([
             overlay.topAnchor.constraint(equalTo: view.topAnchor),
             overlay.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             overlay.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             overlay.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            background.topAnchor.constraint(equalTo: overlay.topAnchor),
+            background.leadingAnchor.constraint(equalTo: overlay.leadingAnchor),
+            background.trailingAnchor.constraint(equalTo: overlay.trailingAnchor),
+            background.bottomAnchor.constraint(equalTo: overlay.bottomAnchor),
+            logo.widthAnchor.constraint(equalTo: overlay.widthAnchor, multiplier: 0.186667),
+            logo.heightAnchor.constraint(equalTo: logo.widthAnchor),
+            logo.centerXAnchor.constraint(equalTo: overlay.centerXAnchor),
+            NSLayoutConstraint(item: logo, attribute: .centerY, relatedBy: .equal, toItem: overlay, attribute: .bottom, multiplier: 0.3375, constant: 0),
         ])
         launchOverlay = overlay
     }

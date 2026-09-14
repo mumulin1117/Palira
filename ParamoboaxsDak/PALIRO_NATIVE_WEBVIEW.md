@@ -41,6 +41,40 @@ The launch overlay stays until Vue reports readiness. Native keyboard notificati
 
 ## Permissions and functional limits
 
+### Installation language
+
+- On a fresh installation, only a Korean primary device language (including ko-KR) selects Korean. All other primary languages select English; region/IP are not used. Native resolves this before WebView creation and injects the result before HTML paints.
+- The resolved initial choice and every manual change are saved for this installation in UserDefaults and localStorage. Logout, login, account switching and server profile refresh do not override the current App language. Existing installed preferences are preserved when upgrading.
+- Settings switches UI, runtime launch artwork and discovery fixtures immediately. Existing conversations, sent greetings, posts and relationships are not deleted or translated.
+- Ordinary deletion and reinstallation starts with a new sandbox and repeats device-language detection. Offloading with retained data, or restoring an OS backup, is not a clean installation. Language is not stored in Keychain or restored from the account server.
+- The system launch storyboard contains only a shared background and logo, with no English/Korean name. The native/WebView transition uses the saved language's artwork. Desktop app names and native permission prompts use iOS localization (English fallback, Korean resources); the in-app selector cannot force system-owned text to change instantly.
+
+Language QA: clean install with Korean, English, Chinese and Japanese primary language; manual English/Korean switching then relaunch/logout/login; login with an account whose server language differs; verify settings selection, runtime launch art, Box/video fixtures and retained conversations. Use a dedicated simulator for deletion tests, not a user's app sandbox.
+
+### Language change files and verification (2026-09-14)
+
+Paths below are relative to this project directory.
+
+| Files | Purpose |
+| --- | --- |
+| `src/services/paliroLanguage.js` | Shared language resolver and runtime launch artwork mapping. |
+| `src/services/paliroLocalStore.js` | Installation-level preference takes precedence over accounts; server login does not replace it; default discovery/video/Box language follows it. |
+| `src/services/paliroI18n.js` | Localized settings options and English fallback for UI/legal copy. |
+| `src/PaliroEntryApp.vue` | Reactive launch artwork, background and settings labels. |
+| `public/paliro-launch.js`, `index.html` | Resolve/persist language before the first HTML paint, with a neutral background fallback. |
+| `ios/App/App/PaliroBridgeViewController.swift` | Resolve/persist native initial language before WebView creation; retain manual choices. |
+| `ios/App/App/Info.plist`, `ios/App/App.xcodeproj/project.pbxproj` | English development fallback and app-name baseline; retain existing English/Korean InfoPlist.strings. |
+| `ios/App/App/Base.lproj/PaliroLaunchScreen.storyboard` | Language-neutral system launch background/logo; retains the pure-code main entry. |
+| `ios/App/App/Assets.xcassets/PaliroLaunchSpace.imageset/Contents.json`, `paliro-welcome-space-background@2x.png` | Reuse the existing space background without modifying the artwork. |
+| `ios/App/App/Assets.xcassets/PaliroLaunchLogo.imageset/Contents.json`, `paliro-launch-logo.pdf` | Reuse the existing logo with a vector rounded-rectangle clip: 20pt radius at the 70pt reference width. No runtime attributes in LaunchScreen. |
+| `scripts/paliro-build-launch-logo.swift` | Rebuild the clipped launch asset with `xcrun swift scripts/paliro-build-launch-logo.swift`; preserves the original AppIcon image and existing launch layout. |
+| `scripts/paliro-language-persistence.test.mjs`, `scripts/paliro-launch-language.test.mjs`, `scripts/paliro-launch-transition.test.mjs` | Language priority, reinstall, account/server isolation, data language, first frame and neutral launch checks. |
+| `ios/App/PaliroNativeTests/PaliroNativeBridgeTests.swift` | Native locale persistence, primary-language fallback, bridge alignment, localized name/permission resources and existing keyboard regression. |
+| `dist/index.html`, `dist/paliro-launch.js`, `dist/assets/index-*.js`, generated `ios/App/App/public/` | Rebuilt and synchronized distribution resources. |
+| `PALIRO_NATIVE_WEBVIEW.md` | Rules, limitations, file inventory and verification record. |
+
+Verification: 112 Node tests and 13 native tests passed; Release device compilation passed without signing. On a newly created, isolated iPhone SE simulator, launch arguments simulated Chinese/English and Korean language preferences: fresh Chinese-primary launch displayed English; restarting with Korean retained English; deleting only this test installation and reinstalling with Korean displayed Korean. Native saved preferences were checked alongside screenshots. Native locale-unit tests use isolated UserDefaults suites and do not clear the user's preferences. Existing conversation/relationship preservation is covered by Node tests. Physical-device system permission dialogs and large-screen visual checks were not repeated in this change.
+
 - Selecting an upload category only changes the selection. Tapping upload opens the native flow.
 - Photo/video library selection requests Photos access and accepts limited access.
 - Taking a photo requests Camera; recording a video requests Camera and Microphone.

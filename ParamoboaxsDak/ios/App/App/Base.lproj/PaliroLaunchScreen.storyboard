@@ -4,28 +4,39 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Paliro Launch View Controller-->
+        <!--View Controller-->
         <scene sceneID="EHf-IW-A2E">
             <objects>
                 <viewController id="01J-lp-oVM" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="K9G-8m-xh6">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <color key="backgroundColor" red="0.019607843137254902" green="0.043137254901960784" blue="0.12941176470588237" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="PaliroLaunchKorean" translatesAutoresizingMaskIntoConstraints="NO" id="snD-IY-ifK">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.22" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="PaliroLaunchSpace" translatesAutoresizingMaskIntoConstraints="NO" id="snD-IY-ifK">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                             </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="PaliroLaunchLogo" translatesAutoresizingMaskIntoConstraints="NO" id="pal-logo-img">
+                                <rect key="frame" x="152.5" y="190" width="70" height="70"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="pal-logo-img" secondAttribute="height" id="pal-logo-aspect"/>
+                                </constraints>
+                            </imageView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="nai-R9-B7o"/>
                         <constraints>
                             <constraint firstItem="snD-IY-ifK" firstAttribute="leading" secondItem="K9G-8m-xh6" secondAttribute="leading" id="7ck-WP-uO8"/>
                             <constraint firstAttribute="trailing" secondItem="snD-IY-ifK" secondAttribute="trailing" id="Ifu-hK-L4c"/>
                             <constraint firstItem="snD-IY-ifK" firstAttribute="top" secondItem="K9G-8m-xh6" secondAttribute="top" id="X2A-4a-VeN"/>
+                            <constraint firstItem="pal-logo-img" firstAttribute="width" secondItem="K9G-8m-xh6" secondAttribute="width" multiplier="0.186667" id="pal-logo-width"/>
+                            <constraint firstItem="pal-logo-img" firstAttribute="centerX" secondItem="K9G-8m-xh6" secondAttribute="centerX" id="pal-logo-x"/>
+                            <constraint firstItem="pal-logo-img" firstAttribute="centerY" secondItem="K9G-8m-xh6" secondAttribute="centerY" multiplier="0.675" id="pal-logo-y"/>
                             <constraint firstAttribute="bottom" secondItem="snD-IY-ifK" secondAttribute="bottom" id="yVq-OJ-1Dg"/>
                         </constraints>
+                        <color key="backgroundColor" red="0.02" green="0.04" blue="0.13" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -34,6 +45,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="PaliroLaunchKorean" width="375" height="812"/>
+        <image name="PaliroLaunchLogo" width="70" height="70"/>
+        <image name="PaliroLaunchSpace" width="375" height="812"/>
     </resources>
 </document>

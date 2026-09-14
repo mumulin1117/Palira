@@ -1,6 +1,7 @@
 import { paliroGetMockBoxContent } from './paliroMockBoxContent.js'
 import { paliroVideoIdentityFixtures } from './paliroVideoIdentityFixtures.js'
 import { paliroMergeRemoteProfile } from './paliroProfileSync.js'
+import { paliroResolveLanguage } from './paliroLanguage.js'
 
 const paliroVideoIdentityByOwner = new Map(paliroVideoIdentityFixtures.map((fixture) => [fixture.ownerID, fixture]))
 
@@ -299,8 +300,8 @@ const PALIRO_LEGACY_MOCK_MEMBER_IDS = new Set([
   ...Object.values(PALIRO_MOCK_MEMBERS_BY_LANGUAGE).flat().map((member) => member.id),
 ])
 
-export function paliroGetMockMembers(language = 'ko') {
-  const members = PALIRO_MOCK_MEMBERS_BY_LANGUAGE[language] ?? PALIRO_MOCK_MEMBERS_BY_LANGUAGE.ko
+export function paliroGetMockMembers(language = paliroGetLanguagePreference()) {
+  const members = PALIRO_MOCK_MEMBERS_BY_LANGUAGE[language] ?? PALIRO_MOCK_MEMBERS_BY_LANGUAGE.en
   return members.map(clonePaliroMember)
 }
 
@@ -495,8 +496,7 @@ export function paliroAcceptServerUser(serverUser) {
   if (index < 0) next.push(user)
   else next[index] = user
   writeJson(PALIRO_USERS_KEY, next)
-  const languageByUser = readJson(PALIRO_LANGUAGE_KEY, {})
-  if (!languageByUser[localID]) paliroSetLanguagePreference(localID, serverUser.profile.language)
+  // Language belongs to this installation, not to a restored account or server profile.
   ensureDebugLoginBalance(localID)
   return createSession(user)
 }
@@ -823,12 +823,12 @@ function videoWithInteraction(video, interaction) {
   }
 }
 
-export function paliroGetVideoFeed(userID, language = 'ko') {
+export function paliroGetVideoFeed(userID, language = paliroGetLanguagePreference()) {
   if (!userID) return []
   const { state } = getVideoStateByUser(userID)
   const blockedIDs = new Set(paliroGetBlockedUsers(userID).map((member) => member.id))
   const hiddenIDs = new Set(state.hiddenVideoIDs)
-  const fixtures = PALIRO_VIDEO_FIXTURES_BY_LANGUAGE[language] ?? PALIRO_VIDEO_FIXTURES_BY_LANGUAGE.ko
+  const fixtures = PALIRO_VIDEO_FIXTURES_BY_LANGUAGE[language] ?? PALIRO_VIDEO_FIXTURES_BY_LANGUAGE.en
   const published = state.published.filter((video) => video.language === language)
   return [...published, ...fixtures]
     .filter((video) => !hiddenIDs.has(video.id) && !blockedIDs.has(video.member?.id))
@@ -958,10 +958,10 @@ function getExcludedMatchMemberIDs(userID) {
   return new Set([...blockedIDs, ...openedIDs, ...mutualFriendIDs])
 }
 
-export function paliroGetAvailableMatchMembers(userID, language = 'ko') {
+export function paliroGetAvailableMatchMembers(userID, language = paliroGetLanguagePreference()) {
   if (!userID) return []
   const excludedMemberIDs = getExcludedMatchMemberIDs(userID)
-  const members = PALIRO_MOCK_MEMBERS_BY_LANGUAGE[language] ?? PALIRO_MOCK_MEMBERS_BY_LANGUAGE.ko
+  const members = PALIRO_MOCK_MEMBERS_BY_LANGUAGE[language] ?? PALIRO_MOCK_MEMBERS_BY_LANGUAGE.en
   return members.filter((member) => !excludedMemberIDs.has(member.id)).map(clonePaliroMember)
 }
 
@@ -974,7 +974,7 @@ export function paliroRecordOpenedMatchMember(userID, memberID) {
   return openedByUser[userID]
 }
 
-export function paliroTakeAvailableMatchMember(userID, language = 'ko', randomValue = Math.random()) {
+export function paliroTakeAvailableMatchMember(userID, language = paliroGetLanguagePreference(), randomValue = Math.random()) {
   const candidates = paliroGetAvailableMatchMembers(userID, language)
   if (!candidates.length) return null
   const normalizedRandom = Number.isFinite(randomValue) ? Math.abs(randomValue) % 1 : Math.random()
@@ -1091,17 +1091,20 @@ export function paliroUnblockUser(userID, blockedUserID) {
 }
 
 export function paliroGetLanguagePreference(userID) {
-  const accountLanguage = userID ? readJson(PALIRO_LANGUAGE_KEY, {})?.[userID] : null
-  if (['en', 'ko'].includes(accountLanguage)) return accountLanguage
-  const appLanguage = readJson(PALIRO_APP_LANGUAGE_KEY, null)
-  if (['en', 'ko'].includes(appLanguage)) return appLanguage
-  // Older installations already keep the last App language in the native launch bridge.
-  return window.__paliroLaunchLanguage === 'en' ? 'en' : 'ko'
+  const language = paliroResolveLanguage({
+    savedLanguage: readJson(PALIRO_APP_LANGUAGE_KEY, null),
+    nativeLanguage: globalThis.window?.__paliroLaunchLanguage,
+    deviceLanguage: globalThis.navigator?.languages?.[0] ?? globalThis.navigator?.language,
+  })
+  // Persist the initial choice too, so later device-language changes cannot override it.
+  writeJson(PALIRO_APP_LANGUAGE_KEY, language)
+  return language
 }
 
 export function paliroSetLanguagePreference(userID, language) {
   if (!['en', 'ko'].includes(language)) return paliroGetLanguagePreference(userID)
   writeJson(PALIRO_APP_LANGUAGE_KEY, language)
+  if (globalThis.window) window.__paliroLaunchLanguage = language
   if (userID) {
     const languageByUser = readJson(PALIRO_LANGUAGE_KEY, {})
     languageByUser[userID] = language

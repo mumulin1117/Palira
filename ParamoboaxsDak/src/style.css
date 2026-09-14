@@ -40,7 +40,7 @@
 
 :root {
   color: #ffffff;
-  background: #06071e;
+  background: #050a21;
   font-family: 'Paliro Montserrat', Montserrat, sans-serif;
   font-synthesis: none;
 }
@@ -59,7 +59,7 @@ button { cursor: pointer; }
   min-height: 100dvh;
   overflow: hidden;
   overscroll-behavior: none;
-  background: #050b21;
+  background: #050a21;
 }
 
 .paliro-stars,
@@ -91,45 +91,30 @@ button { cursor: pointer; }
 
 .paliro-boot {
   display: grid;
+  width: 100%;
+  max-width: none;
   padding: 0;
-  background: #050b21;
+  background: #050a21;
   place-items: center;
 }
 
-.paliro-boot > img {
+.paliro-boot-background {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  opacity: .22;
 }
 
-.paliro-boot-indicator {
+.paliro-boot-logo {
   position: absolute;
-  bottom: max(48px, calc(env(safe-area-inset-bottom) + 28px));
-  display: flex;
-  gap: 7px;
-}
-
-.paliro-boot-indicator i {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(213, 226, 255, .9);
-  box-shadow: 0 0 10px rgba(120, 148, 255, .8);
-  animation: paliro-boot-pulse 1.05s ease-in-out infinite;
-}
-
-.paliro-boot-indicator i:nth-child(2) { animation-delay: .14s; }
-.paliro-boot-indicator i:nth-child(3) { animation-delay: .28s; }
-
-@keyframes paliro-boot-pulse {
-  0%, 60%, 100% { opacity: .3; transform: translateY(0) scale(.82); }
-  30% { opacity: 1; transform: translateY(-4px) scale(1); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .paliro-boot-indicator i { animation: none; opacity: .7; }
+  top: 33.75%;
+  left: 50%;
+  width: 18.6667%;
+  height: auto;
+  border-radius: 28.571%;
+  transform: translate(-50%, -50%);
 }
 
 .paliro-kicker { margin: 0; color: #1ffffb; font-size: 11px; font-weight: 800; letter-spacing: .16em; }
@@ -274,7 +259,8 @@ button { cursor: pointer; }
 .paliro-segmented-control button { min-height: 40px; border: 1px solid rgba(92, 86, 115, .44); border-radius: 999px; color: #fff; background: rgba(20, 17, 49, .6); font-size: 13px; font-weight: 700; }
 .paliro-segmented-control .is-selected { border-color: #1ffffb; color: #071337; background: #1ffffb; box-shadow: 0 7px 21px rgba(31, 255, 251, .2); }
 .paliro-date-field { position: relative; display: grid; grid-template-rows: minmax(0, 1fr); }
-.paliro-date-field input { padding-right: 55px; }
+.paliro-birthday-field, .paliro-date-field { width: 100%; min-width: 0; max-width: 100%; }
+.paliro-date-field input { min-width: 0; max-width: 100%; padding-right: 55px; }
 .paliro-date-field img { position: absolute; top: 50%; right: 16px; width: 16px; height: 16px; pointer-events: none; transform: translateY(-50%); filter: brightness(0) invert(1); }
 .paliro-age-notice { display: flex; align-items: flex-start; gap: 8px; margin: -7px 0 0; padding: 9px 11px; border: 1px solid rgba(255, 190, 105, .38); border-radius: 13px; color: rgba(255, 225, 190, .92); background: rgba(109, 55, 77, .33); font-size: 11px; line-height: 1.4; }
 .paliro-age-notice strong { flex: 0 0 auto; color: #ffce8a; font-size: 12px; line-height: 1.3; }
@@ -864,12 +850,14 @@ button { cursor: pointer; }
 .paliro-profile-safety-actions button span { display: grid; width: 20px; height: 20px; color: #ff6378; font-size: 18px; place-items: center; }
 .paliro-profile-safety-actions button:first-child, .paliro-profile-safety-actions button:nth-child(2) { color: #ff6777; border-bottom: 1px solid rgba(255, 255, 255, .06); }
 .paliro-profile-safety-actions button:last-child { justify-content: center; margin: 7px 12px 0; border-radius: 11px; background: rgba(255, 255, 255, .08); color: #fff; text-align: center; }
-.paliro-profile-block-dialog { width: min(calc(100% - 56px), 330px); margin: auto; padding: 24px 18px 17px; border: 1px solid rgba(111, 113, 168, .36); border-radius: 19px; color: #fff; background: linear-gradient(150deg, #1a1938, #111127); box-shadow: 0 16px 45px rgba(0, 0, 0, .45); text-align: center; }
-.paliro-profile-block-symbol { display: grid; width: 45px; height: 45px; margin: 0 auto 12px; border: 1.5px solid #ff5d75; border-radius: 50%; color: #ff5d75; font-size: 25px; font-weight: 800; place-items: center; }
-.paliro-profile-block-dialog h2 { margin: 0; font-size: 16px; font-weight: 800; }
-.paliro-profile-block-dialog p { margin: 8px auto 18px; color: rgba(227, 224, 239, .62); font-size: 11px; line-height: 1.45; }
-.paliro-profile-block-dialog button { display: block; width: 100%; min-height: 42px; border: 0; border-radius: 999px; color: #fff; background: linear-gradient(90deg, #ff5c74, #bc1d43); font: inherit; font-size: 13px; font-weight: 800; }
-.paliro-profile-block-dialog button + button { margin-top: 8px; border: 1px solid rgba(124, 129, 179, .38); background: transparent; }
+.paliro-profile-block-backdrop { align-items: center; padding: max(20px, env(safe-area-inset-top)) 24px max(20px, env(safe-area-inset-bottom)); background: rgba(0, 0, 0, .8); backdrop-filter: none; }
+.paliro-profile-block-dialog { width: min(100%, 312px); min-height: 320px; margin: auto; padding: 23px 23px 19px; border: 1px solid rgba(255, 255, 255, .13); border-radius: 24px; color: #fff; background: rgba(26, 26, 46, .75); box-shadow: 0 12px 32px rgba(0, 0, 0, .63); backdrop-filter: blur(16px); text-align: center; }
+.paliro-profile-block-symbol { display: grid; width: 60px; height: 60px; margin: 0 auto 16px; border: 1.5px solid #ff4f68; border-radius: 50%; color: #ff4f68; box-shadow: 0 0 14px rgba(255, 79, 104, .2); place-items: center; }
+.paliro-profile-block-symbol svg { width: 30px; height: 30px; }
+.paliro-profile-block-dialog h2 { min-height: 22px; margin: 0 0 8px; font-family: 'Paliro Montserrat', Montserrat, sans-serif; font-size: 18px; font-weight: 800; line-height: 22px; }
+.paliro-profile-block-dialog p { min-height: 36px; margin: 0 auto 20px; color: rgba(255, 255, 255, .5); font-family: 'Paliro Montserrat', Montserrat, sans-serif; font-size: 13px; font-weight: 400; line-height: 18px; }
+.paliro-profile-block-dialog button { display: block; width: 100%; min-height: 52px; border: 0; border-radius: 40px; color: #fff; background: linear-gradient(90deg, #ff536b, #c91e43); box-shadow: 0 4px 16px rgba(255, 69, 95, .2); font: 800 15px/18px 'Paliro Montserrat', Montserrat, sans-serif; }
+.paliro-profile-block-dialog button + button { margin-top: 10px; border: 1px solid rgba(122, 128, 182, .38); background: rgba(26, 26, 46, .36); box-shadow: none; }
 .paliro-report-user { display: flex; z-index: 260; min-height: 100%; flex-direction: column; background: #030303; }
 .paliro-report-user .paliro-me-secondary-nav { position: sticky; top: 0; z-index: 2; margin: 0; background: #030303; }
 .paliro-report-scroll { display: flex; min-height: 0; flex: 1; flex-direction: column; overflow-y: auto; padding: 20px 22px max(24px, env(safe-area-inset-bottom)); scrollbar-width: none; }
@@ -906,6 +894,11 @@ button { cursor: pointer; }
 .paliro-profile-reminder-art { display: grid; width: 58px; aspect-ratio: 1; margin: 0 auto 13px; border-radius: 50%; color: #fff; background: radial-gradient(circle at 32% 28%, #fff7c7 0 9%, #ffcf5e 25%, #e28658 63%, #8055c7 100%); box-shadow: 0 0 20px rgba(255, 204, 103, .28); font-size: 27px; place-items: center; }
 .paliro-profile-reminder h2 { margin: 0 0 8px; color: #fff; font-size: 16px; font-weight: 800; }
 .paliro-profile-reminder p { margin: 0 5px 18px; color: rgba(255, 255, 255, .65); font-size: 12px; line-height: 1.45; }
+.paliro-profile-reminder.is-mutual-only { width: min(100%, 312px); min-height: 330px; padding: 23px; border-color: rgba(255, 255, 255, .13); border-radius: 24px; background: rgba(26, 26, 46, .75); box-shadow: 0 12px 32px rgba(0, 0, 0, .63); backdrop-filter: blur(16px); }
+.paliro-profile-reminder-art-image { display: block; width: 124px; height: 124px; margin: 0 auto 20px; object-fit: contain; }
+.paliro-profile-reminder.is-mutual-only h2 { min-height: 22px; margin: 0 0 8px; font-family: 'Paliro Montserrat', Montserrat, sans-serif; font-size: 18px; font-weight: 800; line-height: 22px; }
+.paliro-profile-reminder.is-mutual-only p { min-height: 36px; margin: 0 0 20px; color: rgba(255, 255, 255, .5); font-family: 'Paliro Montserrat', Montserrat, sans-serif; font-size: 13px; font-weight: 400; line-height: 18px; }
+.paliro-profile-reminder.is-mutual-only .paliro-home-modal-button { width: 100%; min-height: 52px; border-radius: 40px; background: linear-gradient(90deg, #1ffffb, #4285cb); box-shadow: 0 4px 16px rgba(31, 255, 251, .2); font-family: 'Paliro Montserrat', Montserrat, sans-serif; font-size: 15px; font-weight: 800; }
 .paliro-composer-backdrop, .paliro-media-source-backdrop { position: fixed; z-index: 130; inset: 0; display: grid; min-height: 100dvh; padding: max(18px, env(safe-area-inset-top)) 24px max(18px, env(safe-area-inset-bottom)); background: rgba(1, 3, 14, .7); backdrop-filter: blur(6px) brightness(.58); place-items: center; }
 .paliro-composer { position: relative; width: min(100%, 330px); padding: 28px 17px 18px; border: 1px solid rgba(168, 143, 255, .54); border-radius: 24px; background: linear-gradient(150deg, rgba(73, 65, 154, .98), rgba(48, 47, 115, .98)); box-shadow: 0 18px 48px rgba(0, 0, 0, .42); }
 .paliro-composer-close { position: absolute; top: 9px; right: 12px; width: 29px; height: 29px; padding: 0; border: 0; background: transparent; }

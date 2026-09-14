@@ -5,6 +5,82 @@ import AVFoundation
 
 @MainActor
 final class PaliroNativeBridgeTests: XCTestCase {
+    func testLaunchLogoHasTransparentRoundedCorners() throws {
+        let image = try XCTUnwrap(UIImage(named: "PaliroLaunchLogo"))
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = false
+        let rendered = UIGraphicsImageRenderer(size: CGSize(width: 70, height: 70), format: format).image { _ in
+            image.draw(in: CGRect(x: 0, y: 0, width: 70, height: 70))
+        }
+        let cgImage = try XCTUnwrap(rendered.cgImage)
+        var pixels = [UInt8](repeating: 0, count: 70 * 70 * 4)
+        try pixels.withUnsafeMutableBytes { buffer in
+            let context = try XCTUnwrap(CGContext(data: buffer.baseAddress, width: 70, height: 70,
+                bitsPerComponent: 8, bytesPerRow: 70 * 4, space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
+            context.draw(cgImage, in: CGRect(x: 0, y: 0, width: 70, height: 70))
+        }
+        for (x, y) in [(1, 1), (68, 1), (1, 68), (68, 68), (4, 4)] {
+            XCTAssertEqual(pixels[(y * 70 + x) * 4 + 3], 0)
+        }
+        for (x, y) in [(35, 35), (35, 1), (1, 35), (20, 20)] {
+            XCTAssertEqual(pixels[(y * 70 + x) * 4 + 3], 255)
+        }
+    }
+
+    func testFirstInstallLanguageUsesOnlyPrimaryDeviceLanguage() throws {
+        let suite = "paliro.locale-tests.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        for (languages, expected) in [
+            (["ko-KR"], "ko"), (["ko_KR"], "ko"), (["KO-kr"], "ko"),
+            (["en-US", "ko-KR"], "en"), (["zh-Hans", "ko-KR"], "en"),
+            (["ja-JP"], "en"), (["fr-FR"], "en"), ([], "en")
+        ] {
+            defaults.removePersistentDomain(forName: suite)
+            XCTAssertEqual(PaliroLaunchLocale.resolve(defaults: defaults, preferredLanguages: languages), expected)
+            XCTAssertEqual(defaults.string(forKey: PaliroLaunchLocale.storageKey), expected)
+        }
+    }
+
+    func testSavedLanguageSurvivesRestartButNotACleanInstallation() throws {
+        let suite = "paliro.locale-tests.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        XCTAssertEqual(PaliroLaunchLocale.resolve(defaults: defaults, preferredLanguages: ["ko-KR"]), "ko")
+        XCTAssertTrue(PaliroLaunchLocale.save("en", defaults: defaults))
+        XCTAssertFalse(PaliroLaunchLocale.save("ja", defaults: defaults))
+        let reopened = try XCTUnwrap(UserDefaults(suiteName: suite))
+        XCTAssertEqual(PaliroLaunchLocale.resolve(defaults: reopened, preferredLanguages: ["ko-KR"]), "en")
+        defaults.removePersistentDomain(forName: suite)
+        XCTAssertEqual(PaliroLaunchLocale.resolve(defaults: defaults, preferredLanguages: ["ko-KR"]), "ko")
+    }
+
+    func testNativeAndWebLanguagesAgreeAfterLaunch() async throws {
+        let webView = try await loadedWebView()
+        let language = try await webView.evaluateJavaScript("document.documentElement.lang") as? String
+        XCTAssertEqual(language, PaliroLaunchLocale.current)
+        let saved = try await webView.evaluateJavaScript("JSON.parse(localStorage.getItem('paliro.appLanguage.v1'))") as? String
+        XCTAssertEqual(saved, language)
+    }
+
+    func testEnglishFallbackAndLocalizedSystemResources() throws {
+        XCTAssertEqual(Bundle.main.infoDictionary?["CFBundleDevelopmentRegion"] as? String, "en")
+        for (language, name) in [("en", "Paliro"), ("ko", "팔리로")] {
+            let path = try XCTUnwrap(Bundle.main.path(forResource: language, ofType: "lproj"))
+            let bundle = try XCTUnwrap(Bundle(path: path))
+            XCTAssertEqual(bundle.localizedString(forKey: "CFBundleDisplayName", value: nil, table: "InfoPlist"), name)
+            for key in ["NSCameraUsageDescription", "NSMicrophoneUsageDescription", "NSPhotoLibraryUsageDescription"] {
+                let text = bundle.localizedString(forKey: key, value: nil, table: "InfoPlist")
+                XCTAssertNotEqual(text, key)
+                XCTAssertTrue(text.contains(name))
+            }
+        }
+        XCTAssertNotNil(UIImage(named: "PaliroLaunchSpace"))
+        XCTAssertNotNil(UIImage(named: "PaliroLaunchLogo"))
+    }
+
     func testAppStartsWithProgrammaticWindowAndRootController() async throws {
         let webView = try await loadedWebView()
         let delegate = try XCTUnwrap(UIApplication.shared.delegate as? AppDelegate)
