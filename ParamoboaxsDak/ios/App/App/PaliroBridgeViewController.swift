@@ -29,9 +29,13 @@ final class PaliroBridgeViewController: UIViewController, WKNavigationDelegate {
     private var webView: WKWebView!
     private let bridge = PaliroNativeBridge()
     private var keyboardBottom: NSLayoutConstraint!
-    private var launchOverlay: UIView?
+    private var launchOverlay: UIImageView?
     private var hasConfiguredLaunchSurface = false
     private let launchBackgroundColor = UIColor(red: 0.02, green: 0.04, blue: 0.13, alpha: 1)
+
+    private var isKoreanLaunch: Bool {
+        PaliroLaunchLocale.current == "ko"
+    }
 
     override func loadView() {
         view = UIView()
@@ -123,41 +127,20 @@ final class PaliroBridgeViewController: UIViewController, WKNavigationDelegate {
     }
 
     private func showLaunchOverlay() {
-        guard launchOverlay == nil else { return }
-        let overlay = UIView()
+        let assetName = isKoreanLaunch ? "PaliroLaunchKorean" : "appaliguaungld"
+        guard launchOverlay == nil, let image = UIImage(named: assetName) else { return }
+        let overlay = UIImageView(image: image)
         overlay.translatesAutoresizingMaskIntoConstraints = false
+        overlay.contentMode = .scaleAspectFill
         overlay.clipsToBounds = true
-        overlay.backgroundColor = launchBackgroundColor
         overlay.isUserInteractionEnabled = false
         overlay.accessibilityElementsHidden = true
-
-        let background = UIImageView(image: UIImage(named: "PaliroLaunchSpace"))
-        background.translatesAutoresizingMaskIntoConstraints = false
-        background.contentMode = .scaleAspectFill
-        background.clipsToBounds = true
-        background.alpha = 0.22
-        overlay.addSubview(background)
-
-        let logo = UIImageView(image: UIImage(named: "PaliroLaunchLogo"))
-        logo.translatesAutoresizingMaskIntoConstraints = false
-        logo.contentMode = .scaleAspectFit
-        logo.clipsToBounds = true
-        overlay.addSubview(logo)
-
         view.addSubview(overlay)
         NSLayoutConstraint.activate([
             overlay.topAnchor.constraint(equalTo: view.topAnchor),
             overlay.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             overlay.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             overlay.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            background.topAnchor.constraint(equalTo: overlay.topAnchor),
-            background.leadingAnchor.constraint(equalTo: overlay.leadingAnchor),
-            background.trailingAnchor.constraint(equalTo: overlay.trailingAnchor),
-            background.bottomAnchor.constraint(equalTo: overlay.bottomAnchor),
-            logo.widthAnchor.constraint(equalTo: overlay.widthAnchor, multiplier: 0.186667),
-            logo.heightAnchor.constraint(equalTo: logo.widthAnchor),
-            logo.centerXAnchor.constraint(equalTo: overlay.centerXAnchor),
-            NSLayoutConstraint(item: logo, attribute: .centerY, relatedBy: .equal, toItem: overlay, attribute: .bottom, multiplier: 0.3375, constant: 0),
         ])
         launchOverlay = overlay
     }

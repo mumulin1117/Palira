@@ -4,11 +4,7 @@ export function paliroResolveLanguage({ savedLanguage, nativeLanguage, deviceLan
   return /^ko(?:[-_]|$)/i.test(deviceLanguage ?? '') ? 'ko' : 'en'
 }
 
-export function paliroLaunchArtworkForLanguage() {
-  return {
-    src: '/assets/paliro-welcome-space-background@2x.png',
-    srcset: '',
-    logoSrc: '/assets/paliro-launch-logo@2x.png',
-    logoSrcset: '/assets/paliro-launch-logo@2x.png 2x, /assets/paliro-launch-logo@3x.png 3x',
-  }
+export function paliroLaunchArtworkForLanguage(language) {
+  const src = language === 'ko' ? '/assets/paliro-launch-screen-ko@2x.png' : '/assets/paliro-launch-screen@2x.png'
+  return { src, srcset: language === 'ko' ? `${src} 2x, /assets/paliro-launch-screen-ko@3x.png 3x` : '' }
 }

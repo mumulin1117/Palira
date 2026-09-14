@@ -84,7 +84,7 @@ import { PALIRO_LOCALES, paliroGetLegalCopy, paliroTranslate, paliroTranslateMoo
 // Keep the WebView visually neutral until local launch state selects a screen.
 const route = ref('boot')
 const showFirstLaunch = ref(claimPaliroFirstLaunch(window.localStorage))
-const launchArtwork = paliroLaunchArtworkForLanguage()
+const launchArtwork = computed(() => paliroLaunchArtworkForLanguage(languagePreference.value))
 const errorMessage = ref('')
 const showEula = ref(false)
 const hasAgreed = ref(false)
@@ -379,6 +379,7 @@ const currentMemberAvatarSource = computed(() => currentMemberAvatar.value.src)
 const birthdayIssue = computed(() => getBirthdayIssue(profile.value.birthday))
 const boxActionLimit = computed(() => PALIRO_DAILY_BOX_LIMIT + (boxState.value?.bonusActions ?? 0) + (boxState.value?.videoBonusActions ?? 0))
 const freeBoxActionsLeft = computed(() => Math.max(0, boxActionLimit.value - (boxState.value?.freeActionsUsed ?? 0)))
+const makeBoxFreeCountLabel = computed(() => t('timeRemaining').replace('{count}', freeBoxActionsLeft.value))
 const boxProgressStyle = computed(() => ({ width: `${(freeBoxActionsLeft.value / boxActionLimit.value) * 100}%` }))
 const boxCoinBalance = computed(() => boxState.value?.coins ?? 0)
 const pendingBoxActionLabel = computed(() => pendingBoxAction.value === 'make' ? t('createBoxAction') : t('openBoxAction'))
@@ -594,8 +595,10 @@ function applyLocale() {
   const isKorean = languagePreference.value === 'ko'
   document.documentElement.lang = isKorean ? 'ko' : 'en'
   document.title = isKorean ? '팔리로: 미스터리 박스' : 'Paliro: Mystery Box, Meet People'
-  document.documentElement.style.setProperty('--paliro-launch-image', `url("${launchArtwork.src}")`)
-  document.documentElement.style.setProperty('--paliro-launch-logo-image', `url("${launchArtwork.logoSrc}")`)
+  const artwork = launchArtwork.value
+  document.documentElement.style.setProperty('--paliro-launch-image', isKorean
+    ? `image-set(url("${artwork.src}") 2x, url("/assets/paliro-launch-screen-ko@3x.png") 3x)`
+    : `url("${artwork.src}")`)
 }
 
 function openPolicy(policyRoute, origin = 'welcome') {
@@ -2729,7 +2732,7 @@ function finishTopicTest() {
 </script>
 
 <template>
-  <PaliroFirstLaunch v-if="showFirstLaunch" :artwork="launchArtwork" :label="t('appName')" @complete="finishFirstLaunch" />
+  <PaliroFirstLaunch v-if="showFirstLaunch" :title="t('appName')" :copy="t('firstLaunchCopy')" @complete="finishFirstLaunch" />
   <main class="paliro-shell" :class="{ 'is-first-launch': showFirstLaunch }" :inert="showAccountDeletionNotice || showFirstLaunch">
     <div class="paliro-stars" aria-hidden="true"></div>
 
@@ -2785,8 +2788,8 @@ function finishTopicTest() {
 
     <Transition :name="isPrimaryTabTransition ? 'paliro-tab-fade' : 'paliro-route-fade'" :css="!skipVideoRouteAnimation" :mode="isPrimaryTabTransition ? undefined : 'out-in'" @after-enter="handlePageEntered">
       <section v-if="route === 'boot'" key="boot" aria-busy="true" class="paliro-boot paliro-view">
-        <img alt="" class="paliro-boot-background" :src="launchArtwork.src" />
-        <img alt="" class="paliro-boot-logo" :src="launchArtwork.logoSrc" :srcset="launchArtwork.logoSrcset" />
+        <img alt="" :src="launchArtwork.src" :srcset="launchArtwork.srcset || undefined" />
+        <div aria-hidden="true" class="paliro-boot-indicator"><i></i><i></i><i></i></div>
       </section>
 
       <section v-else-if="route === 'welcome'" key="welcome" class="paliro-welcome paliro-view">
@@ -2910,7 +2913,7 @@ function finishTopicTest() {
           <div class="paliro-segmented-control">
             <button v-for="option in ['Male', 'Female', 'Other']" :key="option" :class="{ 'is-selected': profile.gender === option }" type="button" @click="profile.gender = option">{{ localizedGender(option) }}</button>
           </div>
-          <label class="paliro-field paliro-birthday-field">
+          <label class="paliro-field">
             <span>{{ t('birthday') }}</span>
             <span class="paliro-date-field"><input v-model="profile.birthday" :aria-label="t('birthday')" type="date" /><img alt="" src="/assets/paliro-profile-calendar@2x.png" /></span>
           </label>
@@ -2980,7 +2983,7 @@ function finishTopicTest() {
           <button :aria-busy="isBoxActionLocked" :disabled="isBoxActionLocked" :class="['paliro-home-action', 'paliro-home-make', { 'is-paid': freeBoxActionsLeft === 0 }]" type="button" @click="requestBoxAction('make')">
             <img alt="" src="/assets/paliro-home-make-button@2x.png" />
             <span class="paliro-home-action-label">{{ t('makeOne') }}</span>
-            <small v-if="freeBoxActionsLeft > 0">{{ t('timeThree') }}</small>
+            <small aria-live="polite">{{ makeBoxFreeCountLabel }}</small>
             <span v-if="freeBoxActionsLeft === 0" class="paliro-home-price-badge">{{ PALIRO_BOX_ACTION_COST }} {{ t('coins') }} <img alt="" src="/assets/paliro-home-coin-star@2x.png" /></span>
           </button>
           </div>

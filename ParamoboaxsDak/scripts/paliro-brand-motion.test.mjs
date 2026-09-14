@@ -4,7 +4,15 @@ import vm from 'node:vm'
 import { readFileSync } from 'node:fs'
 import { parse } from 'vue/compiler-sfc'
 import { PALIRO_BOX_OPENING_MOTION } from '../src/services/paliroBrandMotion.js'
-import { paliroSeedUsers, paliroCreateVideoPost, paliroAwardVideoBoxAction, paliroGetPublishedVideos } from '../src/services/paliroLocalStore.js'
+import {
+  PALIRO_DAILY_BOX_LIMIT,
+  paliroAwardVideoBoxAction,
+  paliroCreateVideoPost,
+  paliroGetBoxState,
+  paliroGetPublishedVideos,
+  paliroSeedUsers,
+  paliroUseFreeBoxAction,
+} from '../src/services/paliroLocalStore.js'
 
 const source = readFileSync(new URL('../src/PaliroEntryApp.vue', import.meta.url), 'utf8')
 const extract = (...names) => names.map((name) => source.match(new RegExp(`function ${name}\\([^]*?\\n}`))[0]).join('\n')
@@ -48,6 +56,31 @@ test('selection does not replay for the same box or change during opening', () =
   context.isBoxActionLocked.value = true
   context.selectBox(3)
   assert.equal(context.selectedBox.value, 2)
+})
+
+test('Make One displays the persisted shared free-action count through zero', () => {
+  const translations = readFileSync(new URL('../src/services/paliroI18n.js', import.meta.url), 'utf8')
+  assert.match(source, /const makeBoxFreeCountLabel = computed\(\(\) => t\('timeRemaining'\)\.replace\('\{count\}', freeBoxActionsLeft\.value\)\)/)
+  assert.match(source, /<small aria-live="polite">\{\{ makeBoxFreeCountLabel \}\}<\/small>/)
+  assert.doesNotMatch(source, /t\('timeThree'\)/)
+  assert.match(translations, /timeRemaining: '횟수 x\{count\}'/)
+  assert.match(translations, /timeRemaining: 'Time x\{count\}'/)
+})
+
+test('the real daily free-action state decreases to zero and survives a reread', () => {
+  const values = new Map()
+  globalThis.window = { localStorage: { getItem: (key) => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) } }
+  try {
+    const userID = 'make-count-user'
+    const remaining = () => Math.max(0, PALIRO_DAILY_BOX_LIMIT - paliroGetBoxState(userID).freeActionsUsed)
+    assert.equal(remaining(), 3)
+    for (const expected of [2, 1, 0]) {
+      assert.equal(paliroUseFreeBoxAction(userID).type, 'success')
+      assert.equal(remaining(), expected)
+    }
+    assert.equal(paliroUseFreeBoxAction(userID).type, 'coins-required')
+    assert.equal(remaining(), 0)
+  } finally { delete globalThis.window }
 })
 
 test('successful publishing rewards once per day and repeated confirm/submit cannot duplicate posts', () => {

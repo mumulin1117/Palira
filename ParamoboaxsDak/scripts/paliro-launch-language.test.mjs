@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { runInNewContext } from 'node:vm'
 import test from 'node:test'
 import { paliroResolveLanguage, paliroLaunchArtworkForLanguage } from '../src/services/paliroLanguage.js'
@@ -22,39 +22,37 @@ test('first HTML frame matches the device choice and persists it before Vue moun
     const result = artwork([deviceLanguage, 'ko-KR'])
     const language = paliroResolveLanguage({ deviceLanguage })
     assert.equal(result.src, paliroLaunchArtworkForLanguage(language).src)
-    assert.equal(result.logoSrc, paliroLaunchArtworkForLanguage(language).logoSrc)
+    assert.equal(result.srcset, paliroLaunchArtworkForLanguage(language).srcset)
     assert.equal(result.document.documentElement.lang, language)
     assert.equal(JSON.parse(result.saved.get('paliro.appLanguage.v1')), language)
     assert.equal(result.preloads[0].href, result.src)
-    assert.equal(result.preloads[1].href, result.logoSrc)
   }
 })
 
 test('saved App preference wins over native/browser language, native wins over WebKit defaults', () => {
-  assert.equal(artwork(['ko-KR'], 'ko', 'en').document.documentElement.lang, 'en')
-  assert.equal(artwork(['en-US'], 'en', 'ko').document.documentElement.lang, 'ko')
-  assert.equal(artwork(['en-US'], 'ko').document.documentElement.lang, 'ko')
-  assert.equal(artwork(['ko-KR'], 'en').document.documentElement.lang, 'en')
+  assert.doesNotMatch(artwork(['ko-KR'], 'ko', 'en').src, /-ko@2x/)
+  assert.match(artwork(['en-US'], 'en', 'ko').src, /-ko@2x/)
+  assert.match(artwork(['en-US'], 'ko').src, /-ko@2x/)
+  assert.doesNotMatch(artwork(['ko-KR'], 'en').src, /-ko@2x/)
   const native = read('../ios/App/App/PaliroBridgeViewController.swift')
   assert.match(native, /Locale.preferredLanguages/)
   assert.match(native, /let language = primary == "ko" \? "ko" : "en"/)
   assert.match(native, /injectionTime: .atDocumentStart/)
-  assert.match(native, /UIImage\(named: "PaliroLaunchSpace"\)/)
-  assert.match(native, /UIImage\(named: "PaliroLaunchLogo"\)/)
-  assert.doesNotMatch(native, /PaliroLaunchKorean|appaliguaungld|isKoreanLaunch/)
+  assert.match(native, /isKoreanLaunch \? "PaliroLaunchKorean" : "appaliguaungld"/)
   const entry = read('../src/PaliroEntryApp.vue')
-  assert.match(entry, /const launchArtwork = paliroLaunchArtworkForLanguage\(\)/)
+  assert.match(entry, /computed\(\(\) => paliroLaunchArtworkForLanguage\(languagePreference.value\)\)/)
   assert.match(entry, /nativeLaunchScreen\?\.setLanguage\(\{ language \}\)/)
   assert.match(entry, /t\(option.labelKey\)/)
 })
 
-test('all launch surfaces use the same background and icon without a visible App name', () => {
+test('system launch screen is language-neutral while runtime Korean assets stay unchanged', () => {
   const storyboard = read('../ios/App/App/Base.lproj/PaliroLaunchScreen.storyboard')
   assert.ok(storyboard.includes('image="PaliroLaunchSpace"'))
   assert.ok(storyboard.includes('image="PaliroLaunchLogo"'))
   assert.doesNotMatch(storyboard, /PaliroLaunchKorean|appaliguaungld|<label|userDefinedRuntimeAttributes/)
   assert.match(storyboard, /contentMode="scaleAspectFill"/)
-  assert.ok(existsSync(new URL('../public/assets/paliro-launch-logo@2x.png', import.meta.url)))
-  assert.ok(existsSync(new URL('../public/assets/paliro-launch-logo@3x.png', import.meta.url)))
-  assert.doesNotMatch(script, /paliro-launch-screen(?:-ko)?@/)
+  for (const scale of ['2x', '3x']) {
+    const name = `paliro-launch-screen-ko@${scale}.png`
+    assert.deepEqual(readFileSync(new URL(`../public/assets/${name}`, import.meta.url)), readFileSync(new URL(`../ios/App/App/Assets.xcassets/PaliroLaunchKorean.imageset/${name}`, import.meta.url)))
+  }
 })
