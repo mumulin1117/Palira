@@ -2,7 +2,7 @@ import { access, cp, readdir, rm } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 
 const source = new URL('../dist/', import.meta.url)
-const destination = new URL('../ios/App/App/public/', import.meta.url)
+const destination = new URL('../../PaDlroliroBox/PaDlroliroBox/public/', import.meta.url)
 await access(new URL('index.html', source))
 await access(new URL('paliro-native.js', source))
 // Only replace generated Web assets; never touch simulator or application user data.

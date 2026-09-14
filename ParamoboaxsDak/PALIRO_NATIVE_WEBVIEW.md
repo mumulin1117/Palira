@@ -9,12 +9,12 @@ From this project directory:
 ```sh
 pnpm install
 pnpm ios:sync
-open ios/App/App.xcodeproj
+open ../PaDlroliroBox/PaDlroliroBox.xcodeproj
 ```
 
 Select the `App` scheme and an actual connected iPhone or a named iPhone simulator. A generic `Any iOS Device` destination is for building/archiving, not running. Simulator builds cannot be installed on a physical iPhone. Keep the existing signing team and provisioning configuration for device/archive builds.
 
-After changing Vue files, run `pnpm ios:sync` before rebuilding in Xcode. The sync script replaces only generated `ios/App/App/public` resources, never app user data. No `pod install` or `cap sync` is needed. The old workspace is also usable but contains only the app project.
+After changing Vue files, run `pnpm ios:sync` before rebuilding in Xcode. The sync script replaces only generated `../PaDlroliroBox/PaDlroliroBox/public` resources, never app user data. No `pod install` or `cap sync` is needed. The standalone workspace is also usable and contains only the app project.
 
 ## Bridge contract
 
@@ -62,14 +62,14 @@ Paths below are relative to this project directory.
 | `src/services/paliroI18n.js` | Localized settings options and English fallback for UI/legal copy. |
 | `src/PaliroEntryApp.vue` | Reactive launch artwork, background and settings labels. |
 | `public/paliro-launch.js`, `index.html` | Resolve/persist language before the first HTML paint, with a neutral background fallback. |
-| `ios/App/App/PaliroBridgeViewController.swift` | Resolve/persist native initial language before WebView creation; retain manual choices. |
-| `ios/App/App/Info.plist`, `ios/App/App.xcodeproj/project.pbxproj` | English development fallback and app-name baseline; retain existing English/Korean InfoPlist.strings. |
-| `ios/App/App/Base.lproj/PaliroLaunchScreen.storyboard` | Language-neutral system launch background/logo; retains the pure-code main entry. |
-| `ios/App/App/Assets.xcassets/PaliroLaunchSpace.imageset/Contents.json`, `paliro-welcome-space-background@2x.png` | Reuse the existing space background without modifying the artwork. |
-| `ios/App/App/Assets.xcassets/PaliroLaunchLogo.imageset/Contents.json`, `paliro-launch-logo.pdf` | Reuse the existing logo with a vector rounded-rectangle clip: 20pt radius at the 70pt reference width. No runtime attributes in LaunchScreen. |
+| `../PaDlroliroBox/PaDlroliroBox/PaliroBridgeViewController.swift` | Resolve/persist native initial language before WebView creation; retain manual choices. |
+| `../PaDlroliroBox/PaDlroliroBox/Info.plist`, `../PaDlroliroBox/PaDlroliroBox.xcodeproj/project.pbxproj` | English development fallback and app-name baseline; retain existing English/Korean InfoPlist.strings. |
+| `../PaDlroliroBox/PaDlroliroBox/Base.lproj/PaliroLaunchScreen.storyboard` | Language-neutral system launch background/logo; retains the pure-code main entry. |
+| `../PaDlroliroBox/PaDlroliroBox/Assets.xcassets/PaliroLaunchSpace.imageset/Contents.json`, `paliro-welcome-space-background@2x.png` | Reuse the existing space background without modifying the artwork. |
+| `../PaDlroliroBox/PaDlroliroBox/Assets.xcassets/PaliroLaunchLogo.imageset/Contents.json`, `paliro-launch-logo.pdf` | Reuse the existing logo with a vector rounded-rectangle clip: 20pt radius at the 70pt reference width. No runtime attributes in LaunchScreen. |
 | `scripts/paliro-build-launch-logo.swift` | Rebuild the clipped launch asset with `xcrun swift scripts/paliro-build-launch-logo.swift`; preserves the original AppIcon image and existing launch layout. |
 | `scripts/paliro-language-persistence.test.mjs`, `scripts/paliro-launch-language.test.mjs`, `scripts/paliro-launch-transition.test.mjs` | Language priority, reinstall, account/server isolation, data language, first frame and neutral launch checks. |
-| `dist/index.html`, `dist/paliro-launch.js`, `dist/assets/index-*.js`, generated `ios/App/App/public/` | Rebuilt and synchronized distribution resources. |
+| `dist/index.html`, `dist/paliro-launch.js`, `dist/assets/index-*.js`, generated `../PaDlroliroBox/PaDlroliroBox/public/` | Rebuilt and synchronized distribution resources. |
 | `PALIRO_NATIVE_WEBVIEW.md` | Rules, limitations, file inventory and verification record. |
 
 Verification uses the Node regression suite plus Debug and Release compilation of the `App` target. Existing conversation and relationship preservation is covered by Node tests. Physical-device system permission dialogs and large-screen visual checks remain manual checks.
@@ -86,7 +86,7 @@ Verification uses the Node regression suite plus Debug and Release compilation o
 
 ```sh
 node --test scripts/*.test.mjs
-xcodebuild -project ios/App/App.xcodeproj -scheme App \
+xcodebuild -project ../PaDlroliroBox/PaDlroliroBox.xcodeproj -scheme PaDlroliroBox \
   -configuration Debug -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO build
 ```
 

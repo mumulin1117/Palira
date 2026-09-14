@@ -1,0 +1,108 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "8FB00609",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "0.99",
+      "familyShareable" : false,
+      "internalID" : "74D0D817",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "bbdiylyghcvmvmts",
+      "referenceName" : "0.999",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "1.99",
+      "familyShareable" : false,
+      "internalID" : "A6E03A01",
+      "localizations" : [ { "description" : "200 Paliro Coins", "displayName" : "200 Coins", "locale" : "en_US" } ],
+      "productID" : "iyksmadvinojrplp",
+      "referenceName" : "200 Coins",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "A6E03A02",
+      "localizations" : [ { "description" : "600 Paliro Coins", "displayName" : "600 Coins", "locale" : "en_US" } ],
+      "productID" : "hkczppvsoegefpcg",
+      "referenceName" : "600 Coins",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "9.99",
+      "familyShareable" : false,
+      "internalID" : "A6E03A03",
+      "localizations" : [ { "description" : "1500 Paliro Coins", "displayName" : "1500 Coins", "locale" : "en_US" } ],
+      "productID" : "frpbjkpqdhvdzali",
+      "referenceName" : "1500 Coins",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "19.99",
+      "familyShareable" : false,
+      "internalID" : "A6E03A04",
+      "localizations" : [ { "description" : "3500 Paliro Coins", "displayName" : "3500 Coins", "locale" : "en_US" } ],
+      "productID" : "rebfnabjzseqvpgz",
+      "referenceName" : "3500 Coins",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "49.99",
+      "familyShareable" : false,
+      "internalID" : "A6E03A05",
+      "localizations" : [ { "description" : "9500 Paliro Coins", "displayName" : "9500 Coins", "locale" : "en_US" } ],
+      "productID" : "povdflzdkrvkiwdq",
+      "referenceName" : "9500 Coins",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "99.99",
+      "familyShareable" : false,
+      "internalID" : "A6E03A06",
+      "localizations" : [ { "description" : "20050 Paliro Coins", "displayName" : "20050 Coins", "locale" : "en_US" } ],
+      "productID" : "jxioxpaoekomsnqs",
+      "referenceName" : "20050 Coins",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_askToBuyEnabled" : false,
+    "_billingGracePeriodEnabled" : false,
+    "_billingIssuesEnabled" : false,
+    "_disableDialogs" : false,
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_renewalBillingIssuesEnabled" : false,
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+
+    ],
+    "_timeRate" : 0
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 5,
+    "minor" : 0
+  }
+}

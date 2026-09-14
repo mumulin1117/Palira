@@ -65,7 +65,7 @@ test('bridge is not exposed in a browser or subframe', () => {
 })
 
 test('native host validates origin, allowlists methods and restricts readable media directories', () => {
-  const swift = readFileSync(new URL('../ios/App/App/PaliroNativeBridge.swift', import.meta.url), 'utf8')
+  const swift = readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroNativeBridge.swift', import.meta.url), 'utf8')
   assert.match(swift, /message.frameInfo.isMainFrame/)
   assert.match(swift, /securityOrigin.host == "localhost"/)
   assert.match(swift, /api.methods.contains\(method\)/)

@@ -34,7 +34,7 @@ test('saved App preference wins over native/browser language, native wins over W
   assert.match(artwork(['en-US'], 'en', 'ko').src, /-ko@2x/)
   assert.match(artwork(['en-US'], 'ko').src, /-ko@2x/)
   assert.doesNotMatch(artwork(['ko-KR'], 'en').src, /-ko@2x/)
-  const native = read('../ios/App/App/PaliroBridgeViewController.swift')
+  const native = read('../../PaDlroliroBox/PaDlroliroBox/PaliroBridgeViewController.swift')
   assert.match(native, /Locale.preferredLanguages/)
   assert.match(native, /let language = primary == "ko" \? "ko" : "en"/)
   assert.match(native, /injectionTime: .atDocumentStart/)
@@ -46,13 +46,13 @@ test('saved App preference wins over native/browser language, native wins over W
 })
 
 test('system launch screen is language-neutral while runtime Korean assets stay unchanged', () => {
-  const storyboard = read('../ios/App/App/Base.lproj/PaliroLaunchScreen.storyboard')
+  const storyboard = read('../../PaDlroliroBox/PaDlroliroBox/Base.lproj/PaliroLaunchScreen.storyboard')
   assert.ok(storyboard.includes('image="PaliroLaunchSpace"'))
   assert.ok(storyboard.includes('image="PaliroLaunchLogo"'))
   assert.doesNotMatch(storyboard, /PaliroLaunchKorean|appaliguaungld|<label|userDefinedRuntimeAttributes/)
   assert.match(storyboard, /contentMode="scaleAspectFill"/)
   for (const scale of ['2x', '3x']) {
     const name = `paliro-launch-screen-ko@${scale}.png`
-    assert.deepEqual(readFileSync(new URL(`../public/assets/${name}`, import.meta.url)), readFileSync(new URL(`../ios/App/App/Assets.xcassets/PaliroLaunchKorean.imageset/${name}`, import.meta.url)))
+    assert.deepEqual(readFileSync(new URL(`../public/assets/${name}`, import.meta.url)), readFileSync(new URL(`../../PaDlroliroBox/PaDlroliroBox/Assets.xcassets/PaliroLaunchKorean.imageset/${name}`, import.meta.url)))
   }
 })

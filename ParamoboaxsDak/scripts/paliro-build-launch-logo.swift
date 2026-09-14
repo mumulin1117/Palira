@@ -4,7 +4,7 @@ import ImageIO
 
 // A vector clip works in the system launch storyboard without runtime layer attributes.
 let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
-let assets = root.appendingPathComponent("ios/App/App/Assets.xcassets")
+let assets = root.appendingPathComponent("../PaDlroliroBox/PaDlroliroBox/Assets.xcassets")
 let source = assets.appendingPathComponent("AppIcon.appiconset/paliraoon.jpg")
 let output = assets.appendingPathComponent("PaliroLaunchLogo.imageset/paliro-launch-logo.pdf")
 guard let imageSource = CGImageSourceCreateWithURL(source as CFURL, nil),

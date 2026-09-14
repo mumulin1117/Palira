@@ -24,9 +24,9 @@ cd /Users/linqian/Documents/Palira/ParamoboaxsDak
 npm run dev -- --host 127.0.0.1 --port 5173
 ```
 
-开发接口默认 `http://127.0.0.1:3001`，示例见 `.env.example`；生产构建由 `.env.production` 固定使用 `https://mobile.paliroweb.site`。修改环境变量后执行 `pnpm ios:sync`，再使用 `ios/App/App.xcodeproj` 构建原生 WKWebView App，详见 `PALIRO_NATIVE_WEBVIEW.md`。服务器上的 Node 服务仍只监听 `127.0.0.1:3300`，公网只能通过该子域的独立 Nginx HTTPS 反向代理访问。
+开发接口默认 `http://127.0.0.1:3001`，示例见 `.env.example`；生产构建由 `.env.production` 固定使用 `https://mobile.paliroweb.site`。修改环境变量后执行 `pnpm ios:sync`，再使用 `../PaDlroliroBox/PaDlroliroBox.xcodeproj` 构建原生 WKWebView App，详见 `PALIRO_NATIVE_WEBVIEW.md`。服务器上的 Node 服务仍只监听 `127.0.0.1:3300`，公网只能通过该子域的独立 Nginx HTTPS 反向代理访问。
 
-iOS打包：`npm run build` 后运行 `npx cap copy ios`，再在Xcode运行 `ios/App/App.xcworkspace`。原有build脚本已修正为真正执行 `vite build`。
+iOS 打包：运行 `pnpm ios:sync` 构建并同步 Web 资源，再在 Xcode 打开 `../PaDlroliroBox/PaDlroliroBox.xcodeproj`。项目使用原生 WKWebView，不需要 Capacitor 或 CocoaPods。
 
 ## 数据边界
 
@@ -46,7 +46,7 @@ iOS将服务端token保存到Keychain（设备内可用，不同步到其他设�
 
 iOS卸载重装：原生层在`UserDefaults`保存安装实例标识。正常升级和日常启动保留Keychain登录；卸载会移除该标识，重装首次启动时先删除同Bundle ID遗留的Keychain Token，因此必须重新登录。为兼容加入机制前已登录的旧版本，首次升级若仍检测到本地会话，会保留一次凭证并建立标识；卸载后本地会话不存在，不会走这条迁移路径。主动退出不会删除安装标识。
 
-本轮修改位于`ParamoboaxsDak/ios/App/App/PaliroBridgeViewController.swift`、`src/services/paliroAccountApi.js`、`scripts/paliro-server-auth.test.mjs`和本文档。验证包括升级/重装分支单测、全部前端回归测试、Vite生产构建、Capacitor iOS资源同步和iOS模拟器工程编译。没有实际卸载当前模拟器中的用户App，避免破坏已有本地测试数据；请按“登录 > 删除App > 重新安装”做一次最终黑盒验收。
+本轮修改位于`PaDlroliroBox/PaDlroliroBox/PaliroBridgeViewController.swift`、`src/services/paliroAccountApi.js`、`scripts/paliro-server-auth.test.mjs`和本文档。验证包括升级/重装分支单测、全部前端回归测试、Vite生产构建、原生 iOS 资源同步和iOS模拟器工程编译。没有实际卸载当前模拟器中的用户App，避免破坏已有本地测试数据；请按“登录 > 删除App > 重新安装”做一次最终黑盒验收。
 
 启动后先GET `/palirov1/paliro/me/profile`校验会话，通过才进入主模块。默认24小时过期，没有refresh token；到期或401需重新登录。服务未启动时显示连接失败，不假装登录成功。
 
@@ -116,7 +116,7 @@ iOS卸载重装：原生层在`UserDefaults`保存安装实例标识。正常升
 | `ParamoboaxsDak/src/services/paliroServerSession.js` | 服务器认证后保存会话、恢复验证、过期/失败处理及登出 |
 | `ParamoboaxsDak/src/services/paliroLocalStore.js` | 受控测试身份映射、普通账号UUID缓存、保留已有资料和业务数据 |
 | `ParamoboaxsDak/src/services/paliroI18n.js` | 新增英文/韩文请求中及错误提示 |
-| `ParamoboaxsDak/ios/App/App/PaliroBridgeViewController.swift` | 注册Keychain凭证读写插件 |
+| `PaDlroliroBox/PaDlroliroBox/PaliroBridgeViewController.swift` | 注册Keychain凭证读写插件 |
 | `ParamoboaxsDak/package.json` | 修正build脚本，使iOS打包实际构建HTML |
 | `ParamoboaxsDak/.env.example` | 本地API地址配置示例 |
 | `ParamoboaxsDak/scripts/paliro-server-auth.test.mjs` | 认证、注册时机、数据隔离、密码迁移和失败路径回归测试 |
