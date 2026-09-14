@@ -14,12 +14,25 @@ test('native launch art is installed before loading an opaque branded WebView', 
   assert.match(nativeBridge, /webView\.isOpaque = true/)
   assert.match(nativeBridge, /webView\.backgroundColor = launchBackgroundColor/)
   assert.match(nativeBridge, /webView\.underPageBackgroundColor = launchBackgroundColor/)
-  assert.match(appDelegate, /window\?\.backgroundColor = UIColor\(red: 5 \/ 255, green: 11 \/ 255, blue: 33 \/ 255/)
+  assert.match(appDelegate, /window\.backgroundColor = UIColor\(red: 5 \/ 255, green: 11 \/ 255, blue: 33 \/ 255/)
   assert.match(nativeBridge, /bridge.register\(PaliroLaunchScreenPlugin\(\)\)/)
   assert.match(nativeBridge, /UIView\.animate\(withDuration: 0\.28/)
   assert.match(entry, /paliroNativeService\('PaliroLaunchScreen'\)/)
   assert.match(entry, /window\.requestAnimationFrame\(\(\) => \{\s*window\.requestAnimationFrame/)
   assert.match(entry, /void revealWebContent\(\)/)
+})
+
+test('the main interface starts in code without a storyboard dependency', () => {
+  const plist = readFileSync(new URL('../ios/App/App/Info.plist', import.meta.url), 'utf8')
+  const project = readFileSync(new URL('../ios/App/App.xcodeproj/project.pbxproj', import.meta.url), 'utf8')
+  assert.match(appDelegate, /@main/)
+  assert.match(appDelegate, /let window = UIWindow\(frame: UIScreen\.main\.bounds\)/)
+  assert.match(appDelegate, /window\.rootViewController = PaliroBridgeViewController\(nibName: nil, bundle: nil\)/)
+  assert.match(appDelegate, /self\.window = window\s+window\.makeKeyAndVisible\(\)/)
+  assert.doesNotMatch(plist, /UIMainStoryboardFile|UISceneStoryboardFile/)
+  assert.doesNotMatch(project, /Main\.storyboard/)
+  assert.equal(existsSync(new URL('../ios/App/App/Base.lproj/Main.storyboard', import.meta.url)), false)
+  assert.match(plist, /<key>UILaunchStoryboardName<\/key>\s*<string>PaliroLaunchScreen<\/string>/)
 })
 
 test('the boot route and earliest HTML paint use the branded dark launch surface', () => {

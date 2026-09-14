@@ -10,6 +10,20 @@ test('missing and non-finite native durations use the measured recording time', 
   assert.equal(paliroVoiceDuration({ durationMilliseconds: 1400 }, 0), 1.4)
 })
 
+test('unavailable native input preserves its error code, creates no draft and allows retry', async () => {
+  let attempts = 0
+  const session = createPaliroVoiceSession({ nativeRecorder: {
+    start: async () => {
+      if (++attempts === 1) throw Object.assign(new Error('Microphone input is unavailable.'), { code: 'AUDIO_INPUT_UNAVAILABLE' })
+    },
+    stop: async () => ({ fileUri: 'file:///paliro-voice-retry.m4a', durationSeconds: 2 }),
+  } })
+  await assert.rejects(session.start(), { code: 'AUDIO_INPUT_UNAVAILABLE' })
+  assert.equal(await session.stop(), null)
+  assert.equal(await session.start(), true)
+  assert.equal((await session.stop()).durationSeconds, 2)
+})
+
 test('cancel waits for microphone permission and cleans up a late native start', async () => {
   let allow
   let active = false

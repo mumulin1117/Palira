@@ -1,9 +1,53 @@
 import XCTest
 import WebKit
+import AVFoundation
 @testable import App
 
 @MainActor
 final class PaliroNativeBridgeTests: XCTestCase {
+    func testAppStartsWithProgrammaticWindowAndRootController() async throws {
+        let webView = try await loadedWebView()
+        let delegate = try XCTUnwrap(UIApplication.shared.delegate as? AppDelegate)
+        let window = try XCTUnwrap(delegate.window)
+        let controller = try XCTUnwrap(window.rootViewController as? PaliroBridgeViewController)
+        XCTAssertFalse(window.isHidden)
+        XCTAssertTrue(window.isKeyWindow)
+        XCTAssertTrue(webView.window === window)
+        XCTAssertNil(controller.storyboard)
+        XCTAssertNil(Bundle.main.object(forInfoDictionaryKey: "UIMainStoryboardFile"))
+        XCTAssertNil(Bundle.main.url(forResource: "Main", withExtension: "storyboardc"))
+        XCTAssertEqual(Bundle.main.object(forInfoDictionaryKey: "UILaunchStoryboardName") as? String, "PaliroLaunchScreen")
+        controller.view.layoutIfNeeded()
+        XCTAssertEqual(controller.view.bounds.size, window.bounds.size)
+        XCTAssertEqual(webView.frame, controller.view.bounds)
+    }
+
+    func testInvalidMicrophoneFormatsCannotCreateRecordingSettings() {
+        for input in [
+            PaliroVoiceInputFormat(available: false, channels: 1, sampleRate: 44100),
+            PaliroVoiceInputFormat(available: true, channels: 0, sampleRate: 44100),
+            PaliroVoiceInputFormat(available: true, channels: 1, sampleRate: 0),
+            PaliroVoiceInputFormat(available: true, channels: 1, sampleRate: .nan),
+            PaliroVoiceInputFormat(available: true, channels: 1, sampleRate: .infinity)
+        ] {
+            XCTAssertFalse(input.isReady)
+            XCTAssertThrowsError(try input.recordingSettings())
+        }
+    }
+
+    func testRecordingUsesValidHardwareSampleRateAndMonoAAC() throws {
+        let input = PaliroVoiceInputFormat(available: true, channels: 2, sampleRate: 48000)
+        let settings = try input.recordingSettings()
+        XCTAssertEqual(settings[AVSampleRateKey] as? Double, 48000)
+        XCTAssertEqual(settings[AVNumberOfChannelsKey] as? Int, 1)
+        XCTAssertEqual(settings[AVFormatIDKey] as? UInt32, kAudioFormatMPEG4AAC)
+    }
+
+    func testInstalledAppIncludesMicrophonePurpose() {
+        let purpose = Bundle.main.object(forInfoDictionaryKey: "NSMicrophoneUsageDescription") as? String
+        XCTAssertFalse(purpose?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+    }
+
     private func loadedWebView() async throws -> WKWebView {
         let delegate = try XCTUnwrap(UIApplication.shared.delegate as? AppDelegate)
         let controller = try XCTUnwrap(delegate.window?.rootViewController as? PaliroBridgeViewController)

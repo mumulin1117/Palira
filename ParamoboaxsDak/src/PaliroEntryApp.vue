@@ -1304,6 +1304,7 @@ function startVoiceDurationTimer() {
 }
 
 function voiceRecordingError(error) {
+  if (error?.code === 'AUDIO_INPUT_UNAVAILABLE') return t('voiceInputUnavailable')
   const message = String(error?.name ?? '') + ' ' + String(error?.message ?? error ?? '')
   return /permission|denied|notallowed|not granted/i.test(message) ? t('voicePermissionDenied') : t('voiceRecordingFailed')
 }

@@ -18,6 +18,8 @@ After changing Vue files, run `pnpm ios:sync` before rebuilding in Xcode. The sy
 
 ## Bridge contract
 
+The `@main` AppDelegate creates the UIWindow and PaliroBridgeViewController in code. There is no Main.storyboard or UIMainStoryboardFile entry. The existing app-delegate lifecycle is retained; this change does not introduce a scene delegate. PaliroLaunchScreen.storyboard remains only for the system launch screen, while the controller builds its WebView and localized launch overlay in code.
+
 `public/paliro-native.js` is injected by WKWebView at document start, before Vue runs. `src/services/paliroNativeBridge.js` exposes Promise-based service calls. Messages travel through `window.webkit.messageHandlers.paliro`; replies and purchase events return through `window.PaliroNative`.
 
 | Service | Methods |
