@@ -658,11 +658,9 @@ function commentAvatarSource(comment) {
 function applyLocale() {
   const isKorean = languagePreference.value === 'ko'
   document.documentElement.lang = isKorean ? 'ko' : 'en'
-  document.title = isKorean ? '팔리로: 미스터리 박스' : 'Paliro: Mystery Box, Meet People'
+  document.title = isKorean ? 'Paliro: 미스터리 박스' : 'Paliro: Mystery Box, Meet People'
   const artwork = launchArtwork.value
-  document.documentElement.style.setProperty('--paliro-launch-image', isKorean
-    ? `image-set(url("${artwork.src}") 2x, url("/assets/paliro-launch-screen-ko@3x.png") 3x)`
-    : `url("${artwork.src}")`)
+  document.documentElement.style.setProperty('--paliro-launch-image', `url("${artwork.src}")`)
 }
 
 function openPolicy(policyRoute, origin = 'welcome') {

@@ -4,7 +4,7 @@ export function paliroResolveLanguage({ savedLanguage, nativeLanguage, deviceLan
   return /^ko(?:[-_]|$)/i.test(deviceLanguage ?? '') ? 'ko' : 'en'
 }
 
-export function paliroLaunchArtworkForLanguage(language) {
-  const src = language === 'ko' ? '/assets/paliro-launch-screen-ko@2x.png' : '/assets/paliro-launch-screen@2x.png'
-  return { src, srcset: language === 'ko' ? `${src} 2x, /assets/paliro-launch-screen-ko@3x.png 3x` : '' }
+// Branding is shared across locales; UI language resolution remains independent.
+export function paliroLaunchArtworkForLanguage() {
+  return { src: '/assets/paliro-launch-screen@2x.png', srcset: '' }
 }

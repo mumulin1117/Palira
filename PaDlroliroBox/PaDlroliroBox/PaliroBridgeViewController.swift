@@ -165,7 +165,7 @@ final class PaliroBridgeViewController: UIViewController, WKNavigationDelegate {
     }
 
     private func showLaunchOverlay() {
-        let assetName = isKoreanLaunch ? "PaliroLaunchKorean" : "appaliguaungld"
+        let assetName = "appaliguaungld"
         guard launchOverlay == nil, let image = UIImage(named: assetName) else { return }
         let overlay = UIImageView(image: image)
         overlay.translatesAutoresizingMaskIntoConstraints = false

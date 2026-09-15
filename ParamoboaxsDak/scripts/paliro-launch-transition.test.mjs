@@ -48,7 +48,7 @@ test('the boot route and earliest HTML paint use the branded dark launch surface
   assert.doesNotMatch(storyboard, /systemColor="systemBackgroundColor"/)
   assert.match(storyboard, /red="0\.02" green="0\.04" blue="0\.13" alpha="1"/)
   assert.match(storyboard, /<view key="view"[\s\S]*<imageView[\s\S]*translatesAutoresizingMaskIntoConstraints="NO"/)
-  assert.match(html, /var\(--paliro-launch-image,url\('\/assets\/paliro-welcome-space-background@2x\.png'\)\)/)
+  assert.match(html, /var\(--paliro-launch-image,url\('\/assets\/paliro-launch-screen@2x\.png'\)\)/)
 })
 
 

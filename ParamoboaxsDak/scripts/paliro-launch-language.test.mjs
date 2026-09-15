@@ -17,7 +17,7 @@ function artwork(languages, nativeLanguage, savedLanguage) {
   return { ...window.paliroLaunchArtwork, properties, preloads, saved, document }
 }
 
-test('first HTML frame matches the device choice and persists it before Vue mounts', () => {
+test('first HTML frame shares English artwork while preserving the device language', () => {
   for (const deviceLanguage of ['ko', 'ko-KR', 'ko_KR', 'KO-KR', 'zh-CN', 'zh-Hant', 'en-US', 'ja-JP', 'fr', undefined]) {
     const result = artwork([deviceLanguage, 'ko-KR'])
     const language = paliroResolveLanguage({ deviceLanguage })
@@ -31,28 +31,32 @@ test('first HTML frame matches the device choice and persists it before Vue moun
 
 test('saved App preference wins over native/browser language, native wins over WebKit defaults', () => {
   assert.doesNotMatch(artwork(['ko-KR'], 'ko', 'en').src, /-ko@2x/)
-  assert.match(artwork(['en-US'], 'en', 'ko').src, /-ko@2x/)
-  assert.match(artwork(['en-US'], 'ko').src, /-ko@2x/)
+  assert.equal(artwork(['en-US'], 'en', 'ko').document.documentElement.lang, 'ko')
+  assert.doesNotMatch(artwork(['en-US'], 'en', 'ko').src, /-ko@2x/)
+  assert.equal(artwork(['en-US'], 'ko').document.documentElement.lang, 'ko')
+  assert.doesNotMatch(artwork(['en-US'], 'ko').src, /-ko@2x/)
   assert.doesNotMatch(artwork(['ko-KR'], 'en').src, /-ko@2x/)
   const native = read('../../PaDlroliroBox/PaDlroliroBox/PaliroBridgeViewController.swift')
   assert.match(native, /Locale.preferredLanguages/)
   assert.match(native, /let language = primary == "ko" \? "ko" : "en"/)
   assert.match(native, /injectionTime: .atDocumentStart/)
-  assert.match(native, /isKoreanLaunch \? "PaliroLaunchKorean" : "appaliguaungld"/)
+  assert.match(native, /let assetName = "appaliguaungld"/)
   const entry = read('../src/PaliroEntryApp.vue')
   assert.match(entry, /computed\(\(\) => paliroLaunchArtworkForLanguage\(languagePreference.value\)\)/)
   assert.match(entry, /nativeLaunchScreen\?\.setLanguage\(\{ language \}\)/)
   // Language version 1 uses fixed native option labels; launch-language precedence is unchanged.
 })
 
-test('system launch screen is language-neutral while runtime Korean assets stay unchanged', () => {
+test('system launch, native overlay and WebView use the same English branding', () => {
   const storyboard = read('../../PaDlroliroBox/PaDlroliroBox/Base.lproj/PaliroLaunchScreen.storyboard')
-  assert.ok(storyboard.includes('image="PaliroLaunchSpace"'))
-  assert.ok(storyboard.includes('image="PaliroLaunchLogo"'))
-  assert.doesNotMatch(storyboard, /PaliroLaunchKorean|appaliguaungld|<label|userDefinedRuntimeAttributes/)
+  assert.ok(storyboard.includes('image="appaliguaungld"'))
+  assert.doesNotMatch(storyboard, /PaliroLaunchKorean|PaliroLaunchLogo|<label|userDefinedRuntimeAttributes/)
   assert.match(storyboard, /contentMode="scaleAspectFill"/)
-  for (const scale of ['2x', '3x']) {
-    const name = `paliro-launch-screen-ko@${scale}.png`
-    assert.deepEqual(readFileSync(new URL(`../public/assets/${name}`, import.meta.url)), readFileSync(new URL(`../../PaDlroliroBox/PaDlroliroBox/Assets.xcassets/PaliroLaunchKorean.imageset/${name}`, import.meta.url)))
+  assert.deepEqual(readFileSync(new URL('../public/assets/paliro-launch-screen@2x.png', import.meta.url)), readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox/Assets.xcassets/appaliguaungld.imageset/appaliguaungld@2x.png', import.meta.url)))
+  for (const language of ['en', 'ko']) {
+    const result = artwork([language], language, language)
+    assert.match(result.document.title, /^Paliro:/)
+    assert.equal(result.properties['--paliro-launch-image'], 'url("/assets/paliro-launch-screen@2x.png")')
   }
+  assert.doesNotMatch(read('../src/services/paliroI18n.js'), /팔리로/)
 })
