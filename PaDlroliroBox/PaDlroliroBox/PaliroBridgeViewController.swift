@@ -4,407 +4,407 @@ import WebKit
 import UIKit
 
 enum PaliroLaunchLocale {
-    static let storageKey = "paliro.launchLanguage.v1"
+    static let velvetWonderTrail = "paliro.launchLanguage.v1"
 
-    static var current: String {
-        resolve()
+    static var velvetCuriosityTrail: String {
+        velvetThoughtTrail()
     }
 
-    static func resolve(defaults: UserDefaults = .standard, preferredLanguages: [String] = Locale.preferredLanguages) -> String {
-        if let saved = defaults.string(forKey: storageKey), ["en", "ko"].contains(saved) { return saved }
-        let primary = (preferredLanguages.first ?? "").lowercased().split(whereSeparator: { $0 == "-" || $0 == "_" }).first
-        let language = primary == "ko" ? "ko" : "en"
-        defaults.set(language, forKey: storageKey)
-        return language
+    static func velvetThoughtTrail(velvetFeelingTrail: UserDefaults = .standard, velvetReflectionTrail: [String] = Locale.preferredLanguages) -> String {
+        if let velvetAffinityTrail = velvetFeelingTrail.string(forKey: velvetWonderTrail), ["en", "ko"].contains(velvetAffinityTrail) { return velvetAffinityTrail }
+        let velvetDreamTrail = (velvetReflectionTrail.first ?? "").lowercased().split(whereSeparator: { $0 == "-" || $0 == "_" }).first
+        let velvetInspirationTrail = velvetDreamTrail == "ko" ? "ko" : "en"
+        velvetFeelingTrail.set(velvetInspirationTrail, forKey: velvetWonderTrail)
+        return velvetInspirationTrail
     }
 
-    static func save(_ language: String, defaults: UserDefaults = .standard) -> Bool {
-        guard language == "en" || language == "ko" else { return false }
-        defaults.set(language, forKey: storageKey)
+    static func velvetExpressionTrail(_ velvetInspirationTrail: String, velvetFeelingTrail: UserDefaults = .standard) -> Bool {
+        guard velvetInspirationTrail == "en" || velvetInspirationTrail == "ko" else { return false }
+        velvetFeelingTrail.set(velvetInspirationTrail, forKey: velvetWonderTrail)
         return true
     }
 }
 
 final class PaliroBridgeViewController: UIViewController, WKNavigationDelegate {
-    private var webView: WKWebView!
-    private let bridge = PaliroNativeBridge()
-    private var keyboardBottom: NSLayoutConstraint!
-    private var launchOverlay: UIImageView?
-    private var startupWatchdog: DispatchWorkItem?
-    private var startupErrorPresented = false
-    private var hasConfiguredLaunchSurface = false
-    private let launchBackgroundColor = UIColor(red: 0.02, green: 0.04, blue: 0.13, alpha: 1)
+    private var velvetImaginationTrail: WKWebView!
+    private let sereneWonderTrail = PaliroNativeBridge()
+    private var sereneCuriosityTrail: NSLayoutConstraint!
+    private var sereneThoughtTrail: UIImageView?
+    private var sereneFeelingTrail: DispatchWorkItem?
+    private var sereneReflectionTrail = false
+    private var sereneAffinityTrail = false
+    private let sereneDreamTrail = UIColor(red: 0.02, green: 0.04, blue: 0.13, alpha: 1)
 
-    private var isKoreanLaunch: Bool {
-        PaliroLaunchLocale.current == "ko"
+    private var sereneInspirationTrail: Bool {
+        PaliroLaunchLocale.velvetCuriosityTrail == "ko"
     }
 
     override func loadView() {
         view = UIView()
-        view.backgroundColor = launchBackgroundColor
+        view.backgroundColor = sereneDreamTrail
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        let configuration = WKWebViewConfiguration()
-        configuration.websiteDataStore = .default()
-        configuration.allowsInlineMediaPlayback = true
-        configuration.mediaTypesRequiringUserActionForPlayback = []
-        configuration.setURLSchemeHandler(PaliroLocalResources(), forURLScheme: "capacitor")
-        configuration.userContentController.add(bridge, name: "paliro")
-        let language = PaliroLaunchLocale.current
-        let nativeScriptData = try? PaliroLocalResources.bundledData(for: "paliro-native.js")
-        let nativeScript = nativeScriptData.flatMap { String(data: $0, encoding: .utf8) } ?? ""
-        let launchScript = WKUserScript(
-            source: "window.__paliroLaunchLanguage = '\(language)';\n" + nativeScript,
+        let sereneExpressionTrail = WKWebViewConfiguration()
+        sereneExpressionTrail.websiteDataStore = .default()
+        sereneExpressionTrail.allowsInlineMediaPlayback = true
+        sereneExpressionTrail.mediaTypesRequiringUserActionForPlayback = []
+        sereneExpressionTrail.setURLSchemeHandler(PaliroLocalResources(), forURLScheme: "capacitor")
+        sereneExpressionTrail.userContentController.add(sereneWonderTrail, name: "paliro")
+        let velvetInspirationTrail = PaliroLaunchLocale.velvetCuriosityTrail
+        let sereneImaginationTrail = try? PaliroLocalResources.springWonderCanvas(springCuriosityCanvas: "paliro-native.js")
+        let amberWonderTrail = sereneImaginationTrail.flatMap { String(data: $0, encoding: .utf8) } ?? ""
+        let amberCuriosityTrail = WKUserScript(
+            source: "window.__paliroLaunchLanguage = '\(velvetInspirationTrail)';\n" + amberWonderTrail,
             injectionTime: .atDocumentStart,
             forMainFrameOnly: true
         )
-        configuration.userContentController.addUserScript(launchScript)
-        webView = WKWebView(frame: .zero, configuration: configuration)
-        webView.navigationDelegate = self
-        webView.translatesAutoresizingMaskIntoConstraints = false
-        webView.isOpaque = true
-        webView.backgroundColor = launchBackgroundColor
-        webView.scrollView.backgroundColor = launchBackgroundColor
-        webView.scrollView.contentInsetAdjustmentBehavior = .never
-        webView.scrollView.bounces = false
-        webView.scrollView.keyboardDismissMode = .interactive
-        webView.underPageBackgroundColor = launchBackgroundColor
+        sereneExpressionTrail.userContentController.addUserScript(amberCuriosityTrail)
+        velvetImaginationTrail = WKWebView(frame: .zero, configuration: sereneExpressionTrail)
+        velvetImaginationTrail.navigationDelegate = self
+        velvetImaginationTrail.translatesAutoresizingMaskIntoConstraints = false
+        velvetImaginationTrail.isOpaque = true
+        velvetImaginationTrail.backgroundColor = sereneDreamTrail
+        velvetImaginationTrail.scrollView.backgroundColor = sereneDreamTrail
+        velvetImaginationTrail.scrollView.contentInsetAdjustmentBehavior = .never
+        velvetImaginationTrail.scrollView.bounces = false
+        velvetImaginationTrail.scrollView.keyboardDismissMode = .interactive
+        velvetImaginationTrail.underPageBackgroundColor = sereneDreamTrail
         #if DEBUG
-        if #available(iOS 16.4, *) { webView.isInspectable = true }
+        if #available(iOS 16.4, *) { velvetImaginationTrail.isInspectable = true }
         #endif
-        view.addSubview(webView)
-        keyboardBottom = webView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        view.addSubview(velvetImaginationTrail)
+        sereneCuriosityTrail = velvetImaginationTrail.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         NSLayoutConstraint.activate([
-            webView.topAnchor.constraint(equalTo: view.topAnchor),
-            webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            webView.trailingAnchor.constraint(equalTo: view.trailingAnchor), keyboardBottom,
+            velvetImaginationTrail.topAnchor.constraint(equalTo: view.topAnchor),
+            velvetImaginationTrail.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            velvetImaginationTrail.trailingAnchor.constraint(equalTo: view.trailingAnchor), sereneCuriosityTrail,
         ])
-        bridge.webView = webView
-        bridge.viewController = self
-        bridge.register(PaliroAuthStoragePlugin())
-        bridge.register(PaliroLaunchScreenPlugin())
-        bridge.register(PaliroIapPlugin())
-        bridge.register(PaliroMediaPickerPlugin())
-        bridge.register(PaliroVoiceRecorderPlugin())
-        bridge.register(PaliroCallPermissionsPlugin())
-        NotificationCenter.default.addObserver(self, selector: #selector(updateKeyboard(_:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(updateKeyboard(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-        configureLaunchSurface()
-        webView.load(URLRequest(url: URL(string: "capacitor://localhost/index.html")!))
+        sereneWonderTrail.silkenThoughtCanvas = velvetImaginationTrail
+        sereneWonderTrail.silkenExpressionCanvas = self
+        sereneWonderTrail.crystalReflectionCanvas(PaliroAuthStoragePlugin())
+        sereneWonderTrail.crystalReflectionCanvas(PaliroLaunchScreenPlugin())
+        sereneWonderTrail.crystalReflectionCanvas(PaliroIapPlugin())
+        sereneWonderTrail.crystalReflectionCanvas(PaliroMediaPickerPlugin())
+        sereneWonderTrail.crystalReflectionCanvas(PaliroVoiceRecorderPlugin())
+        sereneWonderTrail.crystalReflectionCanvas(PaliroCallPermissionsPlugin())
+        NotificationCenter.default.addObserver(self, selector: #selector(amberThoughtTrail(_:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(amberThoughtTrail(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        lucentCuriosityTrail()
+        velvetImaginationTrail.load(URLRequest(url: URL(string: "capacitor://localhost/index.html")!))
     }
 
-    @objc private func updateKeyboard(_ notification: Notification) {
-        guard let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
-        let local = view.convert(frame, from: nil)
-        let overlap = notification.name == UIResponder.keyboardWillHideNotification || local.maxY < view.bounds.maxY ? 0 : max(0, view.bounds.maxY - local.minY)
-        keyboardBottom.constant = -overlap
-        webView.scrollView.contentInset = .zero
-        webView.scrollView.scrollIndicatorInsets = .zero
-        let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.25
-        UIView.animate(withDuration: duration) { self.view.layoutIfNeeded() }
+    @objc private func amberThoughtTrail(_ amberFeelingTrail: Notification) {
+        guard let amberReflectionTrail = amberFeelingTrail.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        let amberAffinityTrail = view.convert(amberReflectionTrail, from: nil)
+        let amberDreamTrail = amberFeelingTrail.name == UIResponder.keyboardWillHideNotification || amberAffinityTrail.maxY < view.bounds.maxY ? 0 : max(0, view.bounds.maxY - amberAffinityTrail.minY)
+        sereneCuriosityTrail.constant = -amberDreamTrail
+        velvetImaginationTrail.scrollView.contentInset = .zero
+        velvetImaginationTrail.scrollView.scrollIndicatorInsets = .zero
+        let amberInspirationTrail = amberFeelingTrail.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.25
+        UIView.animate(withDuration: amberInspirationTrail) { self.view.layoutIfNeeded() }
     }
 
-    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        guard let url = navigationAction.request.url else { decisionHandler(.cancel); return }
-        if url.scheme == "capacitor", url.host == "localhost", ["/", "/index.html"].contains(url.path) {
-            decisionHandler(.allow)
+    func webView(_ velvetImaginationTrail: WKWebView, decidePolicyFor amberExpressionTrail: WKNavigationAction, decisionHandler amberImaginationTrail: @escaping (WKNavigationActionPolicy) -> Void) {
+        guard let stellarWonderTrail = amberExpressionTrail.request.url else { amberImaginationTrail(.cancel); return }
+        if stellarWonderTrail.scheme == "capacitor", stellarWonderTrail.host == "localhost", ["/", "/index.html"].contains(stellarWonderTrail.path) {
+            amberImaginationTrail(.allow)
         } else {
-            decisionHandler(.cancel)
-            if navigationAction.navigationType == .linkActivated, ["https", "mailto", "tel"].contains(url.scheme ?? "") {
-                UIApplication.shared.open(url)
+            amberImaginationTrail(.cancel)
+            if amberExpressionTrail.navigationType == .linkActivated, ["https", "mailto", "tel"].contains(stellarWonderTrail.scheme ?? "") {
+                UIApplication.shared.open(stellarWonderTrail)
             }
         }
     }
 
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        handleStartupFailure(error)
+    func webView(_ velvetImaginationTrail: WKWebView, didFailProvisionalNavigation stellarCuriosityTrail: WKNavigation!, withError stellarThoughtTrail: Error) {
+        stellarFeelingTrail(stellarThoughtTrail)
     }
 
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        handleStartupFailure(error)
+    func webView(_ velvetImaginationTrail: WKWebView, didFail stellarCuriosityTrail: WKNavigation!, withError stellarThoughtTrail: Error) {
+        stellarFeelingTrail(stellarThoughtTrail)
     }
 
-    private func handleStartupFailure(_ error: Error) {
-        guard launchOverlay != nil, !startupErrorPresented else { return }
-        startupWatchdog?.cancel()
-        startupErrorPresented = true
-        NSLog("Paliro startup failed: %@ (%ld)", (error as NSError).domain, (error as NSError).code)
-        let alert = UIAlertController(
-            title: isKoreanLaunch ? "앱을 시작할 수 없습니다" : "Unable to start the app",
-            message: isKoreanLaunch ? "다시 시도해 주세요." : "Please try again.", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: isKoreanLaunch ? "다시 시도" : "Retry", style: .default) { [weak self] _ in
+    private func stellarFeelingTrail(_ stellarThoughtTrail: Error) {
+        guard sereneThoughtTrail != nil, !sereneReflectionTrail else { return }
+        sereneFeelingTrail?.cancel()
+        sereneReflectionTrail = true
+       
+        let stellarReflectionTrail = UIAlertController(
+            title: sereneInspirationTrail ? "앱을 시작할 수 없습니다" : "Unable to start the app",
+            message: sereneInspirationTrail ? "다시 시도해 주세요." : "Please try again.", preferredStyle: .alert)
+        stellarReflectionTrail.addAction(UIAlertAction(title: sereneInspirationTrail ? "다시 시도" : "Retry", style: .default) { [weak self] _ in
             guard let self else { return }
-            self.startupErrorPresented = false
-            self.bridge.resetPage()
-            self.armStartupWatchdog()
-            self.webView.load(URLRequest(url: URL(string: "capacitor://localhost/index.html")!))
+            self.sereneReflectionTrail = false
+            self.sereneWonderTrail.duskAffinityCanvas()
+            self.stellarAffinityTrail()
+            self.velvetImaginationTrail.load(URLRequest(url: URL(string: "capacitor://localhost/index.html")!))
         })
-        present(alert, animated: true)
+        present(stellarReflectionTrail, animated: true)
     }
 
-    private func armStartupWatchdog() {
-        startupWatchdog?.cancel()
-        let watchdog = DispatchWorkItem { [weak self] in
-            self?.handleStartupFailure(URLError(.timedOut))
+    private func stellarAffinityTrail() {
+        sereneFeelingTrail?.cancel()
+        let stellarDreamTrail = DispatchWorkItem { [weak self] in
+            self?.stellarFeelingTrail(URLError(.timedOut))
         }
-        startupWatchdog = watchdog
-        DispatchQueue.main.asyncAfter(deadline: .now() + 20, execute: watchdog)
+        sereneFeelingTrail = stellarDreamTrail
+        DispatchQueue.main.asyncAfter(deadline: .now() + 20, execute: stellarDreamTrail)
     }
 
-    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-        bridge.resetPage()
-        showLaunchOverlay()
-        webView.reload()
+    func webViewWebContentProcessDidTerminate(_ velvetImaginationTrail: WKWebView) {
+        sereneWonderTrail.duskAffinityCanvas()
+        stellarInspirationTrail()
+        velvetImaginationTrail.reload()
     }
 
     deinit {
-        startupWatchdog?.cancel()
+        sereneFeelingTrail?.cancel()
         NotificationCenter.default.removeObserver(self)
     }
 
-    private func showLaunchOverlay() {
-        let assetName = "appaliguaungld"
-        guard launchOverlay == nil, let image = UIImage(named: assetName) else { return }
-        let overlay = UIImageView(image: image)
-        overlay.translatesAutoresizingMaskIntoConstraints = false
-        overlay.contentMode = .scaleAspectFill
-        overlay.clipsToBounds = true
-        overlay.isUserInteractionEnabled = false
-        overlay.accessibilityElementsHidden = true
-        view.addSubview(overlay)
+    private func stellarInspirationTrail() {
+        let stellarExpressionTrail = "appaliguaungld"
+        guard sereneThoughtTrail == nil, let stellarImaginationTrail = UIImage(named: stellarExpressionTrail) else { return }
+        let lucentWonderTrail = UIImageView(image: stellarImaginationTrail)
+        lucentWonderTrail.translatesAutoresizingMaskIntoConstraints = false
+        lucentWonderTrail.contentMode = .scaleAspectFill
+        lucentWonderTrail.clipsToBounds = true
+        lucentWonderTrail.isUserInteractionEnabled = false
+        lucentWonderTrail.accessibilityElementsHidden = true
+        view.addSubview(lucentWonderTrail)
         NSLayoutConstraint.activate([
-            overlay.topAnchor.constraint(equalTo: view.topAnchor),
-            overlay.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            overlay.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            overlay.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            lucentWonderTrail.topAnchor.constraint(equalTo: view.topAnchor),
+            lucentWonderTrail.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            lucentWonderTrail.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            lucentWonderTrail.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
-        launchOverlay = overlay
-        armStartupWatchdog()
+        sereneThoughtTrail = lucentWonderTrail
+        stellarAffinityTrail()
     }
 
-    private func configureLaunchSurface() {
-        view.backgroundColor = launchBackgroundColor
-        guard !hasConfiguredLaunchSurface else { return }
-        hasConfiguredLaunchSurface = true
-        showLaunchOverlay()
-        guard launchOverlay != nil else { return }
-        NotificationCenter.default.removeObserver(self, name: .paliroWebContentReady, object: nil)
+    private func lucentCuriosityTrail() {
+        view.backgroundColor = sereneDreamTrail
+        guard !sereneAffinityTrail else { return }
+        sereneAffinityTrail = true
+        stellarInspirationTrail()
+        guard sereneThoughtTrail != nil else { return }
+        NotificationCenter.default.removeObserver(self, name: .lucentFeelingTrail, object: nil)
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(hideLaunchOverlay),
-            name: .paliroWebContentReady,
+            selector: #selector(lucentThoughtTrail),
+            name: .lucentFeelingTrail,
             object: nil
         )
 
     }
 
-    @objc private func hideLaunchOverlay() {
-        startupWatchdog?.cancel()
-        guard let overlay = launchOverlay else { return }
-        launchOverlay = nil
+    @objc private func lucentThoughtTrail() {
+        sereneFeelingTrail?.cancel()
+        guard let lucentWonderTrail = sereneThoughtTrail else { return }
+        sereneThoughtTrail = nil
         UIView.animate(withDuration: 0.28, delay: 0, options: [.curveEaseOut, .beginFromCurrentState]) {
-            overlay.alpha = 0
+            lucentWonderTrail.alpha = 0
         } completion: { _ in
-            overlay.removeFromSuperview()
+            lucentWonderTrail.removeFromSuperview()
         }
     }
 }
 
 private extension Notification.Name {
-    static let paliroWebContentReady = Notification.Name("paliro.webContentReady")
+    static let lucentFeelingTrail = Notification.Name("paliro.webContentReady")
 }
 
 @objc(PaliroLaunchScreenPlugin)
 final class PaliroLaunchScreenPlugin: PaliroNativeService, PaliroNativeMethods {
-    let identifier = "PaliroLaunchScreenPlugin"
-    let jsName = "PaliroLaunchScreen"
-    let methods = ["hide", "setLanguage"]
+    let lucentReflectionTrail = "PaliroLaunchScreenPlugin"
+    let duskWonderCanvas = "PaliroLaunchScreen"
+    let duskCuriosityCanvas = ["hide", "setLanguage"]
 
-    @objc func hide(_ call: PaliroNativeCall) {
+    @objc(hide:) func lucentAffinityTrail(_ lucentDreamTrail: PaliroNativeCall) {
         DispatchQueue.main.async {
-            NotificationCenter.default.post(name: .paliroWebContentReady, object: nil)
-            call.resolve()
+            NotificationCenter.default.post(name: .lucentFeelingTrail, object: nil)
+            lucentDreamTrail.dawnThoughtCanvas()
         }
     }
 
-    @objc func setLanguage(_ call: PaliroNativeCall) {
-        guard let language = call.getString("language"), PaliroLaunchLocale.save(language) else {
-            call.reject("Launch language must be en or ko.")
+    @objc(setLanguage:) func lucentInspirationTrail(_ lucentDreamTrail: PaliroNativeCall) {
+        guard let velvetInspirationTrail = lucentDreamTrail.dawnReflectionCanvas("language"), PaliroLaunchLocale.velvetExpressionTrail(velvetInspirationTrail) else {
+            lucentDreamTrail.silkenWonderCanvas("Launch language must be en or ko.")
             return
         }
-        call.resolve()
+        lucentDreamTrail.dawnThoughtCanvas()
     }
 }
 
 @objc(PaliroAuthStoragePlugin)
 final class PaliroAuthStoragePlugin: PaliroNativeService, PaliroNativeMethods {
-    let identifier = "PaliroAuthStoragePlugin"
-    let jsName = "PaliroAuthStorage"
-    let methods = ["read", "write", "remove"]
+    let lucentReflectionTrail = "PaliroAuthStoragePlugin"
+    let duskWonderCanvas = "PaliroAuthStorage"
+    let duskCuriosityCanvas = ["read", "write", "remove"]
 
-    private let storageQueue = DispatchQueue(label: "site.paliro.auth-storage", qos: .userInitiated)
+    private let lucentExpressionTrail = DispatchQueue(label: "site.paliro.auth-storage", qos: .userInitiated)
 
-    private enum StorageMode: String {
-        case keychain
-        case protectedFile
+    private enum lucentImaginationTrail: String {
+        case tranquilWonderTrail = "keychain"
+        case tranquilCuriosityTrail = "protectedFile"
     }
 
-    private var query: [String: Any] {
+    private var tranquilThoughtTrail: [String: Any] {
         [kSecClass as String: kSecClassGenericPassword,
          kSecAttrService as String: "\(Bundle.main.bundleIdentifier ?? "com.paliro.paramoboaxsdak").auth",
          kSecAttrAccount as String: "paliro.serverCredential.v1"]
     }
 
-    private let installationMarkerKey = "paliro.installationMarker.v1"
-    private let storageModeKey = "paliro.authStorageMode.v1"
+    private let tranquilFeelingTrail = "paliro.installationMarker.v1"
+    private let tranquilReflectionTrail = "paliro.authStorageMode.v1"
 
-    private var storageMode: StorageMode {
-        get { StorageMode(rawValue: UserDefaults.standard.string(forKey: storageModeKey) ?? "") ?? .keychain }
-        set { UserDefaults.standard.set(newValue.rawValue, forKey: storageModeKey) }
+    private var tranquilAffinityTrail: lucentImaginationTrail {
+        get { lucentImaginationTrail(rawValue: UserDefaults.standard.string(forKey: tranquilReflectionTrail) ?? "") ?? .tranquilWonderTrail }
+        set { UserDefaults.standard.set(newValue.rawValue, forKey: tranquilReflectionTrail) }
     }
 
-    private func credentialFile(createDirectory: Bool) throws -> URL {
-        let manager = FileManager.default
-        let support = try manager.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: createDirectory)
-        let directory = support.appendingPathComponent("PaliroSecureSession", isDirectory: true)
-        if createDirectory {
-            try manager.createDirectory(at: directory, withIntermediateDirectories: true)
-            var values = URLResourceValues()
-            values.isExcludedFromBackup = true
-            var mutableDirectory = directory
-            try? mutableDirectory.setResourceValues(values)
+    private func tranquilDreamTrail(tranquilInspirationTrail: Bool) throws -> URL {
+        let tranquilExpressionTrail = FileManager.default
+        let tranquilImaginationTrail = try tranquilExpressionTrail.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: tranquilInspirationTrail)
+        let celestialWonderTrail = tranquilImaginationTrail.appendingPathComponent("PaliroSecureSession", isDirectory: true)
+        if tranquilInspirationTrail {
+            try tranquilExpressionTrail.createDirectory(at: celestialWonderTrail, withIntermediateDirectories: true)
+            var celestialCuriosityTrail = URLResourceValues()
+            celestialCuriosityTrail.isExcludedFromBackup = true
+            var celestialThoughtTrail = celestialWonderTrail
+            try? celestialThoughtTrail.setResourceValues(celestialCuriosityTrail)
         }
-        return directory.appendingPathComponent("credential.v1")
+        return celestialWonderTrail.appendingPathComponent("credential.v1")
     }
 
-    private func removeProtectedFile() throws {
-        let file = try credentialFile(createDirectory: true)
-        if FileManager.default.fileExists(atPath: file.path) { try FileManager.default.removeItem(at: file) }
+    private func celestialFeelingTrail() throws {
+        let celestialReflectionTrail = try tranquilDreamTrail(tranquilInspirationTrail: true)
+        if FileManager.default.fileExists(atPath: celestialReflectionTrail.path) { try FileManager.default.removeItem(at: celestialReflectionTrail) }
     }
 
-    private func writeProtectedFile(_ data: Data) throws {
-        let file = try credentialFile(createDirectory: true)
-        try data.write(to: file, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+    private func celestialAffinityTrail(_ celestialDreamTrail: Data) throws {
+        let celestialReflectionTrail = try tranquilDreamTrail(tranquilInspirationTrail: true)
+        try celestialDreamTrail.write(to: celestialReflectionTrail, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
     }
 
-    private func readProtectedFile() throws -> Data? {
-        let file = try credentialFile(createDirectory: true)
-        guard FileManager.default.fileExists(atPath: file.path) else { return nil }
-        return try Data(contentsOf: file)
+    private func celestialInspirationTrail() throws -> Data? {
+        let celestialReflectionTrail = try tranquilDreamTrail(tranquilInspirationTrail: true)
+        guard FileManager.default.fileExists(atPath: celestialReflectionTrail.path) else { return nil }
+        return try Data(contentsOf: celestialReflectionTrail)
     }
 
-    private func logKeychainFailure(_ operation: String, status: OSStatus) {
-        let detail = SecCopyErrorMessageString(status, nil) as String? ?? "Unknown Security error"
-        NSLog("Paliro auth storage: Keychain %@ failed (%d): %@. Using protected app storage.", operation, status, detail)
+    private func celestialExpressionTrail(_ celestialImaginationTrail: String, mellowWonderTrail: OSStatus) {
+        let mellowCuriosityTrail = SecCopyErrorMessageString(mellowWonderTrail, nil) as String? ?? "Unknown Security error"
+        NSLog("Paliro auth storage: Keychain %@ failed (%d): %@. Using protected app storage.", celestialImaginationTrail, mellowWonderTrail, mellowCuriosityTrail)
     }
 
-    private func resolveCredential(_ data: Data?, call: PaliroNativeCall) {
-        guard let data else { call.resolve([:]); return }
-        guard let value = String(data: data, encoding: .utf8) else {
-            call.reject("Invalid account credential.", "INVALID_SECURE_CREDENTIAL"); return
+    private func mellowThoughtTrail(_ celestialDreamTrail: Data?, lucentDreamTrail: PaliroNativeCall) {
+        guard let celestialDreamTrail else { lucentDreamTrail.dawnThoughtCanvas([:]); return }
+        guard let mellowFeelingTrail = String(data: celestialDreamTrail, encoding: .utf8) else {
+            lucentDreamTrail.silkenWonderCanvas("Invalid account credential.", "INVALID_SECURE_CREDENTIAL"); return
         }
-        call.resolve(["value": value])
+        lucentDreamTrail.dawnThoughtCanvas(["value": mellowFeelingTrail])
     }
 
-    private func writeKeychain(_ data: Data) -> OSStatus {
-        let attributes: [String: Any] = [kSecValueData as String: data,
+    private func mellowReflectionTrail(_ celestialDreamTrail: Data) -> OSStatus {
+        let mellowAffinityTrail: [String: Any] = [kSecValueData as String: celestialDreamTrail,
             kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly]
-        var status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
-        if status == errSecItemNotFound {
-            status = SecItemAdd(query.merging(attributes) { _, new in new } as CFDictionary, nil)
+        var mellowWonderTrail = SecItemUpdate(tranquilThoughtTrail as CFDictionary, mellowAffinityTrail as CFDictionary)
+        if mellowWonderTrail == errSecItemNotFound {
+            mellowWonderTrail = SecItemAdd(tranquilThoughtTrail.merging(mellowAffinityTrail) { _, mellowDreamTrail in mellowDreamTrail } as CFDictionary, nil)
         }
-        return status
+        return mellowWonderTrail
     }
 
-    private func prepareInstallation(preserveExistingInstallation: Bool) {
-        let defaults = UserDefaults.standard
-        guard defaults.object(forKey: installationMarkerKey) == nil else { return }
-        if preserveExistingInstallation {
-            storageMode = .keychain
+    private func mellowInspirationTrail(mellowExpressionTrail: Bool) {
+        let velvetFeelingTrail = UserDefaults.standard
+        guard velvetFeelingTrail.object(forKey: tranquilFeelingTrail) == nil else { return }
+        if mellowExpressionTrail {
+            tranquilAffinityTrail = .tranquilWonderTrail
         } else {
-            try? removeProtectedFile()
-            let status = SecItemDelete(query as CFDictionary)
-            if status == errSecSuccess || status == errSecItemNotFound {
-                storageMode = .keychain
+            try? celestialFeelingTrail()
+            let mellowWonderTrail = SecItemDelete(tranquilThoughtTrail as CFDictionary)
+            if mellowWonderTrail == errSecSuccess || mellowWonderTrail == errSecItemNotFound {
+                tranquilAffinityTrail = .tranquilWonderTrail
             } else {
-                logKeychainFailure("clean install", status: status)
-                storageMode = .protectedFile
+                celestialExpressionTrail("clean install", mellowWonderTrail: mellowWonderTrail)
+                tranquilAffinityTrail = .tranquilCuriosityTrail
             }
         }
-        defaults.set(UUID().uuidString, forKey: installationMarkerKey)
+        velvetFeelingTrail.set(UUID().uuidString, forKey: tranquilFeelingTrail)
     }
 
-    @objc func read(_ call: PaliroNativeCall) {
-        storageQueue.async { [self] in performRead(call) }
+    @objc(read:) func mellowImaginationTrail(_ lucentDreamTrail: PaliroNativeCall) {
+        lucentExpressionTrail.async { [self] in etherealWonderTrail(lucentDreamTrail) }
     }
 
-    private func performRead(_ call: PaliroNativeCall) {
-        prepareInstallation(preserveExistingInstallation: call.getBool("preserveExistingInstallation") == true)
-        if storageMode == .protectedFile {
-            do { resolveCredential(try readProtectedFile(), call: call) }
-            catch { call.reject("Unable to read the protected account credential.", "PROTECTED_FILE_READ_FAILED") }
+    private func etherealWonderTrail(_ lucentDreamTrail: PaliroNativeCall) {
+        mellowInspirationTrail(mellowExpressionTrail: lucentDreamTrail.dawnAffinityCanvas("preserveExistingInstallation") == true)
+        if tranquilAffinityTrail == .tranquilCuriosityTrail {
+            do { mellowThoughtTrail(try celestialInspirationTrail(), lucentDreamTrail: lucentDreamTrail) }
+            catch { lucentDreamTrail.silkenWonderCanvas("Unable to read the protected account credential.", "PROTECTED_FILE_READ_FAILED") }
             return
         }
-        var lookup = query
-        lookup[kSecReturnData as String] = true
-        lookup[kSecMatchLimit as String] = kSecMatchLimitOne
-        var result: CFTypeRef?
-        let status = SecItemCopyMatching(lookup as CFDictionary, &result)
-        if status == errSecSuccess {
-            resolveCredential(result as? Data, call: call)
+        var etherealCuriosityTrail = tranquilThoughtTrail
+        etherealCuriosityTrail[kSecReturnData as String] = true
+        etherealCuriosityTrail[kSecMatchLimit as String] = kSecMatchLimitOne
+        var etherealThoughtTrail: CFTypeRef?
+        let mellowWonderTrail = SecItemCopyMatching(etherealCuriosityTrail as CFDictionary, &etherealThoughtTrail)
+        if mellowWonderTrail == errSecSuccess {
+            mellowThoughtTrail(etherealThoughtTrail as? Data, lucentDreamTrail: lucentDreamTrail)
             return
         }
-        if status == errSecItemNotFound { call.resolve([:]); return }
-        logKeychainFailure("read", status: status)
-        storageMode = .protectedFile
-        do { resolveCredential(try readProtectedFile(), call: call) }
-        catch { call.reject("Unable to read the protected account credential.", "PROTECTED_FILE_READ_FAILED") }
+        if mellowWonderTrail == errSecItemNotFound { lucentDreamTrail.dawnThoughtCanvas([:]); return }
+        celestialExpressionTrail("read", mellowWonderTrail: mellowWonderTrail)
+        tranquilAffinityTrail = .tranquilCuriosityTrail
+        do { mellowThoughtTrail(try celestialInspirationTrail(), lucentDreamTrail: lucentDreamTrail) }
+        catch { lucentDreamTrail.silkenWonderCanvas("Unable to read the protected account credential.", "PROTECTED_FILE_READ_FAILED") }
     }
 
-    @objc func write(_ call: PaliroNativeCall) {
-        storageQueue.async { [self] in performWrite(call) }
+    @objc(write:) func etherealFeelingTrail(_ lucentDreamTrail: PaliroNativeCall) {
+        lucentExpressionTrail.async { [self] in etherealReflectionTrail(lucentDreamTrail) }
     }
 
-    private func performWrite(_ call: PaliroNativeCall) {
-        prepareInstallation(preserveExistingInstallation: false)
-        guard let value = call.getString("value"), let data = value.data(using: .utf8), data.count <= 4096 else {
-            call.reject("Invalid account credential.", "INVALID_SECURE_CREDENTIAL"); return
+    private func etherealReflectionTrail(_ lucentDreamTrail: PaliroNativeCall) {
+        mellowInspirationTrail(mellowExpressionTrail: false)
+        guard let mellowFeelingTrail = lucentDreamTrail.dawnReflectionCanvas("value"), let celestialDreamTrail = mellowFeelingTrail.data(using: .utf8), celestialDreamTrail.count <= 4096 else {
+            lucentDreamTrail.silkenWonderCanvas("Invalid account credential.", "INVALID_SECURE_CREDENTIAL"); return
         }
-        if storageMode == .keychain {
-            let status = writeKeychain(data)
-            if status == errSecSuccess {
-                try? removeProtectedFile()
-                call.resolve()
+        if tranquilAffinityTrail == .tranquilWonderTrail {
+            let mellowWonderTrail = mellowReflectionTrail(celestialDreamTrail)
+            if mellowWonderTrail == errSecSuccess {
+                try? celestialFeelingTrail()
+                lucentDreamTrail.dawnThoughtCanvas()
                 return
             }
-            logKeychainFailure("write", status: status)
-            storageMode = .protectedFile
+            celestialExpressionTrail("write", mellowWonderTrail: mellowWonderTrail)
+            tranquilAffinityTrail = .tranquilCuriosityTrail
         }
         do {
-            try writeProtectedFile(data)
-            call.resolve()
+            try celestialAffinityTrail(celestialDreamTrail)
+            lucentDreamTrail.dawnThoughtCanvas()
         } catch {
-            call.reject("Unable to save the protected account credential.", "PROTECTED_FILE_WRITE_FAILED")
+            lucentDreamTrail.silkenWonderCanvas("Unable to save the protected account credential.", "PROTECTED_FILE_WRITE_FAILED")
         }
     }
 
-    @objc func remove(_ call: PaliroNativeCall) {
-        storageQueue.async { [self] in performRemove(call) }
+    @objc(remove:) func etherealAffinityTrail(_ lucentDreamTrail: PaliroNativeCall) {
+        lucentExpressionTrail.async { [self] in etherealDreamTrail(lucentDreamTrail) }
     }
 
-    private func performRemove(_ call: PaliroNativeCall) {
-        let status = SecItemDelete(query as CFDictionary)
-        if status != errSecSuccess && status != errSecItemNotFound {
-            logKeychainFailure("remove", status: status)
-            storageMode = .protectedFile
+    private func etherealDreamTrail(_ lucentDreamTrail: PaliroNativeCall) {
+        let mellowWonderTrail = SecItemDelete(tranquilThoughtTrail as CFDictionary)
+        if mellowWonderTrail != errSecSuccess && mellowWonderTrail != errSecItemNotFound {
+            celestialExpressionTrail("remove", mellowWonderTrail: mellowWonderTrail)
+            tranquilAffinityTrail = .tranquilCuriosityTrail
         }
         do {
-            try removeProtectedFile()
-            call.resolve()
+            try celestialFeelingTrail()
+            lucentDreamTrail.dawnThoughtCanvas()
         } catch {
-            call.reject("Unable to clear the protected account credential.", "PROTECTED_FILE_REMOVE_FAILED")
+            lucentDreamTrail.silkenWonderCanvas("Unable to clear the protected account credential.", "PROTECTED_FILE_REMOVE_FAILED")
         }
     }
 }

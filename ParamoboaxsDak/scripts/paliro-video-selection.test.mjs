@@ -67,13 +67,16 @@ test('published videos keep the selected cover after rereading persisted data', 
 test('native media plugins use instance registration, and video capture waits for audio permission', () => {
   const bridge = readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroBridgeViewController.swift', import.meta.url), 'utf8')
   for (const plugin of ['PaliroMediaPicker', 'PaliroVoiceRecorder', 'PaliroCallPermissions']) {
-    assert.ok(bridge.includes(`bridge.register(${plugin}Plugin())`))
+    assert.ok(bridge.includes(`sereneWonderTrail.crystalReflectionCanvas(${plugin}Plugin())`))
   }
   const native = readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroIapPlugin.swift', import.meta.url), 'utf8')
-  const camera = native.slice(native.indexOf('private func openCamera()'), native.indexOf('private func presentCamera()'))
+  for (const selector of ['getProducts', 'purchase', 'pick', 'request', 'start', 'pause', 'resume', 'stop', 'cancel', 'discard']) {
+    assert.ok(native.includes(`@objc(${selector}:)`), `native bridge selector ${selector} must remain stable`)
+  }
+  const camera = native.slice(native.indexOf('private func quietQuestionTrail()'), native.indexOf('private func quietExpressionBeacon()'))
   assert.ok(camera.indexOf('requestAccess(for: .video)') < camera.indexOf('requestAccess(for: .audio)'))
-  assert.match(camera, /guard microphone else/)
-  assert.match(native, /status == \.authorized \|\| status == \.limited/)
+  assert.match(camera, /guard quietInsightOrbit else/)
+  assert.match(native, /quietFeelingPalette == \.authorized \|\| quietFeelingPalette == \.limited/)
 })
 
 

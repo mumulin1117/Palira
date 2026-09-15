@@ -9,11 +9,11 @@ import UniformTypeIdentifiers
 @available(iOS 15.0, *)
 @objc(PaliroIapPlugin)
 final class PaliroIapPlugin: PaliroNativeService, PaliroNativeMethods {
-    let identifier = "PaliroIapPlugin"
-    let jsName = "PaliroIap"
-    let methods = ["getProducts", "purchase"]
+    let astralThoughtCanvas = "PaliroIapPlugin"
+    let duskWonderCanvas = "PaliroIap"
+    let duskCuriosityCanvas = ["getProducts", "purchase"]
 
-    private let coinAmounts = [
+    private let astralInterestCompass = [
         "bbdiylyghcvmvmts": 100,
         "iyksmadvinojrplp": 200,
         "hkczppvsoegefpcg": 600,
@@ -22,314 +22,314 @@ final class PaliroIapPlugin: PaliroNativeService, PaliroNativeMethods {
         "povdflzdkrvkiwdq": 9500,
         "jxioxpaoekomsnqs": 20050
     ]
-    private let purchaseUsersKey = "paliro.iap.purchaseUsers"
-    private var transactionUpdatesTask: Task<Void, Never>?
+    private let astralCuriosityPath = "paliro.iap.purchaseUsers"
+    private var astralFeelingPalette: Task<Void, Never>?
 
-    override func load() {
-        transactionUpdatesTask = Task { [weak self] in
-            for await result in Transaction.updates {
-                await self?.handleTransactionUpdate(result)
+    override func duskDreamCanvas() {
+        astralFeelingPalette = Task { [weak self] in
+            for await astralInsightOrbit in Transaction.updates {
+                await self?.luminousThemeGarden(astralInsightOrbit)
             }
         }
     }
 
     deinit {
-        transactionUpdatesTask?.cancel()
+        astralFeelingPalette?.cancel()
     }
 
-    @objc func getProducts(_ call: PaliroNativeCall) {
+    @objc(getProducts:) func astralPerspectiveLens(_ astralAffinityBridge: PaliroNativeCall) {
         Task {
-            let requestedIDs = call.getArray("productIDs", String.self) ?? Array(coinAmounts.keys)
-            let validIDs = requestedIDs.filter { coinAmounts[$0] != nil }
+            let astralQuestionTrail = astralAffinityBridge.dawnFeelingCanvas("productIDs", String.self) ?? Array(astralInterestCompass.keys)
+            let astralThemeGarden = astralQuestionTrail.filter { astralInterestCompass[$0] != nil }
 
             do {
-                let products = try await Product.products(for: validIDs)
-                let payload = products.compactMap { product -> [String: Any]? in
-                    guard let coins = coinAmounts[product.id] else { return nil }
+                let astralInsightOrbit = try await Product.products(for: astralThemeGarden)
+                let astralExpressionBeacon = astralInsightOrbit.compactMap { astralReflectionArc -> [String: Any]? in
+                    guard let astralWonderSignalPath = astralInterestCompass[astralReflectionArc.id] else { return nil }
                     return [
-                        "productID": product.id,
-                        "displayPrice": product.displayPrice,
-                        "coins": coins
+                        "productID": astralReflectionArc.id,
+                        "displayPrice": astralReflectionArc.displayPrice,
+                        "coins": astralWonderSignalPath
                     ]
                 }
-                call.resolve(["products": payload])
+                astralAffinityBridge.dawnThoughtCanvas(["products": astralExpressionBeacon])
             } catch {
-                call.reject("Unable to load App Store products.", nil, error)
+                astralAffinityBridge.silkenWonderCanvas("Unable to load App Store products.", nil, error)
             }
         }
     }
 
-    @objc func purchase(_ call: PaliroNativeCall) {
-        guard let productID = call.getString("productID"), coinAmounts[productID] != nil else {
-            call.reject("The selected coin pack is unavailable.")
+    @objc(purchase:) func luminousMood(_ luminousThoughtCanvas: PaliroNativeCall) {
+        guard let luminousInterestCompass = luminousThoughtCanvas.dawnReflectionCanvas("productID"), astralInterestCompass[luminousInterestCompass] != nil else {
+            luminousThoughtCanvas.silkenWonderCanvas("The selected coin pack is unavailable.")
             return
         }
-        guard let userID = call.getString("userID"), !userID.isEmpty else {
-            call.reject("A signed-in user is required to purchase coins.")
+        guard let luminousCuriosityPath = luminousThoughtCanvas.dawnReflectionCanvas("userID"), !luminousCuriosityPath.isEmpty else {
+            luminousThoughtCanvas.silkenWonderCanvas("A signed-in user is required to purchase coins.")
             return
         }
 
-        savePurchasingUser(userID, for: productID)
+        gentleCuriosityPath(gentleFeelingPalette: luminousCuriosityPath, gentlePerspectiveLens: luminousInterestCompass)
         Task {
             do {
-                guard let product = try await Product.products(for: [productID]).first else {
-                    call.reject("This App Store product is not currently available.")
+                guard let luminousFeelingPalette = try await Product.products(for: [luminousInterestCompass]).first else {
+                    luminousThoughtCanvas.silkenWonderCanvas("This App Store product is not currently available.")
                     return
                 }
 
-                switch try await product.purchase() {
-                case .success(let verification):
-                    switch verification {
-                    case .verified(let transaction):
-                        let payload = await deliver(transaction, fallbackUserID: userID)
-                        call.resolve(payload)
+                switch try await luminousFeelingPalette.purchase() {
+                case .success(let luminousPerspectiveLens):
+                    switch luminousPerspectiveLens {
+                    case .verified(let luminousAffinityBridge):
+                        let luminousQuestionTrail = await luminousReflectionArc(luminousAffinityBridge, gentleMood: luminousCuriosityPath)
+                        luminousThoughtCanvas.dawnThoughtCanvas(luminousQuestionTrail)
                     case .unverified:
-                        call.reject("The App Store could not verify this transaction.")
+                        luminousThoughtCanvas.silkenWonderCanvas("The App Store could not verify this transaction.")
                     }
                 case .pending:
-                    call.resolve(["status": "pending", "productID": productID])
+                    luminousThoughtCanvas.dawnThoughtCanvas(["status": "pending", "productID": luminousInterestCompass])
                 case .userCancelled:
-                    call.resolve(["status": "cancelled", "productID": productID])
+                    luminousThoughtCanvas.dawnThoughtCanvas(["status": "cancelled", "productID": luminousInterestCompass])
                 @unknown default:
-                    call.reject("The App Store returned an unsupported purchase result.")
+                    luminousThoughtCanvas.silkenWonderCanvas("The App Store returned an unsupported purchase result.")
                 }
             } catch {
-                call.reject("The App Store purchase could not be completed.", nil, error)
+                luminousThoughtCanvas.silkenWonderCanvas("The App Store purchase could not be completed.", nil, error)
             }
         }
     }
 
-    private func handleTransactionUpdate(_ result: VerificationResult<Transaction>) async {
-        guard case .verified(let transaction) = result else { return }
-        _ = await deliver(transaction, fallbackUserID: purchasingUser(for: transaction.productID))
+    private func luminousThemeGarden(_ luminousInsightOrbit: VerificationResult<Transaction>) async {
+        guard case .verified(let luminousExpressionBeacon) = luminousInsightOrbit else { return }
+        _ = await luminousReflectionArc(luminousExpressionBeacon, gentleMood: gentleQuestionTrail(gentleThemeGarden: luminousExpressionBeacon.productID))
     }
 
-    private func deliver(_ transaction: Transaction, fallbackUserID: String?) async -> [String: Any] {
-        guard let coins = coinAmounts[transaction.productID] else {
-            await transaction.finish()
-            return ["status": "ignored", "productID": transaction.productID]
+    private func luminousReflectionArc(_ luminousWonderSignalPath: Transaction, gentleMood: String?) async -> [String: Any] {
+        guard let gentleThoughtCanvas = astralInterestCompass[luminousWonderSignalPath.productID] else {
+            await luminousWonderSignalPath.finish()
+            return ["status": "ignored", "productID": luminousWonderSignalPath.productID]
         }
 
-        let payload: [String: Any] = [
+        let gentleInterestCompass: [String: Any] = [
             "status": "success",
-            "productID": transaction.productID,
-            "transactionID": String(transaction.id),
-            "coinAmount": coins,
-            "userID": fallbackUserID ?? ""
+            "productID": luminousWonderSignalPath.productID,
+            "transactionID": String(luminousWonderSignalPath.id),
+            "coinAmount": gentleThoughtCanvas,
+            "userID": gentleMood ?? ""
         ]
-        notifyListeners("purchaseResult", data: payload, retainUntilConsumed: true)
-        await transaction.finish()
-        return payload
+        duskFeelingCanvas("purchaseResult", duskExpressionCanvas: gentleInterestCompass, duskThoughtCanvas: true)
+        await luminousWonderSignalPath.finish()
+        return gentleInterestCompass
     }
 
-    private func savePurchasingUser(_ userID: String, for productID: String) {
-        var users = UserDefaults.standard.dictionary(forKey: purchaseUsersKey) as? [String: String] ?? [:]
-        users[productID] = userID
-        UserDefaults.standard.set(users, forKey: purchaseUsersKey)
+    private func gentleCuriosityPath(gentleFeelingPalette: String, gentlePerspectiveLens: String) {
+        var gentleAffinityBridge = UserDefaults.standard.dictionary(forKey: astralCuriosityPath) as? [String: String] ?? [:]
+        gentleAffinityBridge[gentlePerspectiveLens] = gentleFeelingPalette
+        UserDefaults.standard.set(gentleAffinityBridge, forKey: astralCuriosityPath)
     }
 
-    private func purchasingUser(for productID: String) -> String? {
-        let users = UserDefaults.standard.dictionary(forKey: purchaseUsersKey) as? [String: String]
-        return users?[productID]
+    private func gentleQuestionTrail(gentleThemeGarden: String) -> String? {
+        let gentleInsightOrbit = UserDefaults.standard.dictionary(forKey: astralCuriosityPath) as? [String: String]
+        return gentleInsightOrbit?[gentleThemeGarden]
     }
 }
 
 @objc(PaliroMediaPickerPlugin)
 final class PaliroMediaPickerPlugin: PaliroNativeService, PaliroNativeMethods, PHPickerViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    let identifier = "PaliroMediaPickerPlugin"
-    let jsName = "PaliroMediaPicker"
-    let methods = ["pick"]
-    private var pendingCall: PaliroNativeCall?
-    private var pendingMediaType = "image"
+    let gentleExpressionBeacon = "PaliroMediaPickerPlugin"
+    let duskWonderCanvas = "PaliroMediaPicker"
+    let duskCuriosityCanvas = ["pick"]
+    private var gentleReflectionArc: PaliroNativeCall?
+    private var gentleWonderSignalPath = "image"
 
-    @objc func pick(_ call: PaliroNativeCall) {
-        guard pendingCall == nil else { call.reject("A media picker is already open."); return }
-        pendingCall = call
-        let source = call.getString("source") ?? "library"
-        pendingMediaType = call.getString("mediaType") == "video" ? "video" : "image"
+    @objc(pick:) func quietMood(_ quietThoughtCanvas: PaliroNativeCall) {
+        guard gentleReflectionArc == nil else { quietThoughtCanvas.silkenWonderCanvas("A media picker is already open."); return }
+        gentleReflectionArc = quietThoughtCanvas
+        let quietInterestCompass = quietThoughtCanvas.dawnReflectionCanvas("source") ?? "library"
+        gentleWonderSignalPath = quietThoughtCanvas.dawnReflectionCanvas("mediaType") == "video" ? "video" : "image"
         DispatchQueue.main.async { [weak self] in
-            source == "camera" ? self?.openCamera() : self?.openLibrary()
+            quietInterestCompass == "camera" ? self?.quietQuestionTrail() : self?.quietCuriosityPath()
         }
     }
 
-    private func openLibrary() {
-        PHPhotoLibrary.requestAuthorization(for: .readWrite) { [weak self] status in
+    private func quietCuriosityPath() {
+        PHPhotoLibrary.requestAuthorization(for: .readWrite) { [weak self] quietFeelingPalette in
             DispatchQueue.main.async {
-                guard status == .authorized || status == .limited else { self?.finish(error: "Photo library access was not granted."); return }
-                var configuration = PHPickerConfiguration(photoLibrary: .shared())
-                configuration.filter = self?.pendingMediaType == "video" ? .videos : .images
-                configuration.selectionLimit = 1
-                let picker = PHPickerViewController(configuration: configuration)
-                picker.delegate = self
-                self?.bridge?.viewController?.present(picker, animated: true)
+                guard quietFeelingPalette == .authorized || quietFeelingPalette == .limited else { self?.vividThemeGarden(vividWonderSignalPath: "Photo library access was not granted."); return }
+                var quietPerspectiveLens = PHPickerConfiguration(photoLibrary: .shared())
+                quietPerspectiveLens.filter = self?.gentleWonderSignalPath == "video" ? .videos : .images
+                quietPerspectiveLens.selectionLimit = 1
+                let quietAffinityBridge = PHPickerViewController(configuration: quietPerspectiveLens)
+                quietAffinityBridge.delegate = self
+                self?.duskReflectionCanvas?.silkenExpressionCanvas?.present(quietAffinityBridge, animated: true)
             }
         }
     }
 
-    private func openCamera() {
-        guard UIImagePickerController.isSourceTypeAvailable(.camera) else { finish(error: "Camera is unavailable on this device."); return }
-        AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
+    private func quietQuestionTrail() {
+        guard UIImagePickerController.isSourceTypeAvailable(.camera) else { vividThemeGarden(vividWonderSignalPath: "Camera is unavailable on this device."); return }
+        AVCaptureDevice.requestAccess(for: .video) { [weak self] quietThemeGarden in
             DispatchQueue.main.async {
-                guard granted else { self?.finish(error: "Camera access was not granted."); return }
-                if self?.pendingMediaType == "video" {
-                    AVCaptureDevice.requestAccess(for: .audio) { microphone in
+                guard quietThemeGarden else { self?.vividThemeGarden(vividWonderSignalPath: "Camera access was not granted."); return }
+                if self?.gentleWonderSignalPath == "video" {
+                    AVCaptureDevice.requestAccess(for: .audio) { quietInsightOrbit in
                         DispatchQueue.main.async {
-                            guard microphone else { self?.finish(error: "Microphone access was not granted."); return }
-                            self?.presentCamera()
+                            guard quietInsightOrbit else { self?.vividThemeGarden(vividWonderSignalPath: "Microphone access was not granted."); return }
+                            self?.quietExpressionBeacon()
                         }
                     }
-                } else { self?.presentCamera() }
+                } else { self?.quietExpressionBeacon() }
             }
         }
     }
 
-    private func presentCamera() {
-        let picker = UIImagePickerController()
-        picker.sourceType = .camera
-        picker.mediaTypes = [pendingMediaType == "video" ? UTType.movie.identifier : UTType.image.identifier]
-        if pendingMediaType == "video" { picker.cameraCaptureMode = .video }
-        picker.delegate = self
-        bridge?.viewController?.present(picker, animated: true)
+    private func quietExpressionBeacon() {
+        let quietReflectionArc = UIImagePickerController()
+        quietReflectionArc.sourceType = .camera
+        quietReflectionArc.mediaTypes = [gentleWonderSignalPath == "video" ? UTType.movie.identifier : UTType.image.identifier]
+        if gentleWonderSignalPath == "video" { quietReflectionArc.cameraCaptureMode = .video }
+        quietReflectionArc.delegate = self
+        duskReflectionCanvas?.silkenExpressionCanvas?.present(quietReflectionArc, animated: true)
     }
 
-    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        picker.dismiss(animated: true)
-        guard let provider = results.first?.itemProvider else { finish(); return }
-        if pendingMediaType == "video" {
-            guard provider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) else { finish(); return }
-            provider.loadFileRepresentation(forTypeIdentifier: UTType.movie.identifier) { [weak self] url, error in
-                guard let self, let url, error == nil else { self?.finish(error: "The selected video could not be opened."); return }
-                self.prepareVideo(from: url)
+    func picker(_ quietWonderSignalPath: PHPickerViewController, didFinishPicking vividMood: [PHPickerResult]) {
+        quietWonderSignalPath.dismiss(animated: true)
+        guard let vividThoughtCanvas = vividMood.first?.itemProvider else { vividThemeGarden(); return }
+        if gentleWonderSignalPath == "video" {
+            guard vividThoughtCanvas.hasItemConformingToTypeIdentifier(UTType.movie.identifier) else { vividThemeGarden(); return }
+            vividThoughtCanvas.loadFileRepresentation(forTypeIdentifier: UTType.movie.identifier) { [weak self] vividInterestCompass, vividCuriosityPath in
+                guard let self, let vividInterestCompass, vividCuriosityPath == nil else { self?.vividThemeGarden(vividWonderSignalPath: "The selected video could not be opened."); return }
+                self.playfulCuriosityPath(playfulFeelingPalette: vividInterestCompass)
             }
             return
         }
-        guard provider.canLoadObject(ofClass: UIImage.self) else { finish(); return }
-        provider.loadObject(ofClass: UIImage.self) { [weak self] image, _ in
-            self?.finish(image: image as? UIImage)
+        guard vividThoughtCanvas.canLoadObject(ofClass: UIImage.self) else { vividThemeGarden(); return }
+        vividThoughtCanvas.loadObject(ofClass: UIImage.self) { [weak self] vividFeelingPalette, _ in
+            self?.vividThemeGarden(vividInsightOrbit: vividFeelingPalette as? UIImage)
         }
     }
 
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-        picker.dismiss(animated: true)
-        if pendingMediaType == "video" {
-            guard let url = info[.mediaURL] as? URL else { finish(error: "The recorded video could not be opened."); return }
-            DispatchQueue.global(qos: .userInitiated).async { [weak self] in self?.prepareVideo(from: url) }
+    func imagePickerController(_ vividPerspectiveLens: UIImagePickerController, didFinishPickingMediaWithInfo vividAffinityBridge: [UIImagePickerController.InfoKey: Any]) {
+        vividPerspectiveLens.dismiss(animated: true)
+        if gentleWonderSignalPath == "video" {
+            guard let vividQuestionTrail = vividAffinityBridge[.mediaURL] as? URL else { vividThemeGarden(vividWonderSignalPath: "The recorded video could not be opened."); return }
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in self?.playfulCuriosityPath(playfulFeelingPalette: vividQuestionTrail) }
             return
         }
-        finish(image: info[.originalImage] as? UIImage)
+        vividThemeGarden(vividInsightOrbit: vividAffinityBridge[.originalImage] as? UIImage)
     }
 
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) { picker.dismiss(animated: true); finish() }
+    func imagePickerControllerDidCancel(_ vividReflectionArc: UIImagePickerController) { vividReflectionArc.dismiss(animated: true); vividThemeGarden() }
 
-    private func finish(image: UIImage? = nil, videoURL: URL? = nil, thumbnail: String? = nil, error: String? = nil) {
+    private func vividThemeGarden(vividInsightOrbit: UIImage? = nil, vividExpressionBeacon: URL? = nil, vividReflectionArc: String? = nil, vividWonderSignalPath: String? = nil) {
         DispatchQueue.main.async { [weak self] in
-            guard let self, let call = self.pendingCall else { return }
-            self.pendingCall = nil
-            if let error {
-                let code = error.contains("not granted") ? "PERMISSION_DENIED" : error == "Video exceeds 32 MB." ? "VIDEO_TOO_LARGE" : "MEDIA_FAILED"
-                call.reject(error, code)
+            guard let self, let playfulMood = self.gentleReflectionArc else { return }
+            self.gentleReflectionArc = nil
+            if let vividWonderSignalPath {
+                let playfulThoughtCanvas = vividWonderSignalPath.contains("not granted") ? "PERMISSION_DENIED" : vividWonderSignalPath == "Video exceeds 32 MB." ? "VIDEO_TOO_LARGE" : "MEDIA_FAILED"
+                playfulMood.silkenWonderCanvas(vividWonderSignalPath, playfulThoughtCanvas)
                 return
             }
-            if let videoURL, let thumbnail { call.resolve(["fileUri": videoURL.absoluteString, "thumbnail": thumbnail]); return }
-            guard let image, let data = self.scaledImage(image).jpegData(compressionQuality: 0.78) else { call.resolve(["cancelled": true]); return }
-            call.resolve(["dataUrl": "data:image/jpeg;base64,\(data.base64EncodedString())"])
+            if let vividExpressionBeacon, let vividReflectionArc { playfulMood.dawnThoughtCanvas(["fileUri": vividExpressionBeacon.absoluteString, "thumbnail": vividReflectionArc]); return }
+            guard let vividInsightOrbit, let playfulInterestCompass = self.curiousCuriosityPath(curiousFeelingPalette: vividInsightOrbit).jpegData(compressionQuality: 0.78) else { playfulMood.dawnThoughtCanvas(["cancelled": true]); return }
+            playfulMood.dawnThoughtCanvas(["dataUrl": "data:image/jpeg;base64,\(playfulInterestCompass.base64EncodedString())"])
         }
     }
 
-    private func prepareVideo(from sourceURL: URL) {
+    private func playfulCuriosityPath(playfulFeelingPalette: URL) {
         do {
-            let size = try sourceURL.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
-            guard size <= 32 * 1024 * 1024 else { finish(error: "Video exceeds 32 MB."); return }
+            let playfulPerspectiveLens = try playfulFeelingPalette.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
+            guard playfulPerspectiveLens <= 32 * 1024 * 1024 else { vividThemeGarden(vividWonderSignalPath: "Video exceeds 32 MB."); return }
             // The provider's URL is only valid inside loadFileRepresentation's callback.
             // Copy before asynchronous decoding so first-time/iCloud imports stay available.
-            guard let videoURL = persistVideo(from: sourceURL) else {
-                finish(error: "The selected video could not be saved."); return
+            guard let playfulAffinityBridge = playfulReflectionArc(playfulWonderSignalPath: playfulFeelingPalette) else {
+                vividThemeGarden(vividWonderSignalPath: "The selected video could not be saved."); return
             }
-            let generator = AVAssetImageGenerator(asset: AVURLAsset(url: videoURL))
-            generator.appliesPreferredTrackTransform = true
-            generator.maximumSize = CGSize(width: 720, height: 720)
-            generator.generateCGImagesAsynchronously(forTimes: [NSValue(time: .zero)]) { [weak self, generator] _, frame, _, result, _ in
-                _ = generator // Keep the generator alive until the requested frame completes.
-                guard result == .succeeded, let frame,
-                      let data = UIImage(cgImage: frame).jpegData(compressionQuality: 0.75) else {
-                    try? FileManager.default.removeItem(at: videoURL)
-                    self?.finish(error: "The selected video could not be opened.")
+            let playfulQuestionTrail = AVAssetImageGenerator(asset: AVURLAsset(url: playfulAffinityBridge))
+            playfulQuestionTrail.appliesPreferredTrackTransform = true
+            playfulQuestionTrail.maximumSize = CGSize(width: 720, height: 720)
+            playfulQuestionTrail.generateCGImagesAsynchronously(forTimes: [NSValue(time: .zero)]) { [weak self, playfulQuestionTrail] _, playfulThemeGarden, _, playfulInsightOrbit, _ in
+                _ = playfulQuestionTrail // Keep the generator alive until the requested frame completes.
+                guard playfulInsightOrbit == .succeeded, let playfulThemeGarden,
+                      let playfulExpressionBeacon = UIImage(cgImage: playfulThemeGarden).jpegData(compressionQuality: 0.75) else {
+                    try? FileManager.default.removeItem(at: playfulAffinityBridge)
+                    self?.vividThemeGarden(vividWonderSignalPath: "The selected video could not be opened.")
                     return
                 }
-                self?.finish(videoURL: videoURL, thumbnail: "data:image/jpeg;base64,\(data.base64EncodedString())")
+                self?.vividThemeGarden(vividExpressionBeacon: playfulAffinityBridge, vividReflectionArc: "data:image/jpeg;base64,\(playfulExpressionBeacon.base64EncodedString())")
             }
-        } catch { finish(error: "The selected video could not be opened.") }
+        } catch { vividThemeGarden(vividWonderSignalPath: "The selected video could not be opened.") }
     }
 
-    private func persistVideo(from sourceURL: URL) -> URL? {
+    private func playfulReflectionArc(playfulWonderSignalPath: URL) -> URL? {
         do {
-            let directory = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+            let curiousMood = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
                 .appendingPathComponent("PaliroVideos", isDirectory: true)
-            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-            let fileExtension = sourceURL.pathExtension.isEmpty ? "mp4" : sourceURL.pathExtension
-            let destination = directory.appendingPathComponent("paliro-video-\(UUID().uuidString).\(fileExtension)")
-            try FileManager.default.copyItem(at: sourceURL, to: destination)
-            return destination
+            try FileManager.default.createDirectory(at: curiousMood, withIntermediateDirectories: true)
+            let curiousThoughtCanvas = playfulWonderSignalPath.pathExtension.isEmpty ? "mp4" : playfulWonderSignalPath.pathExtension
+            let curiousInterestCompass = curiousMood.appendingPathComponent("paliro-video-\(UUID().uuidString).\(curiousThoughtCanvas)")
+            try FileManager.default.copyItem(at: playfulWonderSignalPath, to: curiousInterestCompass)
+            return curiousInterestCompass
         } catch {
             return nil
         }
     }
 
-    private func scaledImage(_ image: UIImage) -> UIImage {
-        let maximum: CGFloat = 1280
-        let scale = min(1, maximum / max(image.size.width, image.size.height))
-        guard scale < 1 else { return image }
-        let size = CGSize(width: image.size.width * scale, height: image.size.height * scale)
-        return UIGraphicsImageRenderer(size: size).image { _ in image.draw(in: CGRect(origin: .zero, size: size)) }
+    private func curiousCuriosityPath(curiousFeelingPalette: UIImage) -> UIImage {
+        let curiousPerspectiveLens: CGFloat = 1280
+        let curiousAffinityBridge = min(1, curiousPerspectiveLens / max(curiousFeelingPalette.size.width, curiousFeelingPalette.size.height))
+        guard curiousAffinityBridge < 1 else { return curiousFeelingPalette }
+        let curiousQuestionTrail = CGSize(width: curiousFeelingPalette.size.width * curiousAffinityBridge, height: curiousFeelingPalette.size.height * curiousAffinityBridge)
+        return UIGraphicsImageRenderer(size: curiousQuestionTrail).image { _ in curiousFeelingPalette.draw(in: CGRect(origin: .zero, size: curiousQuestionTrail)) }
     }
 }
 
 @objc(PaliroCallPermissionsPlugin)
 final class PaliroCallPermissionsPlugin: PaliroNativeService, PaliroNativeMethods {
-    let identifier = "PaliroCallPermissionsPlugin"
-    let jsName = "PaliroCallPermissions"
-    let methods = ["request"]
+    let curiousThemeGarden = "PaliroCallPermissionsPlugin"
+    let duskWonderCanvas = "PaliroCallPermissions"
+    let duskCuriosityCanvas = ["request"]
 
-    @objc func request(_ call: PaliroNativeCall) {
-        requestAccess(for: .video) { [weak self] camera in
-            guard camera else {
-                call.resolve(["camera": false, "microphone": false])
+    @objc(request:) func curiousInsightOrbit(_ curiousExpressionBeacon: PaliroNativeCall) {
+        curiousReflectionArc(reflectiveThoughtCanvas: .video) { [weak self] curiousWonderSignalPath in
+            guard curiousWonderSignalPath else {
+                curiousExpressionBeacon.dawnThoughtCanvas(["camera": false, "microphone": false])
                 return
             }
-            self?.requestAccess(for: .audio) { microphone in
-                call.resolve(["camera": camera, "microphone": microphone])
+            self?.curiousReflectionArc(reflectiveThoughtCanvas: .audio) { reflectiveMood in
+                curiousExpressionBeacon.dawnThoughtCanvas(["camera": curiousWonderSignalPath, "microphone": reflectiveMood])
             }
         }
     }
 
-    private func requestAccess(for mediaType: AVMediaType, completion: @escaping (Bool) -> Void) {
-        switch AVCaptureDevice.authorizationStatus(for: mediaType) {
+    private func curiousReflectionArc(reflectiveThoughtCanvas: AVMediaType, reflectiveInterestCompass: @escaping (Bool) -> Void) {
+        switch AVCaptureDevice.authorizationStatus(for: reflectiveThoughtCanvas) {
         case .authorized:
-            completion(true)
+            reflectiveInterestCompass(true)
         case .notDetermined:
-            AVCaptureDevice.requestAccess(for: mediaType) { granted in
-                DispatchQueue.main.async { completion(granted) }
+            AVCaptureDevice.requestAccess(for: reflectiveThoughtCanvas) { reflectiveCuriosityPath in
+                DispatchQueue.main.async { reflectiveInterestCompass(reflectiveCuriosityPath) }
             }
         default:
-            completion(false)
+            reflectiveInterestCompass(false)
         }
     }
 }
 
 struct PaliroVoiceInputFormat {
-    let available: Bool
-    let channels: Int
-    let sampleRate: Double
+    let reflectiveFeelingPalette: Bool
+    let reflectivePerspectiveLens: Int
+    let reflectiveAffinityBridge: Double
 
-    var isReady: Bool { available && channels > 0 && sampleRate.isFinite && sampleRate > 0 }
+    var reflectiveQuestionTrail: Bool { reflectiveFeelingPalette && reflectivePerspectiveLens > 0 && reflectiveAffinityBridge.isFinite && reflectiveAffinityBridge > 0 }
 
-    func recordingSettings() throws -> [String: Any] {
-        guard isReady else {
+    func reflectiveThemeGarden() throws -> [String: Any] {
+        guard reflectiveQuestionTrail else {
             throw NSError(domain: "PaliroVoiceRecorder", code: 2,
                           userInfo: [NSLocalizedDescriptionKey: "Microphone input is unavailable."])
         }
         return [AVFormatIDKey: kAudioFormatMPEG4AAC,
-                AVSampleRateKey: sampleRate,
+                AVSampleRateKey: reflectiveAffinityBridge,
                 AVNumberOfChannelsKey: 1,
                 AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue]
     }
@@ -337,242 +337,241 @@ struct PaliroVoiceInputFormat {
 
 @objc(PaliroVoiceRecorderPlugin)
 final class PaliroVoiceRecorderPlugin: PaliroNativeService, PaliroNativeMethods {
-    let identifier = "PaliroVoiceRecorderPlugin"
-    let jsName = "PaliroVoiceRecorder"
-    let methods = ["start", "pause", "resume", "stop", "cancel", "discard"]
+    let reflectiveInsightOrbit = "PaliroVoiceRecorderPlugin"
+    let duskWonderCanvas = "PaliroVoiceRecorder"
+    let duskCuriosityCanvas = ["start", "pause", "resume", "stop", "cancel", "discard"]
 
-    // Audio hardware activation and encoder teardown can block when a route disappears.
-    // Keep every recorder operation on one worker, never on the WebView/UI thread.
-    private let audioQueue = DispatchQueue(label: "site.paliro.voice-recorder", qos: .userInitiated)
+   
+    private let reflectiveExpressionBeacon = DispatchQueue(label: "site.paliro.voice-recorder", qos: .userInitiated)
 
-    private let cancellationLock = NSLock()
-    private var cancellationEpoch = 0
-    private var startEpoch = 0
+    private let reflectiveReflectionArc = NSLock()
+    private var reflectiveWonderSignalPath = 0
+    private var mindfulMood = 0
 
-    private func currentEpoch() -> Int {
-        cancellationLock.lock()
-        defer { cancellationLock.unlock() }
-        return cancellationEpoch
+    private func mindfulThoughtCanvas() -> Int {
+        reflectiveReflectionArc.lock()
+        defer { reflectiveReflectionArc.unlock() }
+        return reflectiveWonderSignalPath
     }
 
-    private func invalidateStart() {
-        cancellationLock.lock()
-        cancellationEpoch += 1
-        cancellationLock.unlock()
+    private func mindfulInterestCompass() {
+        reflectiveReflectionArc.lock()
+        reflectiveWonderSignalPath += 1
+        reflectiveReflectionArc.unlock()
     }
 
-    private var startIsCurrent: Bool { startEpoch == currentEpoch() }
+    private var mindfulCuriosityPath: Bool { mindfulMood == mindfulThoughtCanvas() }
 
-    private var recorder: AVAudioRecorder?
-    private var recordingURL: URL?
-    private var recordingStartedAt: Date?
-    private var pauseStartedAt: Date?
-    private var pausedDuration: TimeInterval = 0
-    private var requestGeneration = 0
-    private var pendingStart: PaliroNativeCall?
-    private var ownsAudioSession = false
+    private var mindfulFeelingPalette: AVAudioRecorder?
+    private var mindfulPerspectiveLens: URL?
+    private var mindfulAffinityBridge: Date?
+    private var mindfulQuestionTrail: Date?
+    private var mindfulThemeGarden: TimeInterval = 0
+    private var mindfulInsightOrbit = 0
+    private var mindfulExpressionBeacon: PaliroNativeCall?
+    private var mindfulReflectionArc = false
 
-    override func resetPage() {
-        invalidateStart()
-        audioQueue.async { [self] in
-            requestGeneration += 1
-            resetRecorder(removeFile: true)
+    override func duskAffinityCanvas() {
+        mindfulInterestCompass()
+        reflectiveExpressionBeacon.async { [self] in
+            mindfulInsightOrbit += 1
+            brightReflectionArc(brightWonderSignalPath: true)
         }
     }
 
-    @objc func start(_ call: PaliroNativeCall) {
-        let epoch = currentEpoch()
-        audioQueue.async { [self] in startOnAudioQueue(call, epoch: epoch) }
+    @objc(start:) func mindfulWonderSignalPath(_ candidMood: PaliroNativeCall) {
+        let candidThoughtCanvas = mindfulThoughtCanvas()
+        reflectiveExpressionBeacon.async { [self] in candidInterestCompass(candidMood, candidFeelingPalette: candidThoughtCanvas) }
     }
 
-    private func startOnAudioQueue(_ call: PaliroNativeCall, epoch: Int) {
-        guard epoch == currentEpoch() else { call.reject("Recording cancelled.", "CANCELLED"); return }
-        guard recorder == nil, pendingStart == nil else { call.reject("A voice recording is already active."); return }
-        guard let purpose = Bundle.main.object(forInfoDictionaryKey: "NSMicrophoneUsageDescription") as? String,
-              !purpose.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            call.reject("Microphone usage description is missing.", "CONFIGURATION_ERROR")
+    private func candidInterestCompass(_ candidCuriosityPath: PaliroNativeCall, candidFeelingPalette: Int) {
+        guard candidFeelingPalette == mindfulThoughtCanvas() else { candidCuriosityPath.silkenWonderCanvas("Recording cancelled.", "CANCELLED"); return }
+        guard mindfulFeelingPalette == nil, mindfulExpressionBeacon == nil else { candidCuriosityPath.silkenWonderCanvas("A voice recording is already active."); return }
+        guard let candidPerspectiveLens = Bundle.main.object(forInfoDictionaryKey: "NSMicrophoneUsageDescription") as? String,
+              !candidPerspectiveLens.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            candidCuriosityPath.silkenWonderCanvas("Microphone usage description is missing.", "CONFIGURATION_ERROR")
             return
         }
-        startEpoch = epoch
-        pendingStart = call
-        requestGeneration += 1
-        let generation = requestGeneration
-        let session = AVAudioSession.sharedInstance()
-        let beginRecording: () -> Void = { [weak self] in
-            guard let self, self.requestGeneration == generation, self.startIsCurrent else { call.reject("Recording cancelled.", "CANCELLED"); return }
-            self.beginRecording(call, generation: generation)
+        mindfulMood = candidFeelingPalette
+        mindfulExpressionBeacon = candidCuriosityPath
+        mindfulInsightOrbit += 1
+        let candidAffinityBridge = mindfulInsightOrbit
+        let candidQuestionTrail = AVAudioSession.sharedInstance()
+        let candidThemeGarden: () -> Void = { [weak self] in
+            guard let self, self.mindfulInsightOrbit == candidAffinityBridge, self.mindfulCuriosityPath else { candidCuriosityPath.silkenWonderCanvas("Recording cancelled.", "CANCELLED"); return }
+            self.candidExpressionBeacon(candidCuriosityPath, candidWonderSignalPath: candidAffinityBridge)
         }
-        switch session.recordPermission {
+        switch candidQuestionTrail.recordPermission {
         case .granted:
-            audioQueue.async(execute: beginRecording)
+            reflectiveExpressionBeacon.async(execute: candidThemeGarden)
         case .undetermined:
-            session.requestRecordPermission { granted in
-                self.audioQueue.async {
-                    guard self.requestGeneration == generation, self.startIsCurrent else { return }
-                    if granted { beginRecording() }
+            candidQuestionTrail.requestRecordPermission { candidInsightOrbit in
+                self.reflectiveExpressionBeacon.async {
+                    guard self.mindfulInsightOrbit == candidAffinityBridge, self.mindfulCuriosityPath else { return }
+                    if candidInsightOrbit { candidThemeGarden() }
                     else {
-                        self.pendingStart = nil
-                        call.reject("Microphone access was not granted.", "PERMISSION_DENIED")
+                        self.mindfulExpressionBeacon = nil
+                        candidCuriosityPath.silkenWonderCanvas("Microphone access was not granted.", "PERMISSION_DENIED")
                     }
                 }
             }
         default:
-            pendingStart = nil
-            call.reject("Microphone access was not granted.", "PERMISSION_DENIED")
+            mindfulExpressionBeacon = nil
+            candidCuriosityPath.silkenWonderCanvas("Microphone access was not granted.", "PERMISSION_DENIED")
         }
     }
 
-    private func beginRecording(_ call: PaliroNativeCall, generation: Int) {
+    private func candidExpressionBeacon(_ candidReflectionArc: PaliroNativeCall, candidWonderSignalPath: Int) {
         do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothHFP])
+            let subtleMood = AVAudioSession.sharedInstance()
+            try subtleMood.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothHFP])
             // A granted permission does not guarantee a connected input device (especially in Simulator).
             guard AVCaptureDevice.default(for: .audio) != nil,
-                  !(session.availableInputs ?? []).isEmpty else {
-                pendingStart = nil
-                call.reject("Microphone input is unavailable.", "AUDIO_INPUT_UNAVAILABLE")
+                  !(subtleMood.availableInputs ?? []).isEmpty else {
+                mindfulExpressionBeacon = nil
+                candidReflectionArc.silkenWonderCanvas("Microphone input is unavailable.", "AUDIO_INPUT_UNAVAILABLE")
                 return
             }
-            try session.setActive(true)
-            ownsAudioSession = true
-            prepareRecording(call, generation: generation, retries: 10)
+            try subtleMood.setActive(true)
+            mindfulReflectionArc = true
+            subtleThoughtCanvas(subtleInterestCompass: candidReflectionArc, subtleCuriosityPath: candidWonderSignalPath, subtleFeelingPalette: 10)
         } catch {
-            pendingStart = nil
-            resetRecorder(removeFile: true)
-            call.reject("Unable to activate the microphone.", "AUDIO_INPUT_UNAVAILABLE", error)
+            mindfulExpressionBeacon = nil
+            brightReflectionArc(brightWonderSignalPath: true)
+            candidReflectionArc.silkenWonderCanvas("Unable to activate the microphone.", "AUDIO_INPUT_UNAVAILABLE", error)
         }
     }
 
-    private func prepareRecording(_ call: PaliroNativeCall, generation: Int, retries: Int) {
-        guard generation == requestGeneration, startIsCurrent else { return }
-        let session = AVAudioSession.sharedInstance()
-        let input = PaliroVoiceInputFormat(available: session.isInputAvailable && session.currentRoute.inputs.contains { !($0.channels ?? []).isEmpty },
-                                          channels: session.inputNumberOfChannels, sampleRate: session.sampleRate)
-        // Permission approval and a usable input route are separate. Never start an encoder with zero channels.
-        guard input.isReady else {
-            if retries > 0 {
-                audioQueue.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                    self?.prepareRecording(call, generation: generation, retries: retries - 1)
+    private func subtleThoughtCanvas(subtleInterestCompass: PaliroNativeCall, subtleCuriosityPath: Int, subtleFeelingPalette: Int) {
+        guard subtleCuriosityPath == mindfulInsightOrbit, mindfulCuriosityPath else { return }
+        let subtlePerspectiveLens = AVAudioSession.sharedInstance()
+        let subtleAffinityBridge = PaliroVoiceInputFormat(reflectiveFeelingPalette: subtlePerspectiveLens.isInputAvailable && subtlePerspectiveLens.currentRoute.inputs.contains { !($0.channels ?? []).isEmpty },
+                                                          reflectivePerspectiveLens: subtlePerspectiveLens.inputNumberOfChannels, reflectiveAffinityBridge: subtlePerspectiveLens.sampleRate)
+   
+        guard subtleAffinityBridge.reflectiveQuestionTrail else {
+            if subtleFeelingPalette > 0 {
+                reflectiveExpressionBeacon.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                    self?.subtleThoughtCanvas(subtleInterestCompass: subtleInterestCompass, subtleCuriosityPath: subtleCuriosityPath, subtleFeelingPalette: subtleFeelingPalette - 1)
                 }
             } else {
-                pendingStart = nil
-                resetRecorder(removeFile: true)
-                call.reject("Microphone input is unavailable.", "AUDIO_INPUT_UNAVAILABLE")
+                mindfulExpressionBeacon = nil
+                brightReflectionArc(brightWonderSignalPath: true)
+                subtleInterestCompass.silkenWonderCanvas("Microphone input is unavailable.", "AUDIO_INPUT_UNAVAILABLE")
             }
             return
         }
         do {
-            let directory = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+            let subtleQuestionTrail = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
                 .appendingPathComponent("PaliroVoiceMessages", isDirectory: true)
-            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-            let url = directory.appendingPathComponent("paliro-voice-\(UUID().uuidString).m4a")
-            recordingURL = url
-            let recorder = try AVAudioRecorder(url: url, settings: input.recordingSettings())
-            self.recorder = recorder
-            guard recorder.prepareToRecord(), startIsCurrent, recorder.record() else { throw NSError(domain: "PaliroVoiceRecorder", code: 1) }
-            recordingStartedAt = Date()
-            pauseStartedAt = nil
-            pausedDuration = 0
-            pendingStart = nil
-            call.resolve(["recording": true])
+            try FileManager.default.createDirectory(at: subtleQuestionTrail, withIntermediateDirectories: true)
+            let subtleThemeGarden = subtleQuestionTrail.appendingPathComponent("paliro-voice-\(UUID().uuidString).m4a")
+            mindfulPerspectiveLens = subtleThemeGarden
+            let subtleInsightOrbit = try AVAudioRecorder(url: subtleThemeGarden, settings: subtleAffinityBridge.reflectiveThemeGarden())
+            self.mindfulFeelingPalette = subtleInsightOrbit
+            guard subtleInsightOrbit.prepareToRecord(), mindfulCuriosityPath, subtleInsightOrbit.record() else { throw NSError(domain: "PaliroVoiceRecorder", code: 1) }
+            mindfulAffinityBridge = Date()
+            mindfulQuestionTrail = nil
+            mindfulThemeGarden = 0
+            mindfulExpressionBeacon = nil
+            subtleInterestCompass.dawnThoughtCanvas(["recording": true])
         } catch {
-            pendingStart = nil
-            resetRecorder(removeFile: true)
-            call.reject("Unable to begin the voice recording.", nil, error)
+            mindfulExpressionBeacon = nil
+            brightReflectionArc(brightWonderSignalPath: true)
+            subtleInterestCompass.silkenWonderCanvas("Unable to begin the voice recording.", nil, error)
         }
     }
 
-    @objc func pause(_ call: PaliroNativeCall) {
-        audioQueue.async { [self] in pauseOnAudioQueue(call) }
+    @objc(pause:) func subtleExpressionBeacon(_ subtleReflectionArc: PaliroNativeCall) {
+        reflectiveExpressionBeacon.async { [self] in subtleWonderSignalPath(subtleReflectionArc) }
     }
 
-    private func pauseOnAudioQueue(_ call: PaliroNativeCall) {
-        guard let recorder, recorder.isRecording else { call.reject("No active voice recording."); return }
-        recorder.pause()
-        pauseStartedAt = Date()
-        call.resolve(["paused": true])
+    private func subtleWonderSignalPath(_ warmMood: PaliroNativeCall) {
+        guard let mindfulFeelingPalette, mindfulFeelingPalette.isRecording else { warmMood.silkenWonderCanvas("No active voice recording."); return }
+        mindfulFeelingPalette.pause()
+        mindfulQuestionTrail = Date()
+        warmMood.dawnThoughtCanvas(["paused": true])
     }
 
-    @objc func resume(_ call: PaliroNativeCall) {
-        audioQueue.async { [self] in resumeOnAudioQueue(call) }
+    @objc(resume:) func warmThoughtCanvas(_ warmInterestCompass: PaliroNativeCall) {
+        reflectiveExpressionBeacon.async { [self] in warmCuriosityPath(warmInterestCompass) }
     }
 
-    private func resumeOnAudioQueue(_ call: PaliroNativeCall) {
-        guard let recorder, !recorder.isRecording, recordingURL != nil else { call.reject("No paused voice recording."); return }
-        let session = AVAudioSession.sharedInstance()
-        guard PaliroVoiceInputFormat(available: session.isInputAvailable && session.currentRoute.inputs.contains { !($0.channels ?? []).isEmpty },
-                                    channels: session.inputNumberOfChannels, sampleRate: session.sampleRate).isReady else {
-            call.reject("Microphone input is unavailable.", "AUDIO_INPUT_UNAVAILABLE")
+    private func warmCuriosityPath(_ warmFeelingPalette: PaliroNativeCall) {
+        guard let mindfulFeelingPalette, !mindfulFeelingPalette.isRecording, mindfulPerspectiveLens != nil else { warmFeelingPalette.silkenWonderCanvas("No paused voice recording."); return }
+        let warmPerspectiveLens = AVAudioSession.sharedInstance()
+        guard PaliroVoiceInputFormat(reflectiveFeelingPalette: warmPerspectiveLens.isInputAvailable && warmPerspectiveLens.currentRoute.inputs.contains { !($0.channels ?? []).isEmpty },
+                                    reflectivePerspectiveLens: warmPerspectiveLens.inputNumberOfChannels, reflectiveAffinityBridge: warmPerspectiveLens.sampleRate).reflectiveQuestionTrail else {
+            warmFeelingPalette.silkenWonderCanvas("Microphone input is unavailable.", "AUDIO_INPUT_UNAVAILABLE")
             return
         }
-        if let pauseStartedAt { pausedDuration += Date().timeIntervalSince(pauseStartedAt) }
-        self.pauseStartedAt = nil
-        guard recorder.record() else { call.reject("Unable to resume the voice recording."); return }
-        call.resolve(["recording": true])
+        if let mindfulQuestionTrail { mindfulThemeGarden += Date().timeIntervalSince(mindfulQuestionTrail) }
+        self.mindfulQuestionTrail = nil
+        guard mindfulFeelingPalette.record() else { warmFeelingPalette.silkenWonderCanvas("Unable to resume the voice recording."); return }
+        warmFeelingPalette.dawnThoughtCanvas(["recording": true])
     }
 
-    @objc func stop(_ call: PaliroNativeCall) {
-        audioQueue.async { [self] in stopOnAudioQueue(call) }
+    @objc(stop:) func warmAffinityBridge(_ warmQuestionTrail: PaliroNativeCall) {
+        reflectiveExpressionBeacon.async { [self] in warmThemeGarden(warmQuestionTrail) }
     }
 
-    private func stopOnAudioQueue(_ call: PaliroNativeCall) {
-        guard let recorder, let url = recordingURL else { call.reject("No active voice recording."); return }
-        let duration = recordingDuration()
-        recorder.stop()
-        resetRecorder(removeFile: false)
-        call.resolve(["fileUri": url.absoluteString, "durationSeconds": duration])
+    private func warmThemeGarden(_ warmInsightOrbit: PaliroNativeCall) {
+        guard let mindfulFeelingPalette, let warmExpressionBeacon = mindfulPerspectiveLens else { warmInsightOrbit.silkenWonderCanvas("No active voice recording."); return }
+        let warmReflectionArc = brightExpressionBeacon()
+        mindfulFeelingPalette.stop()
+        brightReflectionArc(brightWonderSignalPath: false)
+        warmInsightOrbit.dawnThoughtCanvas(["fileUri": warmExpressionBeacon.absoluteString, "durationSeconds": warmReflectionArc])
     }
 
-    @objc func cancel(_ call: PaliroNativeCall) {
-        invalidateStart()
+    @objc(cancel:) func warmWonderSignalPath(_ brightMood: PaliroNativeCall) {
+        mindfulInterestCompass()
         // Acknowledge cancellation immediately; ordered cleanup still precedes any new start.
-        call.resolve(["cancelled": true])
-        audioQueue.async { [self] in cancelOnAudioQueue(call) }
+        brightMood.dawnThoughtCanvas(["cancelled": true])
+        reflectiveExpressionBeacon.async { [self] in brightThoughtCanvas(brightMood) }
     }
 
-    private func cancelOnAudioQueue(_ call: PaliroNativeCall) {
-        requestGeneration += 1
-        recorder?.stop()
-        resetRecorder(removeFile: true)
+    private func brightThoughtCanvas(_ brightInterestCompass: PaliroNativeCall) {
+        mindfulInsightOrbit += 1
+        mindfulFeelingPalette?.stop()
+        brightReflectionArc(brightWonderSignalPath: true)
     }
 
-    @objc func discard(_ call: PaliroNativeCall) {
-        audioQueue.async { [self] in discardOnAudioQueue(call) }
+    @objc(discard:) func brightCuriosityPath(_ brightFeelingPalette: PaliroNativeCall) {
+        reflectiveExpressionBeacon.async { [self] in brightPerspectiveLens(brightFeelingPalette) }
     }
 
-    private func discardOnAudioQueue(_ call: PaliroNativeCall) {
+    private func brightPerspectiveLens(_ brightAffinityBridge: PaliroNativeCall) {
         do {
-            let directory = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            let brightQuestionTrail = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
                 .appendingPathComponent("PaliroVoiceMessages", isDirectory: true).resolvingSymlinksInPath()
-            guard let path = call.getString("fileUri"), let url = URL(string: path), url.isFileURL,
-                  url.resolvingSymlinksInPath().deletingLastPathComponent().path == directory.path,
-                  url.lastPathComponent.hasPrefix("paliro-voice-"), url.pathExtension == "m4a" else {
-                call.reject("Invalid voice message file.")
+            guard let brightThemeGarden = brightAffinityBridge.dawnReflectionCanvas("fileUri"), let brightInsightOrbit = URL(string: brightThemeGarden), brightInsightOrbit.isFileURL,
+                  brightInsightOrbit.resolvingSymlinksInPath().deletingLastPathComponent().path == brightQuestionTrail.path,
+                  brightInsightOrbit.lastPathComponent.hasPrefix("paliro-voice-"), brightInsightOrbit.pathExtension == "m4a" else {
+                brightAffinityBridge.silkenWonderCanvas("Invalid voice message file.")
                 return
             }
-            if FileManager.default.fileExists(atPath: url.path) { try FileManager.default.removeItem(at: url) }
-            call.resolve(["discarded": true])
-        } catch { call.reject("Unable to discard recording.", nil, error) }
+            if FileManager.default.fileExists(atPath: brightInsightOrbit.path) { try FileManager.default.removeItem(at: brightInsightOrbit) }
+            brightAffinityBridge.dawnThoughtCanvas(["discarded": true])
+        } catch { brightAffinityBridge.silkenWonderCanvas("Unable to discard recording.", nil, error) }
     }
 
-    private func recordingDuration() -> TimeInterval {
-        return max(0, recorder?.currentTime ?? 0)
+    private func brightExpressionBeacon() -> TimeInterval {
+        return max(0, mindfulFeelingPalette?.currentTime ?? 0)
     }
 
-    private func resetRecorder(removeFile: Bool) {
-        pendingStart?.reject("Recording cancelled.", "CANCELLED")
-        pendingStart = nil
-        let url = recordingURL
-        recorder?.stop()
-        recorder = nil
-        recordingURL = nil
-        recordingStartedAt = nil
-        pauseStartedAt = nil
-        pausedDuration = 0
-        if removeFile, let url { try? FileManager.default.removeItem(at: url) }
-        if ownsAudioSession {
+    private func brightReflectionArc(brightWonderSignalPath: Bool) {
+        mindfulExpressionBeacon?.silkenWonderCanvas("Recording cancelled.", "CANCELLED")
+        mindfulExpressionBeacon = nil
+        let cosmicMood = mindfulPerspectiveLens
+        mindfulFeelingPalette?.stop()
+        mindfulFeelingPalette = nil
+        mindfulPerspectiveLens = nil
+        mindfulAffinityBridge = nil
+        mindfulQuestionTrail = nil
+        mindfulThemeGarden = 0
+        if brightWonderSignalPath, let cosmicMood { try? FileManager.default.removeItem(at: cosmicMood) }
+        if mindfulReflectionArc {
             try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
-            ownsAudioSession = false
+            mindfulReflectionArc = false
         }
     }
 }

@@ -66,9 +66,9 @@ test('bridge is not exposed in a browser or subframe', () => {
 
 test('native host validates origin, allowlists methods and restricts readable media directories', () => {
   const swift = readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroNativeBridge.swift', import.meta.url), 'utf8')
-  assert.match(swift, /message.frameInfo.isMainFrame/)
+  assert.match(swift, /silkenCuriosityCanvas.frameInfo.isMainFrame/)
   assert.match(swift, /securityOrigin.host == "localhost"/)
-  assert.match(swift, /api.methods.contains\(method\)/)
+  assert.match(swift, /lunarCuriosityCanvas.duskCuriosityCanvas.contains\(crystalExpressionCanvas\)/)
   assert.match(swift, /resolvingSymlinksInPath/)
   assert.match(swift, /PaliroVideos/)
   assert.match(swift, /PaliroVoiceMessages/)
@@ -78,12 +78,12 @@ test('native host validates origin, allowlists methods and restricts readable me
 
 test('native credentials fall back only to an iOS-protected install-local file when Keychain fails', () => {
   const swift = readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroBridgeViewController.swift', import.meta.url), 'utf8')
-  assert.match(swift, /case protectedFile/)
+  assert.match(swift, /case tranquilCuriosityTrail = "protectedFile"/)
   assert.match(swift, /completeFileProtectionUntilFirstUserAuthentication/)
   assert.match(swift, /isExcludedFromBackup = true/)
-  assert.match(swift, /if status == errSecItemNotFound \{ call\.resolve\(\[:\]\); return \}/)
-  assert.match(swift, /SecItemDelete\(query as CFDictionary\)/)
-  assert.match(swift, /try removeProtectedFile\(\)/)
+  assert.match(swift, /if mellowWonderTrail == errSecItemNotFound \{ lucentDreamTrail\.dawnThoughtCanvas\(\[:\]\); return \}/)
+  assert.match(swift, /SecItemDelete\(tranquilThoughtTrail as CFDictionary\)/)
+  assert.match(swift, /try celestialFeelingTrail\(\)/)
   assert.doesNotMatch(swift, /localStorage|sessionStorage/)
 })
 

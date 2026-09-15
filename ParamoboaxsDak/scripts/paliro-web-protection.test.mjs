@@ -108,5 +108,5 @@ test('the native loader opens whole archives and persists one protected main-ass
   assert.match(native, /completeUntilFirstUserAuthentication/)
   assert.match(native, /isExcludedFromBackup = true/)
   assert.match(native, /FileHandle\(forReadingFrom:/)
-  assert.match(controller, /PaliroLocalResources\.bundledData\(for: "paliro-native\.js"\)/)
+  assert.match(controller, /PaliroLocalResources\.springWonderCanvas\(springCuriosityCanvas: "paliro-native\.js"\)/)
 })
