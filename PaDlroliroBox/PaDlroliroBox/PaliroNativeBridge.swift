@@ -170,7 +170,9 @@ final class PaliroLocalResources: NSObject, WKURLSchemeHandler {
                     urlSchemeTask.didReceive(response)
                     urlSchemeTask.didReceive(data)
                     urlSchemeTask.didFinish()
-                case .failure(let error): urlSchemeTask.didFailWithError(error)
+                case .failure(let error):
+                    NSLog("Paliro resource load failed: %@ (%@ %ld)", request.url?.path ?? "", (error as NSError).domain, (error as NSError).code)
+                    urlSchemeTask.didFailWithError(error)
                 }
             }
         }
@@ -188,14 +190,19 @@ final class PaliroLocalResources: NSObject, WKURLSchemeHandler {
     }
 
     private static func resource(for relativePath: String, webRoot: URL) throws -> Resource {
-        guard !relativePath.isEmpty, !relativePath.split(separator: "/").contains("..") else {
+        guard !relativePath.isEmpty, !relativePath.hasPrefix("/"), !relativePath.split(separator: "/").contains("..") else {
             throw URLError(.noPermissionsToReadFile)
         }
         let file = webRoot.appendingPathComponent(relativePath)
-        let canonical = file.resolvingSymlinksInPath().standardizedFileURL
-        let rootPath = webRoot.resolvingSymlinksInPath().standardizedFileURL.path + "/"
-        guard canonical.path.hasPrefix(rootPath) else { throw URLError(.noPermissionsToReadFile) }
-        if FileManager.default.fileExists(atPath: canonical.path) { return .file(canonical) }
+        // Archived resources have no individual file. Foundation does not resolve
+        // parent symlinks consistently for nonexistent paths (notably /var on iOS).
+        // Apply filesystem containment only to real files, then use validated archive keys.
+        if FileManager.default.fileExists(atPath: file.path) {
+            let canonical = file.resolvingSymlinksInPath().standardizedFileURL
+            let rootPath = webRoot.resolvingSymlinksInPath().standardizedFileURL.path + "/"
+            guard canonical.path.hasPrefix(rootPath) else { throw URLError(.noPermissionsToReadFile) }
+            return .file(canonical)
+        }
 
         archiveLock.lock()
         defer { archiveLock.unlock() }
@@ -258,14 +265,22 @@ final class PaliroLocalResources: NSObject, WKURLSchemeHandler {
             try Data().write(to: temporary.appendingPathComponent(".ready"), options: .atomic)
             try? manager.removeItem(at: target)
             try manager.moveItem(at: temporary, to: target)
-            for item in try manager.contentsOfDirectory(at: root, includingPropertiesForKeys: nil) where item != target {
-                try? manager.removeItem(at: item)
-            }
+            try removeOldAssetCaches(in: root, keepingVersion: version)
             preparedAssetCache = target
             return target
         } catch {
             try? manager.removeItem(at: temporary)
             throw error
+        }
+    }
+
+    private static func removeOldAssetCaches(in root: URL, keepingVersion version: String) throws {
+        let manager = FileManager.default
+        // Directory enumeration may return /private/var while our URL uses /var.
+        // These are immediate children of the same root; compare their version names.
+        for item in try manager.contentsOfDirectory(at: root, includingPropertiesForKeys: nil)
+            where item.lastPathComponent != version {
+            try? manager.removeItem(at: item)
         }
     }
 

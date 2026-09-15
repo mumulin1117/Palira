@@ -30,6 +30,8 @@ final class PaliroBridgeViewController: UIViewController, WKNavigationDelegate {
     private let bridge = PaliroNativeBridge()
     private var keyboardBottom: NSLayoutConstraint!
     private var launchOverlay: UIImageView?
+    private var startupWatchdog: DispatchWorkItem?
+    private var startupErrorPresented = false
     private var hasConfiguredLaunchSurface = false
     private let launchBackgroundColor = UIColor(red: 0.02, green: 0.04, blue: 0.13, alpha: 1)
 
@@ -116,6 +118,41 @@ final class PaliroBridgeViewController: UIViewController, WKNavigationDelegate {
         }
     }
 
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        handleStartupFailure(error)
+    }
+
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        handleStartupFailure(error)
+    }
+
+    private func handleStartupFailure(_ error: Error) {
+        guard launchOverlay != nil, !startupErrorPresented else { return }
+        startupWatchdog?.cancel()
+        startupErrorPresented = true
+        NSLog("Paliro startup failed: %@ (%ld)", (error as NSError).domain, (error as NSError).code)
+        let alert = UIAlertController(
+            title: isKoreanLaunch ? "앱을 시작할 수 없습니다" : "Unable to start the app",
+            message: isKoreanLaunch ? "다시 시도해 주세요." : "Please try again.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: isKoreanLaunch ? "다시 시도" : "Retry", style: .default) { [weak self] _ in
+            guard let self else { return }
+            self.startupErrorPresented = false
+            self.bridge.resetPage()
+            self.armStartupWatchdog()
+            self.webView.load(URLRequest(url: URL(string: "capacitor://localhost/index.html")!))
+        })
+        present(alert, animated: true)
+    }
+
+    private func armStartupWatchdog() {
+        startupWatchdog?.cancel()
+        let watchdog = DispatchWorkItem { [weak self] in
+            self?.handleStartupFailure(URLError(.timedOut))
+        }
+        startupWatchdog = watchdog
+        DispatchQueue.main.asyncAfter(deadline: .now() + 20, execute: watchdog)
+    }
+
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         bridge.resetPage()
         showLaunchOverlay()
@@ -123,6 +160,7 @@ final class PaliroBridgeViewController: UIViewController, WKNavigationDelegate {
     }
 
     deinit {
+        startupWatchdog?.cancel()
         NotificationCenter.default.removeObserver(self)
     }
 
@@ -143,6 +181,7 @@ final class PaliroBridgeViewController: UIViewController, WKNavigationDelegate {
             overlay.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
         launchOverlay = overlay
+        armStartupWatchdog()
     }
 
     private func configureLaunchSurface() {
@@ -162,6 +201,7 @@ final class PaliroBridgeViewController: UIViewController, WKNavigationDelegate {
     }
 
     @objc private func hideLaunchOverlay() {
+        startupWatchdog?.cancel()
         guard let overlay = launchOverlay else { return }
         launchOverlay = nil
         UIView.animate(withDuration: 0.28, delay: 0, options: [.curveEaseOut, .beginFromCurrentState]) {
@@ -203,6 +243,8 @@ final class PaliroAuthStoragePlugin: PaliroNativeService, PaliroNativeMethods {
     let identifier = "PaliroAuthStoragePlugin"
     let jsName = "PaliroAuthStorage"
     let methods = ["read", "write", "remove"]
+
+    private let storageQueue = DispatchQueue(label: "site.paliro.auth-storage", qos: .userInitiated)
 
     private enum StorageMode: String {
         case keychain
@@ -295,6 +337,10 @@ final class PaliroAuthStoragePlugin: PaliroNativeService, PaliroNativeMethods {
     }
 
     @objc func read(_ call: PaliroNativeCall) {
+        storageQueue.async { [self] in performRead(call) }
+    }
+
+    private func performRead(_ call: PaliroNativeCall) {
         prepareInstallation(preserveExistingInstallation: call.getBool("preserveExistingInstallation") == true)
         if storageMode == .protectedFile {
             do { resolveCredential(try readProtectedFile(), call: call) }
@@ -318,6 +364,10 @@ final class PaliroAuthStoragePlugin: PaliroNativeService, PaliroNativeMethods {
     }
 
     @objc func write(_ call: PaliroNativeCall) {
+        storageQueue.async { [self] in performWrite(call) }
+    }
+
+    private func performWrite(_ call: PaliroNativeCall) {
         prepareInstallation(preserveExistingInstallation: false)
         guard let value = call.getString("value"), let data = value.data(using: .utf8), data.count <= 4096 else {
             call.reject("Invalid account credential.", "INVALID_SECURE_CREDENTIAL"); return
@@ -341,6 +391,10 @@ final class PaliroAuthStoragePlugin: PaliroNativeService, PaliroNativeMethods {
     }
 
     @objc func remove(_ call: PaliroNativeCall) {
+        storageQueue.async { [self] in performRemove(call) }
+    }
+
+    private func performRemove(_ call: PaliroNativeCall) {
         let status = SecItemDelete(query as CFDictionary)
         if status != errSecSuccess && status != errSecItemNotFound {
             logKeychainFailure("remove", status: status)

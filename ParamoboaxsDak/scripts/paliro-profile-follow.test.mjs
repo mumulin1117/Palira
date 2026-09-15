@@ -58,6 +58,16 @@ test('followed profile button remains clickable and announces the unfollow actio
   assert.match(binding('aria-label'), /t\('unfollow'\)/)
 })
 
+test('mutual profile actions retain the Lanhu version 3 visual hierarchy', () => {
+  assert.match(source, /\['paliro-friend-profile-actions', \{ 'is-mutual': isMatchedMutualFriend \}\]/)
+  assert.match(styles, /\.paliro-friend-profile-actions\.is-mutual \{[^}]*grid-template-columns: minmax\(0, 1fr\) minmax\(0, 1fr\) 48px[^}]*gap: 8px[^}]*padding: 12px 24px/)
+  assert.match(styles, /\.paliro-friend-profile-actions\.is-mutual button \{[^}]*height: 48px[^}]*border-radius: 24px[^}]*font-size: 14px/)
+  assert.match(styles, /\.paliro-friend-profile-actions\.is-mutual button\.is-followed \{[^}]*rgba\(255, 255, 255, \.13\)[^}]*rgba\(26, 26, 46, \.5\)/)
+  assert.match(styles, /\.paliro-friend-profile-actions\.is-mutual \.paliro-friend-profile-message \{[^}]*#267cdc[^}]*linear-gradient\(90deg, #267cdc 0%, #081127 100%\)/)
+  assert.match(styles, /\.paliro-friend-profile-actions\.is-mutual \.paliro-friend-profile-video \{[^}]*width: 48px[^}]*height: 48px/)
+  assert.match(styles, /\.paliro-friend-profile-actions\.is-mutual \.paliro-friend-profile-video svg \{[^}]*width: 24px[^}]*height: 24px/)
+})
+
 test('a non-mutual profile message opens the localized Lanhu reminder', () => {
   const context = vm.createContext({
     isMatchedMutualFriend: { value: false },
@@ -75,4 +85,10 @@ test('a non-mutual profile message opens the localized Lanhu reminder', () => {
   assert.equal(paliroTranslate('en', 'messageMutualOnlyTitle'), 'Reminder')
   assert.equal(paliroTranslate('en', 'messageMutualOnlyCopy'), 'You need to add each other as friends before you can chat or video call.')
   assert.equal(paliroTranslate('ko', 'messageMutualOnlyCopy'), '서로 친구가 되어야 채팅이나 영상 통화를 할 수 있습니다.')
+})
+
+test('Box composer close and Add Friend actions retain the requested design tokens', () => {
+  assert.match(styles, /\.paliro-composer-close \{[^}]*top: calc\(4\.7% \+ 50px\)[^}]*right: calc\(5\.5% - 10px\)[^}]*width: 27px[^}]*height: 27px/)
+  assert.match(styles, /\.paliro-friend-request-actions button \{[^}]*border-radius: 40px[^}]*background: #0b1c39/)
+  assert.match(styles, /\.paliro-friend-request-actions button:last-child \{[^}]*border: 1px solid #267cdc[^}]*background: linear-gradient\(90deg, #267cdc 0%, #081127 100%\)/)
 })

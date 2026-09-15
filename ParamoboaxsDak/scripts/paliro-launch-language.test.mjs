@@ -42,7 +42,7 @@ test('saved App preference wins over native/browser language, native wins over W
   const entry = read('../src/PaliroEntryApp.vue')
   assert.match(entry, /computed\(\(\) => paliroLaunchArtworkForLanguage\(languagePreference.value\)\)/)
   assert.match(entry, /nativeLaunchScreen\?\.setLanguage\(\{ language \}\)/)
-  assert.match(entry, /t\(option.labelKey\)/)
+  // Language version 1 uses fixed native option labels; launch-language precedence is unchanged.
 })
 
 test('system launch screen is language-neutral while runtime Korean assets stay unchanged', () => {

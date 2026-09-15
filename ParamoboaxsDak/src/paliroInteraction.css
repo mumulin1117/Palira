@@ -1,0 +1,20 @@
+/* App surfaces should respond to app gestures, not native image lifting or selection. */
+* {
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Preserve caret placement, selection and copy/paste in editable controls. */
+input,
+textarea,
+[contenteditable=''],
+[contenteditable='true'],
+[contenteditable='true'] *,
+[contenteditable='plaintext-only'],
+[contenteditable='plaintext-only'] * {
+  -webkit-touch-callout: default;
+  -webkit-user-select: text;
+  user-select: text;
+}

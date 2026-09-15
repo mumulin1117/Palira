@@ -25,6 +25,7 @@ export function createPaliroVoiceSession({ nativeRecorder = null, mediaDevices =
   let startedAt = null
   let draft = null
   let state = 'idle'
+  let interruptStart = null
   const run = (work) => {
     const result = queue.then(work)
     queue = result.catch(() => {})
@@ -54,11 +55,21 @@ export function createPaliroVoiceSession({ nativeRecorder = null, mediaDevices =
         if (revision !== generation) return false
         elapsed = 0
         draft = null
+        const cancelled = Symbol('cancelled')
+        const interrupted = new Promise((resolve) => { interruptStart = () => resolve(cancelled) })
         try {
-          if (nativeRecorder) await nativeRecorder.start()
+          if (nativeRecorder) {
+            if (await Promise.race([nativeRecorder.start(), interrupted]) === cancelled) return false
+          }
           else {
             if (!mediaDevices?.getUserMedia || !Recorder) throw new Error('recorder-unavailable')
-            stream = await mediaDevices.getUserMedia({ audio: true })
+            const acquisition = mediaDevices.getUserMedia({ audio: true }).then((input) => {
+              if (revision !== generation) { input.getTracks().forEach((track) => track.stop()); return cancelled }
+              return input
+            })
+            const input = await Promise.race([acquisition, interrupted])
+            if (input === cancelled) return false
+            stream = input
             if (revision !== generation) { release(); return false }
             const mimeType = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'].find((type) => Recorder.isTypeSupported?.(type))
             recorder = new Recorder(stream, { ...(mimeType ? { mimeType } : {}), audioBitsPerSecond: 64000 })
@@ -71,6 +82,7 @@ export function createPaliroVoiceSession({ nativeRecorder = null, mediaDevices =
           state = 'recording'
           return true
         } catch (error) { release(); state = 'idle'; throw error }
+        finally { interruptStart = null }
       })
     },
     pause() {
@@ -109,6 +121,8 @@ export function createPaliroVoiceSession({ nativeRecorder = null, mediaDevices =
     },
     cancel() {
       ++generation
+      // Unblock the queue before native cancel, which rejects the pending permission/start call.
+      interruptStart?.()
       return run(async () => {
         try {
           if (nativeRecorder) {

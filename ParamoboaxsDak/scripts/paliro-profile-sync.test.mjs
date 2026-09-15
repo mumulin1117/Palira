@@ -75,6 +75,25 @@ test('failed GET retains cached profile and draft; a late successful GET cannot 
   assert.equal(ctx.editableProfile.value.nickname, 'New draft')
 })
 
+test('Me requests the server profile once per signed-in user and Edit Profile reuses the cached profile', async () => {
+  const ctx = context()
+  ctx.route.value = 'me'
+  ctx.profileRequestedUserID = ''
+  let calls = 0
+  ctx.refreshCurrentProfile = async targetRoute => {
+    calls += 1
+    assert.equal(targetRoute, 'me')
+  }
+  vm.runInContext(functionSource('requestCurrentProfileOnce'), ctx)
+  await ctx.requestCurrentProfileOnce()
+  await ctx.requestCurrentProfileOnce()
+  assert.equal(calls, 1)
+  assert.match(source, /if \(nextRoute === 'me'\) void requestCurrentProfileOnce\(\)/)
+  assert.doesNotMatch(source, /nextRoute === 'edit-profile'\) void refreshCurrentProfile/)
+  assert.match(source, /class="paliro-me-profile-skeleton"/)
+  assert.doesNotMatch(source, /<p v-if="profileLoading" class="paliro-profile-edit-notice"/)
+})
+
 test('failed PATCH keeps the draft, blocks duplicate submissions and never pretends the local save succeeded', async () => {
   const ctx = context()
   let reject, calls = 0

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync } from 'node:fs'
 import test from 'node:test'
+import vm from 'node:vm'
 
 const entry = readFileSync(new URL('../src/PaliroEntryApp.vue', import.meta.url), 'utf8')
 const styles = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8')
@@ -48,4 +49,26 @@ test('the boot route and earliest HTML paint use the branded dark launch surface
   assert.match(storyboard, /red="0\.02" green="0\.04" blue="0\.13" alpha="1"/)
   assert.match(storyboard, /<view key="view"[\s\S]*<imageView[\s\S]*translatesAutoresizingMaskIntoConstraints="NO"/)
   assert.match(html, /var\(--paliro-launch-image,url\('\/assets\/paliro-welcome-space-background@2x\.png'\)\)/)
+})
+
+
+test('covered WebView reveals even when animation frames never fire', async () => {
+  for (const framesRun of [false, true]) {
+    let hides = 0
+    const timers = new Map(), frames = []
+    const window = { requestAnimationFrame: fn => frames.push(fn) }
+    const context = vm.createContext({ window, document: { querySelector: () => null }, nextTick: async () => {},
+      setTimeout: (fn, ms) => { timers.set(ms, fn); return ms }, clearTimeout: id => timers.delete(id),
+      nativeLaunchScreen: { hide: async () => { hides++ } },
+    })
+    vm.runInContext(entry.match(/async function revealWebContent\(\) \{[^]*?\n\}/)[0], context)
+    await context.revealWebContent()
+    assert.equal(window.__paliroWebContentReady, true)
+    if (framesRun) { frames.shift()(); frames.shift()() }
+    else timers.get(1000)()
+    assert.equal(hides, 1)
+    assert.equal(timers.size, 0)
+    while (frames.length) frames.shift()()
+    assert.equal(hides, 1)
+  }
 })

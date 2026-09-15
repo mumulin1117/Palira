@@ -5,9 +5,14 @@
   let sequence = 0
   const request = (service, method, options = {}) => new Promise((resolve, reject) => {
     const id = `${page}-${++sequence}`
-    pending.set(id, { resolve, reject })
+    // Only the startup read is bounded; user-driven permissions and purchases can take longer.
+    const timer = service === 'PaliroAuthStorage' && method === 'read' ? setTimeout(() => {
+      if (!pending.delete(id)) return
+      reject(Object.assign(new Error('Account storage did not respond.'), { code: 'NATIVE_TIMEOUT' }))
+    }, 8000) : null
+    pending.set(id, { resolve, reject, timer })
     try { window.webkit.messageHandlers.paliro.postMessage({ id, service, method, options }) }
-    catch (error) { pending.delete(id); reject(error) }
+    catch (error) { clearTimeout(timer); pending.delete(id); reject(error) }
   })
   window.PaliroNative = Object.freeze({
     platform: 'ios',
@@ -16,6 +21,7 @@
       const callback = pending.get(message.id)
       if (!callback) return
       pending.delete(message.id)
+      clearTimeout(callback.timer)
       message.error ? callback.reject(Object.assign(new Error(message.error.message), { code: message.error.code })) : callback.resolve(message.value)
     },
     emit(service, event, value) {

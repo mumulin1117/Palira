@@ -44,3 +44,28 @@ export function paliroBrowserVideoCover(source) {
     video.load()
   })
 }
+
+// Keep the picker busy until the first image is actually renderable in WKWebView.
+export function paliroDecodeVideoCover(source) {
+  return new Promise((resolve, reject) => {
+    const image = new Image()
+    let settled = false
+    const finish = (error) => {
+      if (settled) return
+      settled = true
+      clearTimeout(timer)
+      image.onload = image.onerror = null
+      error ? reject(error) : resolve()
+    }
+    const timer = setTimeout(() => finish(new Error('video-preview-timeout')), 15000)
+    image.onerror = () => finish(new Error('video-preview-unavailable'))
+    image.onload = async () => {
+      try {
+        if (image.decode) await image.decode()
+        if (!image.naturalWidth || !image.naturalHeight) throw new Error('video-preview-unavailable')
+        finish()
+      } catch (error) { finish(error) }
+    }
+    image.src = source
+  })
+}

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { createPaliroVideoCall, paliroRequestCallPermissions, PALIRO_CALL_WAIT_MS } from '../src/services/paliroVideoCall.js'
-import { paliroSeedUsers, paliroGetSocialState, paliroCanChatWithMember, paliroGetConversations, paliroMarkConversationRead, paliroToggleFollowMember, paliroBlockMember } from '../src/services/paliroLocalStore.js'
+import { paliroGetOrCreateConversation, paliroGetMockMembers, paliroSeedUsers, paliroGetSocialState, paliroCanChatWithMember, paliroGetConversations, paliroMarkConversationRead, paliroToggleFollowMember, paliroBlockMember } from '../src/services/paliroLocalStore.js'
 
 function harness(overrides = {}) {
   const states = []
@@ -96,6 +96,7 @@ test('chat entry is mutual-only across languages; unfollowed or blocked users ca
   } }
   try {
     const userID = paliroSeedUsers()[0].id
+    paliroGetOrCreateConversation(userID, paliroGetMockMembers('ko')[0])
     const all = paliroGetConversations(userID)
     assert.ok(all.some(({ member }) => member.language === 'en'))
     assert.ok(all.some(({ member }) => member.language === 'ko'))

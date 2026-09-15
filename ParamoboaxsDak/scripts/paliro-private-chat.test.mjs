@@ -24,7 +24,7 @@ test('unavailable native input preserves its error code, creates no draft and al
   assert.equal((await session.stop()).durationSeconds, 2)
 })
 
-test('cancel waits for microphone permission and cleans up a late native start', async () => {
+test('cancel cleans up a native start that resolves at the same time', async () => {
   let allow
   let active = false
   const session = createPaliroVoiceSession({ nativeRecorder: {
@@ -38,6 +38,35 @@ test('cancel waits for microphone permission and cleans up a late native start',
   assert.equal(await starting, false)
   await cancelling
   assert.equal(active, false)
+})
+
+test('cancel interrupts a pending native permission request without waiting for approval', { timeout: 1000 }, async () => {
+  let rejectStart
+  let cancelled = false
+  const session = createPaliroVoiceSession({ nativeRecorder: {
+    start: () => new Promise((_, reject) => { rejectStart = reject }),
+    cancel: async () => { cancelled = true; rejectStart(new Error('cancelled')) },
+  } })
+  const starting = session.start()
+  await Promise.resolve()
+  await session.cancel()
+  assert.equal(await starting, false)
+  assert.equal(cancelled, true)
+})
+
+test('browser cancellation returns immediately and releases a later microphone stream', { timeout: 1000 }, async () => {
+  let allow
+  let stopped = false
+  const session = createPaliroVoiceSession({ Recorder: class {}, mediaDevices: {
+    getUserMedia: () => new Promise(resolve => { allow = resolve }),
+  } })
+  const starting = session.start()
+  await Promise.resolve()
+  await session.cancel()
+  assert.equal(await starting, false)
+  allow({ getTracks: () => [{ stop: () => { stopped = true } }] })
+  await Promise.resolve()
+  assert.equal(stopped, true)
 })
 
 test('paused time is excluded, and repeated stops return the same recording', async () => {

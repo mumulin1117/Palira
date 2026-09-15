@@ -5,11 +5,11 @@ import { readFileSync } from 'node:fs'
 import { paliroNativeService, paliroNativeFileSource } from '../src/services/paliroNativeBridge.js'
 
 const source = readFileSync(new URL('../public/paliro-native.js', import.meta.url), 'utf8')
-function nativePage() {
+function nativePage(timers = { setTimeout, clearTimeout }) {
   const calls = []
   const window = { webkit: { messageHandlers: { paliro: { postMessage: value => calls.push(value) } } } }
   window.top = window
-  vm.runInNewContext(source, { window, location: { protocol: 'capacitor:', host: 'localhost' }, URL })
+  vm.runInNewContext(source, { ...timers, window, location: { protocol: 'capacitor:', host: 'localhost' }, URL })
   return { bridge: window.PaliroNative, calls, window }
 }
 
@@ -85,4 +85,19 @@ test('native credentials fall back only to an iOS-protected install-local file w
   assert.match(swift, /SecItemDelete\(query as CFDictionary\)/)
   assert.match(swift, /try removeProtectedFile\(\)/)
   assert.doesNotMatch(swift, /localStorage|sessionStorage/)
+})
+
+
+test('startup credential read times out and ignores late replies; permissions remain unbounded', async () => {
+  const scheduled = []
+  const { bridge, calls } = nativePage({ setTimeout: (fn, ms) => { scheduled.push({ fn, ms }); return scheduled.length }, clearTimeout() {} })
+  const reading = bridge.request('PaliroAuthStorage', 'read')
+  const recording = bridge.request('PaliroVoiceRecorder', 'start')
+  assert.equal(scheduled.length, 1)
+  assert.equal(scheduled[0].ms, 8000)
+  scheduled[0].fn()
+  await assert.rejects(reading, error => error.code === 'NATIVE_TIMEOUT')
+  bridge.receive({ id: calls[0].id, value: { value: 'late' } })
+  bridge.receive({ id: calls[1].id, value: { recording: true } })
+  assert.equal((await recording).recording, true)
 })

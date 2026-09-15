@@ -310,13 +310,14 @@ const PALIRO_TEST_INCOMING_REQUESTS = [
   { id: 'paliro-request-iris-atlas', member: PALIRO_MOCK_MEMBERS_BY_LANGUAGE.en[3], message: 'Your movie and cooking topics caught my attention, so I sent a friend request.', requestedAt: '2026-09-10T08:05:00.000Z', status: 'pending' },
 ]
 
+const PALIRO_RETIRED_CONVERSATION_MESSAGE_IDS = new Set([
+  'paliro-message-seoyun-1', 'paliro-message-haneul-1', 'paliro-message-minji-1',
+])
+
 const PALIRO_TEST_CONVERSATIONS = [
-  { member: PALIRO_MOCK_MEMBERS_BY_LANGUAGE.ko[0], unreadCount: 2, messages: [{ id: 'paliro-message-haneul-1', sender: 'friend', body: '오늘의 음악 상자에 어울리는 곡을 하나 남겼어요.', sentAt: '2026-09-10T11:24:00.000Z' }] },
-  { member: PALIRO_MOCK_MEMBERS_BY_LANGUAGE.ko[1], unreadCount: 0, messages: [{ id: 'paliro-message-minji-1', sender: 'friend', body: '다음 주제 상자에 레트로 게임 이야기를 넣어 볼까요?', sentAt: '2026-09-10T10:15:00.000Z' }] },
   { member: PALIRO_MOCK_MEMBERS_BY_LANGUAGE.en[0], unreadCount: 1, messages: [{ id: 'paliro-message-maya-1', sender: 'friend', body: 'I left a song that fits today’s reading Box.', sentAt: '2026-09-10T11:14:00.000Z' }] },
   { member: PALIRO_MOCK_MEMBERS_BY_LANGUAGE.en[1], unreadCount: 0, messages: [{ id: 'paliro-message-luna-1', sender: 'friend', body: 'Want to compare our favorite retro games for the next Box?', sentAt: '2026-09-10T10:05:00.000Z' }] },
 ]
-const PALIRO_SEEDED_MESSAGE_IDS = new Set(PALIRO_TEST_CONVERSATIONS.flatMap(conversation => conversation.messages.map(message => message.id)))
 const testUser = {
   id: 'paliro-test-user',
   email: 'paliro@gmail.com',
@@ -1241,7 +1242,7 @@ function getConversationStateByUser(userID) {
   const conversationsByUser = readJson(PALIRO_MESSAGES_KEY, {})
   const savedConversations = Array.isArray(conversationsByUser[userID]) ? conversationsByUser[userID] : []
   if (userID === testUser.id) {
-    const withoutRetiredFixtures = savedConversations.filter((conversation) => !(conversation.messages ?? []).some((message) => message.id === 'paliro-message-seoyun-1'))
+    const withoutRetiredFixtures = savedConversations.filter((conversation) => !(conversation.messages ?? []).some((message) => PALIRO_RETIRED_CONVERSATION_MESSAGE_IDS.has(message.id)))
     const hydratedConversations = withoutRetiredFixtures.map(clonePaliroConversation)
     const missingFixtures = PALIRO_TEST_CONVERSATIONS
       .filter((fixture) => !hydratedConversations.some((conversation) => conversation.member.id === fixture.member.id))
@@ -1288,15 +1289,13 @@ export function paliroCanChatWithMember(userID, memberID) {
     && !paliroGetBlockedUsers(userID).some((member) => member.id === memberID)
 }
 
-export function paliroGetConversations(userID, language = '') {
+export function paliroGetConversations(userID) {
   if (!userID) return []
   const { conversations } = getConversationStateByUser(userID)
   const requests = readJson(PALIRO_FRIEND_REQUESTS_KEY, {})[userID] ?? {}
   const blockedIDs = new Set(paliroGetBlockedUsers(userID).map((member) => member.id))
-  // Only untouched demo rows follow the discovery language; personal history belongs to the account.
-  return conversations.filter((conversation) => (!language || conversation.member?.language === language
-      || (conversation.messages ?? []).some(message => message.sender === 'self' || !PALIRO_SEEDED_MESSAGE_IDS.has(message.id)))
-    && !blockedIDs.has(conversation.member?.id)
+  // Conversations belong to the account, independently of the interface language.
+  return conversations.filter((conversation) => !blockedIDs.has(conversation.member?.id)
     && (paliroCanChatWithMember(userID, conversation.member?.id) || requests[conversation.member?.id]?.status === 'pending'))
     .map((conversation) => {
       const isLocked = !paliroCanChatWithMember(userID, conversation.member.id)

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { readFileSync } from 'node:fs'
 import vm from 'node:vm'
-import { paliroSelectVideo, paliroMediaErrorKey } from '../src/services/paliroVideoSelection.js'
+import { paliroSelectVideo, paliroMediaErrorKey, paliroDecodeVideoCover } from '../src/services/paliroVideoSelection.js'
 import { paliroSeedUsers, paliroCreateVideoPost, paliroGetPublishedVideos } from '../src/services/paliroLocalStore.js'
 
 const selected = { fileUri: 'file:///private/PaliroVideos/test.mp4', thumbnail: 'data:image/jpeg;base64,dGVzdA==' }
@@ -34,6 +34,7 @@ test('selection blocks duplicate requests and ignores a result after the draft c
     videoPublishError: { value: '' }, showVideoPublish: { value: true },
     videoPublishDraft: { value: { source: '', caption: 'Keep my note' } },
     paliroSelectVideo: () => { calls++; return new Promise(resolve => { complete = resolve }) },
+    paliroDecodeVideoCover: async () => {},
     getPaliroMediaPicker: () => ({}), pickBrowserVideo() {}, paliroMediaErrorKey, t: key => key, URL,
   })
   vm.runInContext(code, context)
@@ -73,4 +74,62 @@ test('native media plugins use instance registration, and video capture waits fo
   assert.ok(camera.indexOf('requestAccess(for: .video)') < camera.indexOf('requestAccess(for: .audio)'))
   assert.match(camera, /guard microphone else/)
   assert.match(native, /status == \.authorized \|\| status == \.limited/)
+})
+
+
+test('first cover waits for image load and decode, and a failed cover can be retried', async () => {
+  let image, finishDecode
+  globalThis.Image = class {
+    constructor() { image = this; this.naturalWidth = 720; this.naturalHeight = 480 }
+    decode() { return new Promise(resolve => { finishDecode = resolve }) }
+  }
+  try {
+    let ready = false
+    const first = paliroDecodeVideoCover(selected.thumbnail).then(() => { ready = true })
+    assert.equal(image.src, selected.thumbnail)
+    image.onload()
+    await Promise.resolve()
+    assert.equal(ready, false)
+    finishDecode()
+    await first
+    assert.equal(ready, true)
+    const failed = paliroDecodeVideoCover(selected.thumbnail)
+    image.onerror()
+    await assert.rejects(failed, /video-preview-unavailable/)
+    const retry = paliroDecodeVideoCover(selected.thumbnail)
+    image.onload()
+    finishDecode()
+    await retry
+  } finally { delete globalThis.Image }
+})
+
+test('first selection commits source and cover together only after decode; decode failure keeps the previous draft', async () => {
+  const entry = readFileSync(new URL('../src/PaliroEntryApp.vue', import.meta.url), 'utf8')
+  const code = entry.slice(entry.indexOf('async function pickVideoForPublish('), entry.indexOf('\nfunction publishVideo('))
+  let resolveCover, rejectCover
+  const draft = { source: '', thumbnail: '', caption: 'My caption' }
+  const context = vm.createContext({
+    videoSelectionBusy: { value: false }, videoPublishLoading: { value: false }, videoPublishError: { value: '' },
+    showVideoPublish: { value: true }, videoPublishDraft: { value: draft },
+    paliroSelectVideo: async () => ({ source: selected.fileUri, thumbnail: selected.thumbnail }),
+    paliroDecodeVideoCover: () => new Promise((resolve, reject) => { resolveCover = resolve; rejectCover = reject }),
+    getPaliroMediaPicker: () => ({}), pickBrowserVideo() {}, paliroMediaErrorKey, t: key => key, URL,
+  })
+  vm.runInContext(code, context)
+  const first = context.pickVideoForPublish('library')
+  await new Promise(setImmediate)
+  assert.equal(context.videoSelectionBusy.value, true)
+  assert.equal(context.videoPublishDraft.value, draft)
+  resolveCover()
+  await first
+  assert.equal(context.videoPublishDraft.value.thumbnail, selected.thumbnail)
+  assert.equal(context.videoSelectionBusy.value, false)
+  const saved = context.videoPublishDraft.value
+  const failed = context.pickVideoForPublish('library')
+  await new Promise(setImmediate)
+  rejectCover(new Error('video-preview-unavailable'))
+  await failed
+  assert.equal(context.videoPublishDraft.value, saved)
+  assert.equal(context.videoPublishError.value, 'videoPickerFailed')
+  assert.equal(context.videoSelectionBusy.value, false)
 })

@@ -240,15 +240,24 @@ final class PaliroMediaPickerPlugin: PaliroNativeService, PaliroNativeMethods, P
         do {
             let size = try sourceURL.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
             guard size <= 32 * 1024 * 1024 else { finish(error: "Video exceeds 32 MB."); return }
-            let generator = AVAssetImageGenerator(asset: AVURLAsset(url: sourceURL))
-            generator.appliesPreferredTrackTransform = true
-            generator.maximumSize = CGSize(width: 720, height: 720)
-            let frame = try generator.copyCGImage(at: .zero, actualTime: nil)
-            guard let data = UIImage(cgImage: frame).jpegData(compressionQuality: 0.75),
-                  let videoURL = persistVideo(from: sourceURL) else {
+            // The provider's URL is only valid inside loadFileRepresentation's callback.
+            // Copy before asynchronous decoding so first-time/iCloud imports stay available.
+            guard let videoURL = persistVideo(from: sourceURL) else {
                 finish(error: "The selected video could not be saved."); return
             }
-            finish(videoURL: videoURL, thumbnail: "data:image/jpeg;base64,\(data.base64EncodedString())")
+            let generator = AVAssetImageGenerator(asset: AVURLAsset(url: videoURL))
+            generator.appliesPreferredTrackTransform = true
+            generator.maximumSize = CGSize(width: 720, height: 720)
+            generator.generateCGImagesAsynchronously(forTimes: [NSValue(time: .zero)]) { [weak self, generator] _, frame, _, result, _ in
+                _ = generator // Keep the generator alive until the requested frame completes.
+                guard result == .succeeded, let frame,
+                      let data = UIImage(cgImage: frame).jpegData(compressionQuality: 0.75) else {
+                    try? FileManager.default.removeItem(at: videoURL)
+                    self?.finish(error: "The selected video could not be opened.")
+                    return
+                }
+                self?.finish(videoURL: videoURL, thumbnail: "data:image/jpeg;base64,\(data.base64EncodedString())")
+            }
         } catch { finish(error: "The selected video could not be opened.") }
     }
 
@@ -332,6 +341,28 @@ final class PaliroVoiceRecorderPlugin: PaliroNativeService, PaliroNativeMethods 
     let jsName = "PaliroVoiceRecorder"
     let methods = ["start", "pause", "resume", "stop", "cancel", "discard"]
 
+    // Audio hardware activation and encoder teardown can block when a route disappears.
+    // Keep every recorder operation on one worker, never on the WebView/UI thread.
+    private let audioQueue = DispatchQueue(label: "site.paliro.voice-recorder", qos: .userInitiated)
+
+    private let cancellationLock = NSLock()
+    private var cancellationEpoch = 0
+    private var startEpoch = 0
+
+    private func currentEpoch() -> Int {
+        cancellationLock.lock()
+        defer { cancellationLock.unlock() }
+        return cancellationEpoch
+    }
+
+    private func invalidateStart() {
+        cancellationLock.lock()
+        cancellationEpoch += 1
+        cancellationLock.unlock()
+    }
+
+    private var startIsCurrent: Bool { startEpoch == currentEpoch() }
+
     private var recorder: AVAudioRecorder?
     private var recordingURL: URL?
     private var recordingStartedAt: Date?
@@ -342,33 +373,42 @@ final class PaliroVoiceRecorderPlugin: PaliroNativeService, PaliroNativeMethods 
     private var ownsAudioSession = false
 
     override func resetPage() {
-        requestGeneration += 1
-        recorder?.stop()
-        resetRecorder(removeFile: true)
+        invalidateStart()
+        audioQueue.async { [self] in
+            requestGeneration += 1
+            resetRecorder(removeFile: true)
+        }
     }
 
     @objc func start(_ call: PaliroNativeCall) {
+        let epoch = currentEpoch()
+        audioQueue.async { [self] in startOnAudioQueue(call, epoch: epoch) }
+    }
+
+    private func startOnAudioQueue(_ call: PaliroNativeCall, epoch: Int) {
+        guard epoch == currentEpoch() else { call.reject("Recording cancelled.", "CANCELLED"); return }
         guard recorder == nil, pendingStart == nil else { call.reject("A voice recording is already active."); return }
         guard let purpose = Bundle.main.object(forInfoDictionaryKey: "NSMicrophoneUsageDescription") as? String,
               !purpose.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             call.reject("Microphone usage description is missing.", "CONFIGURATION_ERROR")
             return
         }
+        startEpoch = epoch
         pendingStart = call
         requestGeneration += 1
         let generation = requestGeneration
         let session = AVAudioSession.sharedInstance()
         let beginRecording: () -> Void = { [weak self] in
-            guard let self, self.requestGeneration == generation else { call.reject("Recording cancelled.", "CANCELLED"); return }
+            guard let self, self.requestGeneration == generation, self.startIsCurrent else { call.reject("Recording cancelled.", "CANCELLED"); return }
             self.beginRecording(call, generation: generation)
         }
         switch session.recordPermission {
         case .granted:
-            DispatchQueue.main.async(execute: beginRecording)
+            audioQueue.async(execute: beginRecording)
         case .undetermined:
             session.requestRecordPermission { granted in
-                DispatchQueue.main.async {
-                    guard self.requestGeneration == generation else { return }
+                self.audioQueue.async {
+                    guard self.requestGeneration == generation, self.startIsCurrent else { return }
                     if granted { beginRecording() }
                     else {
                         self.pendingStart = nil
@@ -386,6 +426,13 @@ final class PaliroVoiceRecorderPlugin: PaliroNativeService, PaliroNativeMethods 
         do {
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothHFP])
+            // A granted permission does not guarantee a connected input device (especially in Simulator).
+            guard AVCaptureDevice.default(for: .audio) != nil,
+                  !(session.availableInputs ?? []).isEmpty else {
+                pendingStart = nil
+                call.reject("Microphone input is unavailable.", "AUDIO_INPUT_UNAVAILABLE")
+                return
+            }
             try session.setActive(true)
             ownsAudioSession = true
             prepareRecording(call, generation: generation, retries: 10)
@@ -397,14 +444,14 @@ final class PaliroVoiceRecorderPlugin: PaliroNativeService, PaliroNativeMethods 
     }
 
     private func prepareRecording(_ call: PaliroNativeCall, generation: Int, retries: Int) {
-        guard generation == requestGeneration else { return }
+        guard generation == requestGeneration, startIsCurrent else { return }
         let session = AVAudioSession.sharedInstance()
-        let input = PaliroVoiceInputFormat(available: session.isInputAvailable && !session.currentRoute.inputs.isEmpty,
+        let input = PaliroVoiceInputFormat(available: session.isInputAvailable && session.currentRoute.inputs.contains { !($0.channels ?? []).isEmpty },
                                           channels: session.inputNumberOfChannels, sampleRate: session.sampleRate)
         // Permission approval and a usable input route are separate. Never start an encoder with zero channels.
         guard input.isReady else {
             if retries > 0 {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                audioQueue.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                     self?.prepareRecording(call, generation: generation, retries: retries - 1)
                 }
             } else {
@@ -422,7 +469,7 @@ final class PaliroVoiceRecorderPlugin: PaliroNativeService, PaliroNativeMethods 
             recordingURL = url
             let recorder = try AVAudioRecorder(url: url, settings: input.recordingSettings())
             self.recorder = recorder
-            guard recorder.prepareToRecord(), recorder.record() else { throw NSError(domain: "PaliroVoiceRecorder", code: 1) }
+            guard recorder.prepareToRecord(), startIsCurrent, recorder.record() else { throw NSError(domain: "PaliroVoiceRecorder", code: 1) }
             recordingStartedAt = Date()
             pauseStartedAt = nil
             pausedDuration = 0
@@ -436,6 +483,10 @@ final class PaliroVoiceRecorderPlugin: PaliroNativeService, PaliroNativeMethods 
     }
 
     @objc func pause(_ call: PaliroNativeCall) {
+        audioQueue.async { [self] in pauseOnAudioQueue(call) }
+    }
+
+    private func pauseOnAudioQueue(_ call: PaliroNativeCall) {
         guard let recorder, recorder.isRecording else { call.reject("No active voice recording."); return }
         recorder.pause()
         pauseStartedAt = Date()
@@ -443,9 +494,13 @@ final class PaliroVoiceRecorderPlugin: PaliroNativeService, PaliroNativeMethods 
     }
 
     @objc func resume(_ call: PaliroNativeCall) {
+        audioQueue.async { [self] in resumeOnAudioQueue(call) }
+    }
+
+    private func resumeOnAudioQueue(_ call: PaliroNativeCall) {
         guard let recorder, !recorder.isRecording, recordingURL != nil else { call.reject("No paused voice recording."); return }
         let session = AVAudioSession.sharedInstance()
-        guard PaliroVoiceInputFormat(available: session.isInputAvailable && !session.currentRoute.inputs.isEmpty,
+        guard PaliroVoiceInputFormat(available: session.isInputAvailable && session.currentRoute.inputs.contains { !($0.channels ?? []).isEmpty },
                                     channels: session.inputNumberOfChannels, sampleRate: session.sampleRate).isReady else {
             call.reject("Microphone input is unavailable.", "AUDIO_INPUT_UNAVAILABLE")
             return
@@ -457,6 +512,10 @@ final class PaliroVoiceRecorderPlugin: PaliroNativeService, PaliroNativeMethods 
     }
 
     @objc func stop(_ call: PaliroNativeCall) {
+        audioQueue.async { [self] in stopOnAudioQueue(call) }
+    }
+
+    private func stopOnAudioQueue(_ call: PaliroNativeCall) {
         guard let recorder, let url = recordingURL else { call.reject("No active voice recording."); return }
         let duration = recordingDuration()
         recorder.stop()
@@ -465,13 +524,23 @@ final class PaliroVoiceRecorderPlugin: PaliroNativeService, PaliroNativeMethods 
     }
 
     @objc func cancel(_ call: PaliroNativeCall) {
+        invalidateStart()
+        // Acknowledge cancellation immediately; ordered cleanup still precedes any new start.
+        call.resolve(["cancelled": true])
+        audioQueue.async { [self] in cancelOnAudioQueue(call) }
+    }
+
+    private func cancelOnAudioQueue(_ call: PaliroNativeCall) {
         requestGeneration += 1
         recorder?.stop()
         resetRecorder(removeFile: true)
-        call.resolve(["cancelled": true])
     }
 
     @objc func discard(_ call: PaliroNativeCall) {
+        audioQueue.async { [self] in discardOnAudioQueue(call) }
+    }
+
+    private func discardOnAudioQueue(_ call: PaliroNativeCall) {
         do {
             let directory = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
                 .appendingPathComponent("PaliroVoiceMessages", isDirectory: true).resolvingSymlinksInPath()

@@ -1,4 +1,12 @@
 @font-face {
+  font-family: 'Miltonian Tattoo';
+  src: url('/assets/Paliro-MiltonianTattoo.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
   font-family: 'Paliro Montserrat';
   src: url('/assets/Montserrat-Regular.ttf') format('truetype');
   font-style: normal;
@@ -35,6 +43,14 @@
   src: url('/assets/Montserrat-ExtraBold.ttf') format('truetype');
   font-style: normal;
   font-weight: 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Paliro Baloo Bhai 2';
+  src: url('/assets/Paliro-BalooBhai2.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400 800;
   font-display: swap;
 }
 
@@ -293,31 +309,31 @@ button { cursor: pointer; }
 
 .paliro-home { width: min(100%, 480px); padding: 0; background: #04091f; }
 .paliro-home-stage { position: relative; width: 100%; height: 100%; overflow: hidden; isolation: isolate; }
-.paliro-home-artboard { position: absolute; inset: 0; }
+.paliro-home-artboard { --paliro-top-box-y: clamp(19%, calc(24% - 30px), 21%); position: absolute; inset: 0; }
 .paliro-home-background { position: absolute; z-index: -2; inset: 0; width: 100%; height: 100%; object-fit: fill; }
 .paliro-home-stage::after { position: absolute; z-index: -1; inset: 0; content: ''; pointer-events: none; background: linear-gradient(180deg, rgba(2, 7, 25, .03) 0%, transparent 50%, rgba(1, 3, 14, .2) 100%); }
-.paliro-home-title { position: absolute; top: 4.85%; left: 26.3%; width: 47.4%; height: auto; }
-.paliro-home-title.is-korean { top: 4.42%; left: 28.4%; width: 43.2%; }
-.paliro-home-pill { position: absolute; width: 23.73%; padding: 0; border: 0; background: transparent; transition: transform .18s ease, filter .18s ease; }
+.paliro-home-title { position: absolute; top: 6.03%; left: 24.53%; width: 51.2%; height: 9.61%; object-fit: contain; }
+.paliro-home-title.is-korean { top: 6.03%; left: 28.4%; width: 43.2%; height: 9.61%; }
+.paliro-home-pill { position: absolute; width: 23.73%; height: 4.19%; padding: 0; border: 0; background: transparent; transition: transform .18s ease, filter .18s ease; }
 .paliro-home-pill:active, .paliro-home-action:active { transform: scale(.95); filter: brightness(1.16); }
-.paliro-home-pill img { display: block; width: 100%; height: auto; }
+.paliro-home-pill img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .paliro-home-pill span { position: absolute; inset: 0; display: grid; place-items: center; color: #0b1b67; font-size: clamp(10px, 3.47vw, 13px); font-weight: 700; }
 .paliro-home-guide span { color: #793889; font-weight: 600; }
-.paliro-home-pill .paliro-home-test-icon { position: absolute; top: 50%; left: 11%; width: 25%; height: auto; transform: translateY(-50%); }
+.paliro-home-pill .paliro-home-test-icon { position: absolute; top: -11.76%; left: -17.98%; width: 59.55%; height: 120.59%; object-fit: contain; }
 .paliro-home-guide span { padding-left: 25%; }
-.paliro-home-rule { top: 10.92%; left: 72%; }
-.paliro-home-guide { top: 15.6%; left: 72%; }
+.paliro-home-rule { top: 12.93%; left: 72%; }
+.paliro-home-guide { top: 17.61%; left: 72%; }
 .paliro-floating-box-target { position: absolute; width: 21.07%; aspect-ratio: 1; padding: 0; border: 0; border-radius: 50%; background: transparent; transition: transform .2s ease, box-shadow .2s ease; }
 .paliro-floating-box-target:active { transform: scale(.91); }
 .paliro-floating-box-target.is-selected { box-shadow: 0 0 0 2px #4dfff6, 0 0 19px rgba(77, 255, 246, .95); }
-.paliro-floating-box-1 { top: 23.4%; left: 34.93%; }
+.paliro-floating-box-1 { top: var(--paliro-top-box-y); left: 34.93%; }
 .paliro-floating-box-2 { top: 31.03%; left: 5.6%; }
 .paliro-floating-box-3 { top: 26.23%; left: 65.33%; }
 .paliro-floating-box-4 { top: 37.93%; left: 77.07%; }
 .paliro-floating-box-5 { top: 49.01%; left: 8%; }
 .paliro-floating-box-6 { top: 52.09%; left: 69.87%; }
 .paliro-home-free-panel { position: absolute; top: 63.92%; right: 8.27%; left: 8.27%; }
-.paliro-home-instruction { min-height: 16px; margin: 0 0 8px; overflow: hidden; color: #fff; font-size: clamp(10px, 3.2vw, 12px); font-weight: 700; line-height: 16px; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+.paliro-home-instruction { min-height: 15px; margin: 0 0 13px; overflow: hidden; color: rgba(255, 255, 255, 1); font-size: clamp(10px, 3.2vw, 12px); font-weight: 700; line-height: 15px; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
 .paliro-home-instruction.is-selection-alert { position: relative; z-index: 2; overflow: visible; color: #fff; animation: paliro-box-selection-attention .72s ease-out both; text-shadow: 0 0 10px rgba(255, 255, 255, .7); }
 @keyframes paliro-box-selection-attention {
   0%, 100% { transform: translateX(0) scale(1); }
@@ -327,25 +343,32 @@ button { cursor: pointer; }
   54% { transform: translateX(.1em) scale(1.8); }
   70% { transform: translateX(0) scale(1.28); }
 }
-.paliro-home-free-copy { display: flex; align-items: center; justify-content: space-between; color: #7889ff; font-size: clamp(10px, 3.47vw, 13px); font-weight: 700; line-height: 16px; }
+.paliro-home-free-copy { display: flex; align-items: center; justify-content: space-between; color: rgba(120, 137, 255, 1); font-size: clamp(10px, 3.47vw, 13px); font-weight: 700; line-height: 16px; }
 .paliro-home-free-copy span, .paliro-home-free-copy strong { font: inherit; }
-.paliro-home-progress { height: clamp(10px, 1.6vh, 13px); margin-top: 4px; padding: 2px; overflow: hidden; border: 1px solid rgba(58, 71, 158, 1); border-radius: 999px; background: rgba(12, 18, 71, .64); }
+.paliro-home-progress { position: relative; height: clamp(10px, 1.6vh, 13px); margin-top: 2px; padding: 2px; overflow: hidden; border: 1px solid rgba(58, 71, 158, 1); border-radius: 999px; background: rgba(12, 18, 71, .64); }
 .paliro-home-progress span { display: block; width: 100%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #7580fe, #6774e8); box-shadow: 0 0 8px rgba(129, 145, 255, .78); transition: width .28s ease; }
+.paliro-home-progress-star { position: absolute; top: 46px; display: block; width: 13px; height: 13px; object-fit: contain; pointer-events: none; }
+.paliro-home-progress-star.is-left { left: -11px; }
+.paliro-home-progress-star.is-right { right: -11px; }
 .paliro-home-action { position: absolute; width: 40.53%; height: 7.02%; min-height: 47px; padding: 0; border: 0; color: #11226d; background: transparent; transition: transform .18s ease, filter .18s ease; }
 .paliro-home-action:disabled { cursor: wait; opacity: .72; }
 .paliro-home-action > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
-.paliro-home-action > .paliro-home-action-label { position: absolute; z-index: 1; inset: 0; display: grid; place-items: center; color: #1b326d; font-family: 'Miltonian Tattoo', serif; font-size: 16px; font-weight: 400; text-shadow: 0 1px rgba(255, 255, 255, .75); }
+/* Lanhu 首页 v6: vertical text gradient, no shadow; keep it within the text line. */
+.paliro-home-action > .paliro-home-action-label { position: absolute; z-index: 1; inset: 0; display: grid; place-items: center; color: transparent; font-family: 'Miltonian Tattoo', serif; font-size: 16px; font-weight: 400; line-height: 19px; background: linear-gradient(180deg, #384DAC 0%, #3D51A9 100%) center / 100% 19px no-repeat; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: none; }
 .paliro-home-action small { position: absolute; z-index: 1; bottom: 7%; left: 0; width: 100%; color: #fff; font-size: clamp(8px, 2.67vw, 10px); font-weight: 700; line-height: 1; }
 .paliro-home-action small img { width: clamp(11px, 4.27vw, 16px); height: clamp(11px, 4.27vw, 16px); margin: -3px 0 -4px 2px; vertical-align: middle; }
-.paliro-home-price-badge { position: absolute; z-index: 2; top: -5px; right: 9%; display: inline-flex; align-items: center; gap: 1px; min-height: 15px; padding: 1px 4px 1px 6px; border: 1px solid rgba(178, 255, 255, .75); border-radius: 3px; color: #fff; background: linear-gradient(90deg, #21dfdf, #33cddd); box-shadow: 0 2px 7px rgba(37, 232, 229, .42); font-size: clamp(7px, 2.13vw, 8px); font-weight: 800; line-height: 1; white-space: nowrap; }
-.paliro-home-price-badge img { width: 14px; height: 14px; margin: -1px -2px -1px 0; object-fit: contain; }
+/* Lanhu paid version: 16px badge, 3px below the frame top, coin overhangs right. */
+.paliro-home-price-badge { position: absolute; z-index: 2; top: 5.26%; right: -17px; display: inline-flex; align-items: center; gap: 0; height: 16px; padding: 0 0 0 6px; color: #fff; font-family: 'Paliro Montserrat', Montserrat, sans-serif; font-size: 10px; font-weight: 600; line-height: 12px; white-space: nowrap; }
+.paliro-home-price-badge::before { position: absolute; z-index: -1; inset: 0 8px 0 0; border-radius: 4px 4px 2px 2px; background: linear-gradient(90deg, #00f0ef, #458bcb); content: ''; }
+.paliro-home-price-badge img { display: block; flex: 0 0 16px; width: 16px; height: 16px; object-fit: contain; }
 .paliro-home-take { top: 72.54%; left: 29.87%; }
-.paliro-home-make { top: 81.53%; left: 29.87%; }
-.paliro-home-make > .paliro-home-action-label { background: linear-gradient(90deg, #384DAC 0%, #3D51A9 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
-.paliro-home-make > small { top: calc(50% + 11px); bottom: auto; background: linear-gradient(90deg, #384DAC 0%, #3D51A9 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+.paliro-home-make { top: 81.53%; left: 29.87%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 6px 0 8px; }
+.paliro-home-make > .paliro-home-action-label { position: relative; inset: auto; display: block; flex: 0 0 auto; max-width: 100%; font-size: clamp(13px, 3.8vw, 16px); line-height: 1.1; white-space: nowrap; background-size: 100% 100%; }
+.paliro-home-make > small { position: relative; top: auto; bottom: auto; left: auto; width: auto; max-width: 100%; flex: 0 0 auto; line-height: 1.1; white-space: nowrap; background: linear-gradient(180deg, #384DAC 0%, #3D51A9 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+.paliro-home-action.is-paid > .paliro-home-action-label { position: absolute; inset: 0; display: grid; place-items: center; font-size: clamp(13px, 4.27vw, 16px); line-height: 19px; background-size: 100% 19px; }
 .paliro-home-tabs { position: absolute; right: 0; bottom: 0; left: 0; display: grid; grid-template-columns: repeat(4, 1fr); height: calc(49px + env(safe-area-inset-bottom)); min-height: 49px; padding: 4px 12px calc(4px + env(safe-area-inset-bottom)); background: rgba(1, 4, 14, .91); border-top: 1px solid rgba(120, 137, 255, .12); }
 .paliro-primary-tabs { z-index: 5; width: min(100%, 480px); margin-inline: auto; }
-.paliro-home-tab { display: grid; min-width: 0; min-height: 41px; align-content: center; justify-items: center; gap: 3px; color: rgba(89, 124, 178, .76); font-size: 10px; font-weight: 600; line-height: 1; }
+.paliro-home-tab { display: grid; min-width: 0; min-height: 41px; align-content: center; justify-items: center; gap: 1px; color: rgba(50, 83, 100, 1); font-size: 12px; font-weight: 400; line-height: 15px; }
 .paliro-home-tabs button.paliro-home-tab { padding: 0; border: 0; background: transparent; }
 .paliro-home-tab-icon { display: block; width: 25px; height: 25px; object-fit: contain; }
 .paliro-home-tab small { color: inherit; font: inherit; }
@@ -363,28 +386,34 @@ button { cursor: pointer; }
 .paliro-video-feed-scroll { position: relative; min-height: 0; flex: 1; overflow-y: auto; overscroll-behavior-y: contain; scroll-snap-type: y mandatory; scrollbar-width: none; touch-action: pan-y; }
 .paliro-video-feed-scroll::-webkit-scrollbar { display: none; }
 .paliro-video-slide { position: relative; height: 100%; min-height: 100%; overflow: hidden; scroll-snap-align: start; scroll-snap-stop: always; background: #080a22; }
-.paliro-video-slide > video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; background: #0d1030; }
-.paliro-video-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(1, 3, 13, .42), transparent 24%, transparent 49%, rgba(2, 3, 15, .91) 100%); pointer-events: none; }
-.paliro-video-paused-indicator { position: absolute; z-index: 2; top: 50%; left: 50%; display: block; width: 40px; height: 40px; object-fit: contain; pointer-events: none; transform: translate(-50%, -50%); }
-.paliro-video-header { position: absolute; z-index: 3; top: 0; right: 0; left: 0; display: flex; align-items: center; justify-content: flex-end; padding: max(18px, env(safe-area-inset-top)) 22px 12px; pointer-events: none; }
-.paliro-video-header button { display: grid; width: 40px; height: 40px; padding: 0; border: 0; background: transparent; place-items: center; pointer-events: auto; }
-.paliro-video-publish-icon { display: block; width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 2px 7px rgba(0, 0, 0, .45)); }
+.paliro-video-slide > video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; background: #03040d; }
+.paliro-video-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(1, 3, 13, .38) 0%, rgba(1, 3, 13, .03) 24%, rgba(1, 3, 13, .02) 50%, rgba(2, 3, 15, .38) 68%, rgba(2, 3, 15, .94) 100%); pointer-events: none; }
+.paliro-video-paused-indicator { position: absolute; z-index: 2; top: 50%; left: 50%; display: block; width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 4px 13px rgba(0, 0, 0, .38)); pointer-events: none; transform: translate(-50%, -50%); }
+.paliro-video-header { position: absolute; z-index: 3; top: 0; right: 0; left: 0; display: flex; align-items: center; justify-content: flex-end; padding: calc(env(safe-area-inset-top) + 21.5px) 23.5px 0; pointer-events: none; }
+.paliro-video-header button { display: grid; width: 35px; height: 35px; padding: 0; border: 0; background: transparent; place-items: center; pointer-events: auto; }
+.paliro-video-publish-icon { display: block; width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 2px 7px rgba(0, 0, 0, .45)); }
 .paliro-video-header button:active { transform: scale(.92); }
-.paliro-video-copy { position: absolute; z-index: 1; right: 82px; bottom: calc(68px + env(safe-area-inset-bottom)); left: 22px; color: #fff; text-shadow: 0 2px 12px rgba(0, 0, 0, .5); }
-.paliro-video-copy h2 { margin: 0 0 4px; font-size: 16px; font-weight: 800; letter-spacing: -.03em; }
-.paliro-video-copy p { margin: 0; font-size: 12px; font-weight: 600; line-height: 1.42; }
+.paliro-video-copy { position: absolute; z-index: 1; right: 99px; bottom: calc(69px + env(safe-area-inset-bottom)); left: 16px; color: rgba(255, 255, 255, 1); text-shadow: 0 2px 12px rgba(0, 0, 0, .62); }
+.paliro-video-copy h2 { height: 20px; margin: 0 0 8px; overflow: hidden; font-size: 16px; font-weight: 700; letter-spacing: 0; line-height: 20px; text-overflow: ellipsis; white-space: nowrap; }
+.paliro-video-copy p { max-height: 40px; margin: 0; overflow: hidden; font-size: 14px; font-weight: 400; line-height: 20px; }
 .paliro-video-interests { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .paliro-video-interests span { color: #85fcf5; font-size: 10px; font-weight: 800; }
-.paliro-video-actions { position: absolute; z-index: 1; right: 15px; bottom: calc(67px + env(safe-area-inset-bottom)); display: grid; gap: 14px; justify-items: center; }
-.paliro-video-actions button { display: grid; min-width: 43px; justify-items: center; gap: 3px; padding: 0; border: 0; color: #fff; background: transparent; text-shadow: 0 2px 8px rgba(0, 0, 0, .68); font: inherit; }
+.paliro-video-actions { position: absolute; z-index: 1; right: 16px; bottom: calc(104px + env(safe-area-inset-bottom)); display: block; width: 48px; height: 298px; }
+.paliro-video-actions button { position: absolute; left: 0; display: grid; width: 48px; justify-items: center; gap: 4px; padding: 0; border: 0; color: rgba(255, 255, 255, 1); background: transparent; text-shadow: 0 2px 8px rgba(0, 0, 0, .68); font: inherit; }
 .paliro-video-actions button > img { display: block; width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 2px 7px rgba(0, 0, 0, .55)); }
-.paliro-video-actions button > small { max-width: 52px; overflow: hidden; font-size: 10px; font-weight: 800; line-height: 1.1; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
-.paliro-video-author-action { position: relative; width: 45px; height: 65px; }
-.paliro-video-author-action > img { display: block; width: 43px; height: 43px; padding: 2px; border: 2px solid #31efe9; border-radius: 50%; background: linear-gradient(135deg, #633cbe, #1df0ec); object-fit: cover; object-position: center; }
+.paliro-video-actions button > small { width: 52px; height: 15px; overflow: hidden; font-size: 12px; font-weight: 600; line-height: 15px; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+.paliro-video-actions > button:nth-child(2) { top: 69px; }
+.paliro-video-actions > button:nth-child(3) { top: 152px; }
+.paliro-video-actions > button:nth-child(4) { top: 235px; }
+.paliro-video-author-action { top: 0; width: 48px; height: 53px; }
+.paliro-video-author-action > img { display: block; width: 48px; height: 48px; padding: 2px; border: 2px solid #31efe9; border-radius: 50%; background: linear-gradient(135deg, #633cbe, #1df0ec); object-fit: cover; object-position: center; }
 .paliro-video-actions .paliro-video-author-action > img { object-fit: cover; object-position: center; }
-.paliro-video-author-action > i { position: absolute; bottom: 10px; left: 50%; display: grid; width: 18px; height: 18px; border: 1px solid rgba(255, 255, 255, .78); border-radius: 50%; color: #06112d; background: #2af0e8; font-size: 15px; font-style: normal; font-weight: 900; line-height: 1; place-items: center; text-shadow: none; transform: translateX(-50%); }
+.paliro-video-author-action > i { position: absolute; top: 35px; left: 50%; display: grid; width: 18px; height: 18px; border: 1px solid rgba(255, 255, 255, .78); border-radius: 50%; color: #06112d; background: #2af0e8; font-size: 15px; font-style: normal; font-weight: 900; line-height: 1; place-items: center; text-shadow: none; transform: translateX(-50%); }
 .paliro-video-author-action > i.is-following { border: 0; background: transparent; }
 .paliro-video-author-action > i img { display: block; width: 18px; height: 18px; object-fit: contain; }
+.paliro-video-follow-plus { position: relative; display: block; width: 18px; height: 18px; }
+.paliro-video-follow-plus::before, .paliro-video-follow-plus::after { position: absolute; top: 8px; left: 4px; width: 10px; height: 2px; border-radius: 2px; background: #06112d; content: ''; }
+.paliro-video-follow-plus::after { transform: rotate(90deg); }
 .paliro-video-report-action > img { width: 44px; height: 44px; }
 .paliro-video-report-action > small { width: 52px; text-align: center; }
 .paliro-video-actions button:active { transform: scale(.9); }
@@ -394,46 +423,58 @@ button { cursor: pointer; }
 .paliro-video-empty p { max-width: 270px; color: rgba(227, 224, 241, .65); font-size: 12px; line-height: 1.5; }
 .paliro-video-empty button, .paliro-video-submit { min-height: 44px; padding: 0 28px; border: 0; border-radius: 999px; color: #fff; background: linear-gradient(90deg, #1cf2e9, #3d7fd9); font: inherit; font-size: 14px; font-weight: 800; }
 
-.paliro-video-sheet-backdrop { position: fixed; z-index: 220; inset: 0; display: grid; align-items: end; background: rgba(1, 2, 11, .72); backdrop-filter: blur(4px); }
-.paliro-video-comments-sheet, .paliro-video-action-sheet, .paliro-video-report-sheet, .paliro-video-publish-sheet { width: min(100%, 560px); max-height: min(82dvh, 700px); margin: 0 auto; overflow-y: auto; border: 1px solid rgba(112, 121, 177, .34); border-radius: 23px 23px 0 0; color: #fff; background: linear-gradient(150deg, #161532, #0b0b21); box-shadow: 0 -16px 44px rgba(0, 0, 0, .38); }
-.paliro-video-comments-sheet { display: flex; min-height: 42dvh; flex-direction: column; }
-.paliro-video-comments-sheet > header, .paliro-video-report-sheet > header, .paliro-video-publish-sheet > header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 13px; border-bottom: 1px solid rgba(135, 133, 173, .2); }
-.paliro-video-comments-sheet h2, .paliro-video-report-sheet h2, .paliro-video-publish-sheet h2 { margin: 0; font-size: 16px; font-weight: 800; }
-.paliro-video-comments-sheet h2 span { color: rgba(222, 218, 239, .54); font-size: 12px; }
-.paliro-video-comments-sheet header button, .paliro-video-report-sheet header button, .paliro-video-publish-sheet header button { width: 30px; padding: 0; border: 0; color: #fff; background: transparent; font: inherit; font-size: 25px; line-height: 1; }
-.paliro-video-comments-sheet > main { min-height: 0; flex: 1; padding: 4px 20px 10px; overflow-y: auto; }
-.paliro-video-comments-sheet article { display: grid; grid-template-columns: 31px minmax(0, 1fr) 38px; align-items: start; gap: 9px; padding: 11px 0; }
-.paliro-video-comments-sheet article > img, .paliro-video-comments-sheet article > span { display: grid; width: 29px; height: 29px; border-radius: 50%; background: linear-gradient(135deg, #314d98, #2cece7); color: #07122a; font-size: 12px; font-weight: 800; object-fit: cover; place-items: center; }
+.paliro-video-sheet-backdrop { position: fixed; z-index: 220; inset: 0; display: grid; align-items: end; background: rgba(0, 0, 0, .48); }
+.paliro-video-comments-sheet, .paliro-video-action-sheet, .paliro-video-report-sheet, .paliro-video-publish-sheet { width: min(100%, 480px); max-height: min(82dvh, 700px); margin: 0 auto; overflow-y: auto; border: 1px solid rgba(255, 255, 255, .08); border-radius: 24px 24px 0 0; color: #fff; background: #080808; box-shadow: 0 -16px 44px rgba(0, 0, 0, .46); }
+.paliro-video-comments-sheet { display: flex; height: clamp(430px, 65dvh, 620px); max-height: calc(100dvh - max(20px, env(safe-area-inset-top))); flex-direction: column; overflow: hidden; }
+.paliro-video-comments-sheet > header, .paliro-video-report-sheet > header, .paliro-video-publish-sheet > header { display: flex; flex: 0 0 auto; min-height: 64px; align-items: center; justify-content: space-between; padding: 17px 23px 13px; border-bottom: 0; }
+.paliro-video-comments-sheet h2, .paliro-video-report-sheet h2, .paliro-video-publish-sheet h2 { margin: 0; font-size: 18px; font-weight: 800; line-height: 24px; }
+.paliro-video-comments-sheet h2 span { color: #fff; font: inherit; }
+.paliro-video-comments-sheet header button, .paliro-video-report-sheet header button, .paliro-video-publish-sheet header button { display: grid; width: 32px; height: 32px; padding: 0; border: 0; color: #fff; background: transparent; font: inherit; place-items: center; }
+.paliro-video-sheet-close > span { position: relative; display: block; width: 24px; height: 24px; }
+.paliro-video-sheet-close > span::before, .paliro-video-sheet-close > span::after { position: absolute; top: 11px; left: 1px; width: 22px; height: 2.5px; border-radius: 2px; background: #fff; content: ''; transform: rotate(45deg); }
+.paliro-video-sheet-close > span::after { transform: rotate(-45deg); }
+.paliro-video-comments-sheet > main { min-height: 0; flex: 1; padding: 0 23px 12px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.paliro-video-comments-sheet > main::-webkit-scrollbar { display: none; }
+.paliro-video-comments-sheet article { display: grid; grid-template-columns: 38px minmax(0, 1fr) 38px; align-items: start; gap: 12px; padding: 13px 0 15px; }
+.paliro-video-comments-sheet article > img, .paliro-video-comments-sheet article > span { display: grid; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #314d98, #2cece7); color: #07122a; font-size: 13px; font-weight: 800; object-fit: cover; object-position: center; place-items: center; }
 .paliro-video-comment-copy { min-width: 0; }
-.paliro-video-comments-sheet article strong { color: #fff; font-size: 12px; }
-.paliro-video-comments-sheet article p { margin: 3px 0 0; color: rgba(255, 255, 255, .87); font-size: 12px; line-height: 1.4; }
-.paliro-video-comment-like { display: grid; justify-items: center; gap: 2px; padding: 0; border: 0; color: rgba(213, 213, 225, .68); background: transparent; font: inherit; }
-.paliro-video-comment-like span { font-size: 26px; line-height: .88; }
-.paliro-video-comment-like small { font-size: 10px; font-weight: 700; }
-.paliro-video-comment-like.is-liked { color: #ff42b7; }
+.paliro-video-comments-sheet article strong { color: #fff; font-size: 14px; font-weight: 800; line-height: 18px; }
+.paliro-video-comments-sheet article p { margin: 5px 0 0; color: rgba(255, 255, 255, .95); font-size: 14px; font-weight: 400; line-height: 1.42; overflow-wrap: anywhere; }
+.paliro-video-comment-like { display: grid; min-width: 38px; min-height: 44px; align-content: start; justify-items: center; gap: 3px; padding: 0; border: 0; color: rgba(176, 177, 187, .82); background: transparent; font: inherit; }
+.paliro-video-comment-like .paliro-state-value { display: block; font-family: Arial, sans-serif; font-size: 27px; font-weight: 400; line-height: 25px; }
+.paliro-video-comment-like small { color: rgba(176, 177, 187, .82); font-size: 11px; font-weight: 500; line-height: 14px; }
+.paliro-video-comment-like.is-liked, .paliro-video-comment-like.is-liked small { color: #ff2fae; }
 .paliro-video-comment-like:active { transform: scale(.9); }
-.paliro-video-comments-sheet form { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 11px 18px max(12px, env(safe-area-inset-bottom)); border-top: 1px solid rgba(135, 133, 173, .2); }
-.paliro-video-comment-composer-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+.paliro-video-comments-sheet form { display: grid; flex: 0 0 auto; grid-template-columns: 38px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 71px; padding: 12px 20px max(12px, env(safe-area-inset-bottom)); border-top: 1px solid rgba(255, 255, 255, .12); background: #1a1a1a; }
+.paliro-video-comment-composer-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; object-position: center; }
 .paliro-video-comments-sheet input, .paliro-video-publish-sheet input, .paliro-video-publish-sheet textarea, .paliro-video-report-sheet textarea { min-width: 0; border: 1px solid rgba(132, 128, 171, .28); border-radius: 11px; outline: 0; color: #fff; background: rgba(5, 6, 21, .57); font: inherit; font-size: 12px; }
-.paliro-video-comments-sheet input { min-height: 39px; padding: 0 12px; }
-.paliro-video-comments-sheet form button { padding: 0 9px; border: 0; color: #32f2ec; background: transparent; font: inherit; font-size: 12px; font-weight: 800; }
+.paliro-video-comments-sheet input { min-height: 40px; padding: 0 15px; border-color: rgba(255, 255, 255, .12); border-radius: 999px; background: #080808; font-size: 16px; }
+.paliro-video-comments-sheet input::placeholder { color: rgba(197, 197, 207, .55); }
+.paliro-video-comments-sheet form button { min-height: 40px; padding: 0 3px; border: 0; color: #28f2ec; background: transparent; font: inherit; font-size: 14px; font-weight: 800; }
 .paliro-video-comments-sheet form button:disabled { color: rgba(197, 193, 220, .35); }
 .paliro-video-form-error { margin: 0 20px 13px; color: #ff8aa8; font-size: 11px; }
-.paliro-video-action-sheet { display: grid; gap: 1px; padding: 9px 0 max(11px, env(safe-area-inset-bottom)); background: #0c0c12; }
-.paliro-video-action-sheet button { display: flex; min-height: 53px; align-items: center; gap: 13px; padding: 0 22px; border: 0; color: #fff; background: transparent; font: inherit; font-size: 14px; font-weight: 700; text-align: left; }
-.paliro-video-action-sheet button span { display: grid; width: 20px; height: 20px; color: #cbd0e6; font-size: 19px; place-items: center; }
-.paliro-video-action-sheet button:nth-child(2), .paliro-video-action-sheet button:nth-child(3) { color: #ff6674; border-top: 1px solid rgba(255, 255, 255, .06); }
-.paliro-video-action-sheet button:last-child { justify-content: center; margin: 7px 12px 0; border-radius: 11px; background: rgba(255, 255, 255, .08); text-align: center; }
+.paliro-video-action-backdrop { background: transparent; }
+.paliro-video-action-sheet { display: block; height: calc(249px + env(safe-area-inset-bottom)); max-height: none; padding: 0; overflow: hidden; border: 1px solid #2a2a2a; border-bottom: 0; border-radius: 24px 24px 0 0; color: #fff; background: #0a0a0a; box-shadow: none; font-family: 'Paliro Montserrat', Montserrat, sans-serif; }
+.paliro-video-action-options { display: grid; height: 164px; gap: 4px; padding: 0 24px; }
+.paliro-video-action-options button { display: flex; width: 100%; height: 52px; min-height: 52px; align-items: center; gap: 16px; padding: 0; border: 0; border-bottom: 1px solid #2a2a2a; color: #fff; background: transparent; font-family: 'Paliro Montserrat', Montserrat, sans-serif; font-size: 15px; font-weight: 600; line-height: 18px; text-align: left; }
+.paliro-video-action-options button:nth-child(2), .paliro-video-action-options button:nth-child(3) { color: #ff3b30; }
+.paliro-video-action-options button img { display: block; width: 20px; height: 20px; flex: 0 0 20px; object-fit: contain; }
+.paliro-video-action-options button span { min-width: 0; flex: 1; }
+.paliro-video-action-sheet .paliro-video-action-cancel { display: grid; width: calc(100% - 40px); height: 50px; min-height: 50px; margin: 20px 20px 0; padding: 0; border: 0; border-radius: 14px; color: #fff; background: #1a1a1a; font-family: 'Paliro Montserrat', Montserrat, sans-serif; font-size: 15px; font-weight: 700; line-height: 18px; text-align: center; place-items: center; }
+.paliro-video-action-options button:active, .paliro-video-action-sheet .paliro-video-action-cancel:active { filter: brightness(.82); }
 .paliro-video-report-sheet, .paliro-video-publish-sheet { padding-bottom: max(15px, env(safe-area-inset-bottom)); }
+.paliro-video-report-sheet { background: #080808; }
 .paliro-video-report-sheet > p, .paliro-video-report-sheet > fieldset, .paliro-video-report-sheet > label, .paliro-video-publish-sheet > label, .paliro-video-publish-sheet > video, .paliro-video-publish-picker { margin-right: 20px; margin-left: 20px; }
-.paliro-video-report-sheet > p { margin-top: 16px; margin-bottom: 10px; color: rgba(224, 220, 239, .7); font-size: 12px; }
-.paliro-video-report-sheet fieldset { display: grid; gap: 7px; padding: 0; border: 0; }
-.paliro-video-report-sheet fieldset button { display: grid; grid-template-columns: 18px minmax(0, 1fr); align-items: center; gap: 8px; min-height: 40px; padding: 0 12px; border: 1px solid rgba(135, 132, 171, .25); border-radius: 10px; color: #fff; background: rgba(28, 27, 48, .7); font: inherit; font-size: 12px; text-align: left; }
+.paliro-video-report-sheet > p { margin-top: 2px; margin-bottom: 9px; color: rgba(255, 255, 255, .7); font-size: 12px; font-weight: 600; }
+.paliro-video-report-sheet fieldset { display: grid; gap: 9px; padding: 0; border: 0; }
+.paliro-video-report-sheet fieldset button { display: grid; grid-template-columns: 18px minmax(0, 1fr); align-items: center; gap: 10px; min-height: 41px; padding: 0 12px; border: 1px solid rgba(255, 255, 255, .07); border-radius: 9px; color: rgba(255, 255, 255, .86); background: #1b1b1b; font: inherit; font-size: 12px; text-align: left; }
 .paliro-video-report-sheet fieldset button i { width: 13px; height: 13px; border: 2px solid rgba(221, 220, 231, .6); border-radius: 50%; }
-.paliro-video-report-sheet fieldset button.is-selected { border-color: #27efe9; color: #78fff6; }
-.paliro-video-report-sheet fieldset button.is-selected i { border-color: #27efe9; box-shadow: inset 0 0 0 3px #161531, inset 0 0 0 5px #27efe9; }
+.paliro-video-report-sheet fieldset button.is-selected { border-color: rgba(39, 241, 235, .65); color: #fff; background: #202020; }
+.paliro-video-report-sheet fieldset button.is-selected i { border-color: #27efe9; box-shadow: inset 0 0 0 3px #202020, inset 0 0 0 5px #27efe9; }
 .paliro-video-report-sheet label, .paliro-video-publish-sheet label { display: grid; gap: 7px; margin-top: 14px; color: rgba(224, 220, 239, .68); font-size: 11px; font-weight: 700; }
 .paliro-video-report-sheet textarea, .paliro-video-publish-sheet textarea { min-height: 76px; padding: 10px 11px; resize: vertical; }
+.paliro-video-report-sheet textarea { min-height: 104px; border-color: rgba(255, 255, 255, .07); border-radius: 9px; background: #1b1b1b; font-size: 16px; }
+.paliro-video-report-sheet .paliro-video-submit { min-height: 56px; border: 1px solid #329af2; background: linear-gradient(90deg, #348ee9 0%, #0b1d5f 100%); box-shadow: 0 8px 22px rgba(25, 113, 221, .22); }
 .paliro-video-publish-sheet input { min-height: 40px; padding: 0 11px; }
 .paliro-video-publish-sheet label small { color: rgba(220, 216, 237, .45); font-size: 10px; font-weight: 600; text-align: right; }
 .paliro-video-submit { display: block; width: calc(100% - 40px); margin: 16px 20px 0; }
@@ -444,33 +485,44 @@ button { cursor: pointer; }
 .paliro-video-publish-picker strong { color: #fff; font-size: 13px; }
 .paliro-video-publish-picker > div { display: flex; gap: 8px; }
 .paliro-video-publish-picker button { min-height: 30px; padding: 0 11px; border: 1px solid rgba(71, 238, 232, .62); border-radius: 999px; color: #6dfbf2; background: rgba(10, 15, 42, .68); font: inherit; font-size: 10px; font-weight: 800; }
-.paliro-video-publish-backdrop { position: fixed; z-index: 230; inset: 0; display: grid; background: rgba(3, 4, 18, .94); }
-.paliro-video-publish-backdrop .paliro-video-publish-sheet { display: flex; width: min(100%, 560px); max-height: none; height: 100%; flex-direction: column; margin: 0 auto; padding: 0 0 max(16px, env(safe-area-inset-bottom)); border: 0; border-radius: 0; background: radial-gradient(circle at 72% 18%, rgba(51, 106, 197, .36), transparent 31%), linear-gradient(150deg, #0a0b2b 0%, #1b1035 52%, #070719 100%); box-shadow: none; }
-.paliro-video-publish-sheet > header { display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; flex: 0 0 auto; align-items: center; min-height: 65px; padding: max(10px, env(safe-area-inset-top)) 21px 8px; border: 0; }
-.paliro-video-publish-sheet > header h2 { font-size: 16px; text-align: center; }
-.paliro-video-publish-sheet > header button { width: 35px; height: 35px; border-radius: 50%; font-size: 31px; text-align: left; }
-.paliro-video-reward-banner { flex: 0 0 auto; margin: 0 20px 13px; padding: 10px 12px; border-radius: 10px; color: #fff; background: linear-gradient(95deg, #20eee6, #407fd8); font-size: 11px; font-weight: 700; line-height: 1.35; }
+.paliro-video-publish-backdrop { position: fixed; z-index: 230; inset: 0; display: grid; overflow: hidden; background: #06071e; }
+.paliro-video-publish-backdrop .paliro-video-publish-sheet { display: flex; width: min(100%, 430px); max-height: 100dvh; height: 100%; flex-direction: column; margin: 0 auto; padding: calc(env(safe-area-inset-top) + 16px) 0 max(34px, env(safe-area-inset-bottom)); overflow-x: hidden; overflow-y: auto; border: 0; border-radius: 0; color: #fff; background: linear-gradient(135deg, #0b0c28 0%, #1e1233 50%, #06071e 100%); box-shadow: none; font-family: 'Paliro Montserrat', Montserrat, sans-serif; scrollbar-width: none; }
+.paliro-video-publish-sheet::-webkit-scrollbar { display: none; }
+.paliro-video-publish-sheet > header { display: grid; height: 44px; min-height: 44px; grid-template-columns: 44px minmax(0, 1fr) 44px; flex: 0 0 44px; align-items: center; padding: 0 8px; border: 0; }
+.paliro-video-publish-sheet > header h2 { margin: 0; font-size: 16px; font-weight: 800; line-height: 20px; text-align: center; }
+.paliro-video-publish-sheet > header button { display: grid; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 0; color: #fff; background: transparent; place-items: center; }
+.paliro-video-publish-sheet > header button svg { width: 20px; height: 20px; }
+.paliro-video-reward-banner { display: flex; min-height: 60px; flex: 0 0 60px; align-items: center; box-sizing: border-box; margin: 0 24px; padding: 12px; border-radius: 16px; color: #fff; background: linear-gradient(90deg, #1ffffb 0%, #4285cb 100%); font-family: 'Paliro Baloo Bhai 2', 'Paliro Montserrat', Montserrat, sans-serif; font-size: 12px; font-weight: 800; line-height: 18px; }
 .paliro-video-reward-banner.is-claimed { color: rgba(230, 228, 240, .77); background: rgba(50, 62, 117, .62); }
-.paliro-video-publish-media { display: grid; min-height: min(39dvh, 300px); margin: 0 20px; overflow: hidden; border: 2px dashed rgba(55, 242, 235, .75); border-radius: 16px; background: rgba(20, 21, 61, .68); place-items: center; }
-.paliro-video-publish-media video { width: 100%; height: min(39dvh, 300px); object-fit: cover; }
-.paliro-video-reselect { align-self: center; min-height: 44px; padding: 8px 16px; border: 0; color: #42f2eb; background: transparent; font: inherit; font-size: 12px; }
-.paliro-video-publish-media > button { display: grid; justify-items: center; gap: 10px; border: 0; color: rgba(255, 255, 255, .84); background: transparent; font: inherit; }
-.paliro-video-publish-media > button span { display: grid; width: 51px; height: 51px; border-radius: 50%; color: #42f2eb; background: rgba(37, 126, 157, .66); font-size: 37px; font-weight: 300; place-items: center; }
-.paliro-video-publish-media > button strong { font-size: 12px; }
-.paliro-video-publish-sources { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; margin: 14px 20px 0; }
-.paliro-video-publish-sources button { min-height: 39px; border: 1px solid rgba(140, 131, 189, .35); border-radius: 999px; color: #fff; background: rgba(24, 22, 57, .62); font: inherit; font-size: 11px; font-weight: 700; }
-.paliro-video-publish-sources button.is-selected { border-color: #32eee9; color: #fff; background: linear-gradient(100deg, rgba(35, 235, 228, .32), rgba(49, 123, 210, .5)); box-shadow: 0 0 15px rgba(48, 234, 228, .16); }
-.paliro-video-publish-sources button span { margin-right: 6px; color: #4df5ef; font-size: 14px; }
-.paliro-video-publish-sheet > label { margin: 15px 20px 0; }
-.paliro-video-publish-sheet > label textarea { min-height: 72px; }
-.paliro-video-publish-sheet .paliro-video-submit { flex: 0 0 auto; width: calc(100% - 40px); min-height: 45px; margin-top: auto; }
-.paliro-video-reward-backdrop { position: fixed; z-index: 250; inset: 0; display: grid; padding: 24px; background: rgba(1, 2, 12, .78); backdrop-filter: blur(6px); place-items: center; }
-.paliro-video-reward-dialog { width: min(100%, 330px); padding: 21px 18px 17px; border: 1px solid rgba(109, 119, 179, .4); border-radius: 18px; color: #fff; background: linear-gradient(150deg, #1b1a3b, #101128); box-shadow: 0 18px 42px rgba(0, 0, 0, .46); text-align: center; }
-.paliro-video-reward-dialog img { width: 74px; height: 74px; object-fit: contain; filter: drop-shadow(0 0 16px rgba(80, 233, 255, .6)); }
-.paliro-video-reward-dialog h2 { margin: 4px 0 8px; font-size: 17px; font-weight: 800; }
-.paliro-video-reward-dialog p { margin: 0 7px 17px; color: rgba(230, 227, 241, .67); font-size: 11px; line-height: 1.45; }
-.paliro-video-reward-dialog button { width: 100%; min-height: 43px; border: 0; border-radius: 999px; color: #fff; background: linear-gradient(90deg, #1cf2e9, #3d7fd9); font: inherit; font-size: 13px; font-weight: 800; }
-.paliro-my-videos-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 12px; padding: 18px 20px max(22px, env(safe-area-inset-bottom)); }
+.paliro-video-publish-media { position: relative; display: grid; width: calc(100% - 40px); aspect-ratio: 335 / 260; min-height: 0; flex: 0 0 auto; margin: 18px 20px 0; overflow: hidden; box-sizing: border-box; border: 2px dashed #1ffffb; border-radius: 20px; background: rgba(26, 26, 46, .4); place-items: center; }
+.paliro-video-publish-cover { position: absolute; inset: 0; display: block; width: 100%; height: 100%; background: #101126; object-fit: cover; object-position: center; }
+.paliro-video-publish-media > button { position: absolute; z-index: 1; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; padding: 0; border: 0; color: #fff; background: transparent; font: inherit; }
+.paliro-video-publish-media > button img { display: block; width: 60px; height: 60px; object-fit: contain; }
+.paliro-video-publish-media > button strong { font-size: 15px; font-weight: 600; line-height: 18px; text-align: center; }
+.paliro-video-publish-media.has-video > button:active img { transform: scale(.94); }
+.paliro-video-publish-sources { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 20px 20px 0; }
+.paliro-video-publish-sources button { display: flex; height: 52px; min-height: 52px; min-width: 0; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; border: 1px solid rgba(255, 255, 255, .13); border-radius: 26px; color: #fff; background: rgba(255, 255, 255, .05); font: 600 14px/17px 'Paliro Montserrat', Montserrat, sans-serif; white-space: nowrap; }
+.paliro-video-publish-sources button.is-selected { color: #1ffffb; }
+.paliro-video-publish-sources button span { display: block; width: 18px; height: 18px; flex: 0 0 18px; background: currentColor; -webkit-mask-position: center; mask-position: center; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-size: contain; mask-size: contain; }
+.paliro-video-source-gallery { -webkit-mask-image: url('/assets/paliro-video-upload-gallery.svg'); mask-image: url('/assets/paliro-video-upload-gallery.svg'); }
+.paliro-video-source-camera { -webkit-mask-image: url('/assets/paliro-video-upload-camera.svg'); mask-image: url('/assets/paliro-video-upload-camera.svg'); }
+.paliro-video-publish-sheet > label { display: grid; flex: 0 0 auto; gap: 8px; margin: 20px 20px 0; color: #8a8d9f; font-size: 12px; font-weight: 700; line-height: 15px; text-transform: uppercase; }
+.paliro-video-publish-sheet > label textarea { width: 100%; height: 72px; min-height: 72px; box-sizing: border-box; padding: 12px; border: 1px solid rgba(255, 255, 255, .13); border-radius: 12px; color: #fff; background: rgba(255, 255, 255, .03); font: 400 14px/17px 'Paliro Montserrat', Montserrat, sans-serif; resize: none; }
+.paliro-video-publish-sheet > label textarea::placeholder { color: #8a8d9f; opacity: 1; }
+.paliro-video-publish-sheet > .paliro-video-form-error { margin: 8px 20px -19px; font-size: 11px; line-height: 15px; }
+.paliro-video-publish-sheet .paliro-video-submit { display: grid; width: calc(100% - 48px); height: 52px; min-height: 52px; flex: 0 0 52px; margin: 32px 24px 0; padding: 0 24px; border: 1px solid transparent; border-radius: 40px; color: #fff; background: linear-gradient(90deg, #267cdc 0%, #081127 100%) padding-box, linear-gradient(90deg, #4aa2f5 0%, #1f63b1 100%) border-box; font: 800 16px/20px 'Paliro Montserrat', Montserrat, sans-serif; place-items: center; }
+@media (hover: hover) and (pointer: fine) {
+  .paliro-video-publish-sheet button:focus-visible, .paliro-video-publish-sheet textarea:focus-visible { outline: 2px solid #1ffffb; outline-offset: 2px; }
+}
+@media (max-height: 700px) {
+  .paliro-video-publish-backdrop .paliro-video-publish-sheet { padding-top: calc(env(safe-area-inset-top) + 8px); }
+}
+.paliro-video-reward-backdrop { position: fixed; z-index: 250; inset: 0; display: grid; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); background: rgba(0, 0, 0, .8); place-items: center; }
+.paliro-video-reward-dialog { box-sizing: border-box; display: flex; width: min(calc(100vw - 32px), 312px); min-height: 271px; flex-direction: column; align-items: center; padding: 23px; border: 1px solid rgba(255, 255, 255, .13); border-radius: 24px; color: #fff; background: rgba(26, 26, 46, .75); text-align: center; }
+.paliro-video-reward-dialog .paliro-video-reward-art { display: block; width: 79px; height: 79px; flex: 0 0 79px; object-fit: contain; }
+.paliro-video-reward-dialog p { width: 100%; min-height: 54px; margin: 20px 0; color: rgba(255, 255, 255, .7); font: 500 13px/18px 'Paliro Montserrat', Montserrat, sans-serif; text-align: center; }
+.paliro-video-reward-dialog button { display: grid; width: 100%; height: 50px; min-height: 50px; padding: 0 20px; border: 1px solid transparent; border-radius: 40px; color: #fff; background: linear-gradient(90deg, #267cdc 0%, #081127 100%) padding-box, linear-gradient(90deg, #4aa2f5 0%, #1f63b1 100%) border-box; font: 800 16px/20px 'Paliro Montserrat', Montserrat, sans-serif; place-items: center; }
+.paliro-my-videos-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 12px; padding: 18px 24px max(22px, env(safe-area-inset-bottom)); }
 .paliro-my-videos-grid article { min-width: 0; overflow: hidden; border: 1px solid rgba(112, 140, 209, .3); border-radius: 13px; background: rgba(19, 18, 52, .68); }
 .paliro-my-videos-grid video { display: block; width: 100%; aspect-ratio: .83; background: #070817; object-fit: cover; }
 .paliro-my-videos-grid article div { display: grid; gap: 3px; padding: 8px; }
@@ -478,13 +530,12 @@ button { cursor: pointer; }
 .paliro-my-videos-grid span { color: rgba(215, 211, 235, .58); font-size: 10px; }
 
 .paliro-messages, .paliro-conversation-view { display: flex; flex-direction: column; padding: 0; background: radial-gradient(circle at 60% 14%, rgba(87, 44, 130, .38), transparent 29%), linear-gradient(145deg, #090b2a 0%, #1d1135 51%, #06071d 100%); }
-.paliro-messages-nav { display: flex; flex: 0 0 auto; align-items: center; justify-content: space-between; min-height: 86px; padding: max(22px, env(safe-area-inset-top)) 24px 10px; }
-.paliro-messages-nav h1 { margin: 0; color: #fff; font-size: clamp(25px, 7vw, 32px); font-weight: 800; letter-spacing: -.05em; }
-.paliro-message-notification { position: relative; display: grid; width: 35px; aspect-ratio: 1; padding: 0; border: 1px solid rgba(168, 156, 223, .35); border-radius: 50%; background: rgba(22, 20, 56, .68); place-items: center; }
-.paliro-message-notification span { width: 12px; height: 14px; border: 1.5px solid #fff; border-radius: 7px 7px 4px 4px; opacity: .9; }
-.paliro-message-notification span::after { display: block; width: 5px; height: 1.5px; margin: 14px auto 0; border-radius: 2px; background: #fff; content: ''; }
-.paliro-message-notification i { position: absolute; top: 5px; right: 5px; width: 6px; height: 6px; border: 1px solid #161438; border-radius: 50%; background: #ff6990; }
-.paliro-messages-scroll { min-height: 0; flex: 1; overflow-y: auto; overscroll-behavior-y: contain; padding: 0 24px calc(68px + env(safe-area-inset-bottom)); scrollbar-width: none; touch-action: pan-y; }
+.paliro-messages-nav { position: relative; flex: 0 0 auto; height: calc(env(safe-area-inset-top) + 75px); min-height: 75px; padding: 0 20px; }
+.paliro-messages-nav h1 { position: absolute; top: calc(env(safe-area-inset-top) + 24px); left: 20px; height: 34px; margin: 0; color: rgba(255, 255, 255, 1); font-size: 28px; font-weight: 800; letter-spacing: 0; line-height: 34px; }
+.paliro-message-notification { position: absolute; top: calc(env(safe-area-inset-top) + 25px); right: 20px; display: block; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: transparent; }
+.paliro-message-notification > img { display: block; width: 32px; height: 32px; object-fit: contain; }
+.paliro-message-notification i { position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; border: 1px solid rgba(255, 255, 255, 1); border-radius: 50%; background: rgba(255, 59, 48, 1); }
+.paliro-messages-scroll { min-height: 0; flex: 1; overflow-y: auto; overscroll-behavior-y: contain; padding: 0 20px calc(68px + env(safe-area-inset-bottom)); scrollbar-width: none; touch-action: pan-y; }
 
 .paliro-pull { position: absolute; z-index: 12; left: 50%; display: flex; align-items: center; gap: 9px; max-width: calc(100% - 48px); padding: 11px 17px; border: 1px solid rgba(103, 229, 239, .22); border-radius: 24px; background: rgba(13, 17, 39, .96); color: #d8fafa; box-shadow: 0 8px 24px #0005; font-size: 12px; white-space: nowrap; opacity: 0; transform: translate(-50%, -10px); pointer-events: none; transition: opacity .18s ease, transform .2s ease; }
 .paliro-pull.is-visible { opacity: 1; transform: translate(-50%, min(var(--pull-distance), 24px)); pointer-events: auto; }
@@ -511,55 +562,57 @@ button { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   .paliro-pull { transition: none; }
   .paliro-message-skeleton i, .paliro-message-skeleton b, .paliro-message-skeleton small,
+  .paliro-me-skeleton-identity i, .paliro-me-skeleton-identity b, .paliro-me-skeleton-identity span, .paliro-me-skeleton-identity small, .paliro-me-skeleton-stats i, .paliro-me-skeleton-menu i,
   .paliro-pull.is-busy .paliro-list-spinner, .paliro-video-loading > .paliro-list-spinner { animation: none; }
 }
 .paliro-messages-scroll::-webkit-scrollbar, .paliro-conversation-scroll::-webkit-scrollbar { display: none; }
-.paliro-message-search { display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: center; min-height: 39px; gap: 3px; padding: 0 11px; border: 1px solid rgba(135, 128, 184, .3); border-radius: 11px; color: rgba(220, 216, 237, .54); background: rgba(17, 16, 48, .64); }
-.paliro-message-search span { font-size: 23px; line-height: 1; transform: rotate(-18deg); }
-.paliro-message-search input { min-width: 0; border: 0; outline: 0; color: #fff; background: transparent; font-size: 11px; }
-.paliro-message-search input::placeholder { color: rgba(220, 216, 237, .43); }
-.paliro-messages-scroll > h2, .paliro-friend-requests-scroll > h2 { margin: 16px 0 10px; color: rgba(206, 201, 227, .55); font-size: 10px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+.paliro-message-search { display: grid; height: 40px; grid-template-columns: 16px minmax(0, 1fr); align-items: center; gap: 11px; padding: 0 13px; border: 1px solid rgba(138, 141, 159, .34); border-radius: 12px; color: rgba(138, 141, 159, 1); background: rgba(17, 16, 48, .64); }
+.paliro-message-search > img { display: block; width: 16px; height: 16px; object-fit: contain; }
+.paliro-message-search input { min-width: 0; padding: 0; border: 0; outline: 0; appearance: none; color: rgba(255, 255, 255, 1); background: transparent; font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 400; line-height: 17px; }
+.paliro-message-search input::-webkit-search-decoration, .paliro-message-search input::-webkit-search-cancel-button { display: none; }
+.paliro-message-search input::placeholder { color: rgba(138, 141, 159, 1); opacity: 1; }
+.paliro-messages-scroll > h2, .paliro-friend-requests-scroll > h2 { height: 15px; margin: 21px 0 12px; color: rgba(138, 141, 159, 1); font-size: 12px; font-weight: 700; letter-spacing: 0; line-height: 15px; text-transform: uppercase; }
 .paliro-conversation-list { display: grid; gap: 8px; }
-.paliro-conversation-list > button { display: grid; width: 100%; min-width: 0; grid-template-columns: 49px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid rgba(135, 128, 184, .26); border-radius: 14px; color: #fff; background: rgba(20, 18, 54, .64); text-align: left; transition: background .16s ease, border-color .16s ease, transform .16s ease; }
+.paliro-conversation-list > button { display: grid; width: 100%; height: 72px; min-width: 0; grid-template-columns: 48px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 0 12px; border: 1px solid rgba(138, 141, 159, .28); border-radius: 14px; color: rgba(255, 255, 255, 1); background: rgba(20, 18, 54, .64); text-align: left; transition: background .16s ease, border-color .16s ease, transform .16s ease; }
 .paliro-conversation-list > button:active { border-color: rgba(47, 239, 232, .62); background: rgba(29, 45, 83, .78); transform: scale(.985); }
 .paliro-conversation-list > button:focus-visible, .paliro-message-notification:focus-visible, .paliro-incoming-request-list button:focus-visible { outline: 2px solid #2cf1ed; outline-offset: 2px; }
-.paliro-conversation-list img { width: 46px; height: 46px; border: 1px solid rgba(53, 235, 231, .56); border-radius: 50%; object-fit: cover; object-position: center; }
+.paliro-conversation-list img { width: 48px; height: 48px; border: 0; border-radius: 50%; object-fit: cover; object-position: center; }
 .paliro-conversation-copy { display: grid; min-width: 0; gap: 4px; }
 .paliro-conversation-copy strong, .paliro-conversation-copy small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.paliro-conversation-copy strong { font-size: 13px; font-weight: 800; }
-.paliro-conversation-copy small { color: rgba(213, 208, 233, .52); font-size: 10px; font-weight: 500; }
-.paliro-conversation-meta { display: grid; justify-items: end; gap: 6px; color: rgba(211, 206, 231, .4); font-size: 9px; }
+.paliro-conversation-copy strong { height: 17px; font-size: 14px; font-weight: 700; line-height: 17px; }
+.paliro-conversation-copy small { height: 16px; color: rgba(255, 255, 255, .5); font-size: 13px; font-weight: 400; line-height: 16px; }
+.paliro-conversation-meta { display: grid; align-self: start; justify-items: end; gap: 11px; margin-top: 16px; color: rgba(138, 141, 159, 1); font-size: 11px; font-weight: 400; line-height: 13px; }
 .paliro-conversation-lock { display: grid; width: 16px; height: 16px; color: #8a8d9f; place-items: center; }
 .paliro-conversation-lock svg { width: 14px; height: 14px; }
-.paliro-conversation-meta i { display: grid; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 50%; color: #061832; background: #2bf0e9; font-size: 9px; font-style: normal; font-weight: 800; place-items: center; }
+.paliro-conversation-meta i { display: grid; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 50%; color: rgba(3, 3, 3, 1); background: rgba(31, 255, 251, 1); font-size: 10px; font-style: normal; font-weight: 800; line-height: 12px; place-items: center; }
 .paliro-message-empty { display: grid; min-height: 250px; align-content: center; justify-items: center; padding: 24px; text-align: center; }
 .paliro-message-empty > div { display: grid; width: 62px; aspect-ratio: 1; margin-bottom: 14px; border: 1px solid rgba(47, 239, 232, .48); border-radius: 50%; color: #48f5ee; box-shadow: 0 0 24px rgba(47, 239, 232, .14); font-size: 25px; place-items: center; }
 .paliro-message-empty h2 { margin: 0 0 7px; color: #fff; font-size: 17px; }
 .paliro-message-empty p { max-width: 260px; margin: 0; color: rgba(218, 214, 235, .62); font-size: 12px; line-height: 1.5; }
-.paliro-conversation-view { position: absolute; inset-inline: 0; display: flex; flex-direction: column; padding: env(safe-area-inset-top, 0px) 0 0; background: #020b20; font-family: 'Paliro Montserrat', Montserrat, sans-serif; }
-.paliro-chat-nav { display: grid; grid-template-columns: 28px minmax(0, 1fr) 36px 28px; flex: 0 0 60px; align-items: center; gap: 8px; padding: 0 16px; border-block: 1px solid #303035; background: #14162c; }
-.paliro-chat-nav button { display: grid; min-width: 0; height: 44px; align-items: center; padding: 0; border: 0; color: #fff; background: transparent; place-items: center; }
+.paliro-conversation-view { position: absolute; inset-inline: 0; display: flex; flex-direction: column; padding: env(safe-area-inset-top, 0px) 0 0; background: radial-gradient(circle at 70% 7%, rgba(54, 56, 114, .24), transparent 28%), #020b20; font-family: 'Paliro Montserrat', Montserrat, sans-serif; }
+.paliro-chat-nav { position: relative; display: grid; height: 60px; min-height: 60px; grid-template-columns: 32px minmax(0, 1fr) 36px 32px; flex: 0 0 60px; align-items: center; gap: 8px; padding: 0 20px; border-bottom: 1px solid rgba(255, 255, 255, .1); background: rgba(15, 18, 42, .96); box-shadow: 0 4px 18px rgba(0, 0, 0, .14); }
+.paliro-chat-nav button { display: grid; min-width: 0; height: 60px; align-items: center; align-self: center; padding: 0; border: 0; color: #fff; background: transparent; place-items: center; }
 .paliro-chat-nav svg { width: 24px; height: 24px; }
-.paliro-chat-nav .paliro-chat-member { display: flex; gap: 12px; text-align: left; }
-.paliro-chat-member img { width: 36px; height: 36px; flex-shrink: 0; border-radius: 50%; object-fit: cover; object-position: center; }
-.paliro-chat-member h1 { overflow: hidden; margin: 0; color: rgba(255,255,255,1); font-size: 14px; font-weight: 700; line-height: 1.3; letter-spacing: normal; text-overflow: ellipsis; white-space: nowrap; }
+.paliro-chat-nav .paliro-chat-member { display: flex; align-items: center; justify-content: flex-start; gap: 11px; text-align: left; }
+.paliro-chat-member img { width: 40px; height: 40px; flex-shrink: 0; border: 1px solid rgba(31, 255, 251, .62); border-radius: 50%; object-fit: cover; object-position: center; box-shadow: 0 0 12px rgba(31, 255, 251, .12); }
+.paliro-chat-member h1 { overflow: hidden; margin: 0; color: rgba(255,255,255,1); font-size: 15px; font-weight: 700; line-height: 19px; letter-spacing: normal; text-overflow: ellipsis; white-space: nowrap; }
 .paliro-chat-nav .paliro-chat-video { color: rgba(31,255,251,1); }
 .paliro-chat-nav .paliro-chat-more { color: rgba(142,142,147,1); }
-.paliro-conversation-scroll { display: flex; min-height: 0; flex: 1; flex-direction: column; gap: 14px; overflow-y: auto; padding: 20px; scrollbar-width: none; touch-action: pan-y; overflow-anchor: none; }
-.paliro-chat-row { display: flex; flex: 0 0 auto; align-items: flex-end; gap: 10px; min-width: 0; }
+.paliro-conversation-scroll { display: flex; min-height: 0; flex: 1; flex-direction: column; gap: 14px; overflow-y: auto; padding: 20px 20px 24px; scrollbar-width: none; touch-action: pan-y; overflow-anchor: none; }
+.paliro-chat-row { display: flex; flex: 0 0 auto; align-items: flex-end; gap: 9px; min-width: 0; }
 .paliro-chat-row.is-self { justify-content: flex-end; }
-.paliro-chat-avatar { width: 28px; height: 28px; flex: 0 0 28px; border-radius: 50%; object-fit: cover; object-position: center; }
-.paliro-message-bubble { position: relative; min-width: 0; max-width: 72%; padding: 12px; border-radius: 12px 12px 12px 2px; background: #14162c; }
-.paliro-message-bubble.is-self { border-radius: 12px 12px 2px 12px; background: #315261; }
-.paliro-message-bubble p { margin: 0; color: rgba(255,255,255,1); font-size: 13px; font-weight: 400; line-height: 1.3; white-space: pre-wrap; overflow-wrap: anywhere; }
-.paliro-message-bubble.is-self p { color: rgba(31,255,251,1); }
+.paliro-chat-avatar { width: 32px; height: 32px; flex: 0 0 32px; border-radius: 50%; object-fit: cover; object-position: center; }
+.paliro-message-bubble { position: relative; min-width: 0; max-width: 76%; padding: 11px 13px; border: 1px solid rgba(255, 255, 255, .06); border-radius: 15px 15px 15px 3px; color: #fff; background: rgba(24, 25, 51, .96); box-shadow: 0 5px 14px rgba(0, 0, 0, .12); }
+.paliro-message-bubble.is-self { border-color: rgba(77, 210, 232, .2); border-radius: 15px 15px 3px 15px; background: linear-gradient(135deg, #23657d 0%, #244558 100%); }
+.paliro-message-bubble p { margin: 0; color: rgba(255,255,255,.96); font-size: 13px; font-weight: 400; line-height: 1.42; white-space: pre-wrap; overflow-wrap: anywhere; }
+.paliro-message-bubble.is-self p { color: #fff; }
 .paliro-chat-message-time { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-.paliro-conversation-composer { display: grid; grid-template-columns: 38px minmax(0, 1fr) 38px; flex: 0 0 auto; gap: 10px; align-items: center; padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid #303035; background: #14162c; }
-.paliro-conversation-composer input { min-width: 0; width: 100%; height: 38px; padding: 0 16px; border: 0; border-radius: 999px; outline: 0; color: #fff; background: #0a0a0a; font: inherit; font-size: 16px; }
+.paliro-conversation-composer { display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; flex: 0 0 auto; gap: 10px; align-items: center; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid rgba(255, 255, 255, .1); background: rgba(18, 20, 42, .98); }
+.paliro-conversation-composer input { min-width: 0; width: 100%; height: 40px; padding: 0 16px; border: 1px solid rgba(255, 255, 255, .1); border-radius: 999px; outline: 0; color: #fff; background: #08090f; font: inherit; font-size: 16px; }
 .paliro-conversation-composer input::placeholder { color: rgba(142,142,147,1); font-size: 13px; }
-.paliro-conversation-composer button { display: grid; width: 38px; height: 38px; padding: 0; border: 0; border-radius: 50%; color: #020b20; background: rgba(31,255,251,1); place-items: center; }
+.paliro-conversation-composer button { display: grid; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; color: #020b20; background: rgba(31,255,251,1); box-shadow: 0 3px 12px rgba(31, 255, 251, .18); place-items: center; }
 .paliro-conversation-composer button > svg { width: 24px; height: 24px; }
-.paliro-conversation-composer .paliro-composer-voice-trigger { background: #262628; touch-action: none; user-select: none; -webkit-touch-callout: none; }
+.paliro-conversation-composer .paliro-composer-voice-trigger { background: #292a35; box-shadow: none; touch-action: none; user-select: none; -webkit-touch-callout: none; }
 .paliro-composer-voice-trigger img { width: 24px; height: 24px; filter: invert(89%) sepia(76%) saturate(2334%) hue-rotate(108deg) brightness(105%) contrast(103%); }
 .paliro-conversation-composer button:disabled { opacity: .45; }
 .paliro-conversation-view.has-keyboard .paliro-conversation-composer { padding-bottom: 12px; }
@@ -573,37 +626,43 @@ button { cursor: pointer; }
 .paliro-audio-wave, .paliro-voice-live-wave { display: flex; flex-shrink: 0; align-items: center; height: 32px; gap: 3px; }
 .paliro-audio-wave i, .paliro-voice-live-wave i { display: block; width: 3px; border-radius: 2px; background: rgba(142,142,147,1); }
 .paliro-audio-wave i.is-played, .paliro-voice-live-wave i { background: rgba(31,255,251,1); }
-.paliro-voice-recording { display: flex; max-height: 65%; flex: 0 0 auto; flex-direction: column; align-items: center; overflow-y: auto; padding: 24px 24px max(20px, env(safe-area-inset-bottom)); border-top: 1px solid #303035; background: #14162c; }
-.paliro-voice-recording-head { display: grid; width: 100%; grid-template-columns: 60px 1fr minmax(70px, 110px); align-items: center; gap: 12px; }
+.paliro-voice-recording { display: flex; max-height: 65%; flex: 0 0 auto; flex-direction: column; align-items: center; overflow-y: auto; padding: 23px 24px calc(44px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(42,42,42,1); background: rgba(19,23,44,1); font-family: 'Paliro Montserrat', Montserrat, sans-serif; animation: paliro-voice-sheet-enter .24s ease-out; }
+.paliro-voice-recording-head { display: grid; width: 100%; grid-template-columns: minmax(40px, 1fr) 39px minmax(87px, 1.44fr); align-items: center; gap: 12px; }
 .paliro-voice-recording-head strong { color: rgba(31,255,251,1); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.paliro-voice-recording-head > span:last-child { color: rgba(142,142,147,1); font-size: 12px; text-align: right; }
+.paliro-voice-recording-head > span:last-child { color: rgba(142,142,147,1); font-size: 12px; font-weight: 400; text-align: right; }
 .paliro-voice-live-wave { justify-content: center; }
 .paliro-voice-live-wave i { animation: paliro-voice-wave .7s ease-in-out infinite alternate; }
 .paliro-voice-live-wave i:nth-child(2n) { animation-delay: -.3s; }
-.paliro-voice-recording.is-paused .paliro-voice-live-wave i { animation-play-state: paused; background: rgba(142,142,147,1); }
-.paliro-record-mic { display: grid; width: 56px; height: 56px; min-height: 56px; margin: 36px 0 30px; padding: 0; border: 0; border-radius: 50%; background: rgba(31,255,251,1); box-shadow: 0 0 0 16px #164654; place-items: center; }
-.paliro-record-mic img { width: 24px; height: 24px; }
-.paliro-voice-recording > p { min-height: 16px; margin: 0 0 16px; color: rgba(142,142,147,1); font-size: 12px; font-weight: 600; line-height: 1.4; text-align: center; }
+.paliro-voice-recording.is-paused .paliro-voice-live-wave i { animation-play-state: paused; }
+.paliro-record-mic { display: grid; width: 56px; height: 56px; min-height: 56px; margin: 36px 0 28px; padding: 0; border: 0; border-radius: 50%; background: rgba(31,255,251,1); box-shadow: 0 0 0 16px rgba(31,255,251,.2); place-items: center; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-user-drag: none; -webkit-touch-callout: none; }
+/* Keep iOS image lifting out of the hold-and-swipe recording gesture. */
+.paliro-record-mic img { width: 24px; height: 24px; pointer-events: none; user-select: none; -webkit-user-select: none; -webkit-user-drag: none; -webkit-touch-callout: none; }
+.paliro-voice-recording > p { min-height: 15px; margin: 0; color: rgba(142,142,147,1); font-size: 12px; font-weight: 600; line-height: 15px; text-align: center; }
 .paliro-voice-recording > p[role='alert'], .paliro-voice-recording.is-cancelling .paliro-voice-recording-head > span:last-child { color: #ff6e91; }
 .paliro-voice-recording.is-cancelling .paliro-record-mic { background: #ff6e91; box-shadow: 0 0 0 16px #583144; }
-.paliro-voice-recording-actions { display: flex; width: 100%; gap: 8px; }
-.paliro-voice-recording-actions button { flex: 1; min-width: 0; min-height: 38px; padding: 8px 6px; border: 1px solid #41445e; border-radius: 20px; color: #fff; background: transparent; font: inherit; font-size: 12px; }
-.paliro-voice-recording-actions button:last-child { border: 0; color: #020b20; background: rgba(31,255,251,1); font-weight: 700; }
 .paliro-voice-recording button:disabled { opacity: .4; }
 .paliro-conversation-view.is-recording .paliro-conversation-scroll { opacity: .3; }
 .paliro-conversation-view button:focus-visible, .paliro-conversation-composer input:focus-visible { outline: 2px solid rgba(31,255,251,1); outline-offset: 2px; }
+@keyframes paliro-voice-sheet-enter { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes paliro-voice-wave { from { transform: scaleY(.45); } to { transform: scaleY(1); } }
-@media (prefers-reduced-motion: reduce) { .paliro-voice-live-wave i { animation: none; } }
-.paliro-friend-requests-scroll { padding-top: 4px; }
-.paliro-incoming-request-list { display: grid; gap: 9px; }
-.paliro-incoming-request-list article { display: grid; grid-template-columns: 45px minmax(0, 1fr); align-items: center; gap: 9px; padding: 10px; border: 1px solid rgba(135, 128, 184, .28); border-radius: 14px; background: rgba(20, 18, 54, .64); }
-.paliro-incoming-request-list img { width: 42px; height: 42px; border: 1px solid rgba(46, 238, 232, .57); border-radius: 50%; object-fit: cover; object-position: center; }
+@media (prefers-reduced-motion: reduce) { .paliro-voice-live-wave i, .paliro-voice-recording { animation: none; } }
+.paliro-me-secondary.paliro-friend-requests { background: radial-gradient(circle at 58% 16%, rgba(68, 42, 131, .38), transparent 31%), linear-gradient(145deg, #090b2a 0%, #1b1135 52%, #06071d 100%); }
+.paliro-friend-requests .paliro-friend-requests-nav { min-height: calc(env(safe-area-inset-top) + 64px); padding: calc(env(safe-area-inset-top) + 16px) 24px 10px; }
+.paliro-friend-requests-nav .paliro-back { display: grid; width: 32px; height: 32px; padding: 0; color: #fff; font-size: 0; place-items: center; }
+.paliro-friend-requests-nav .paliro-back svg { width: 24px; height: 24px; }
+.paliro-friend-requests-nav h1 { font-size: 18px; font-weight: 800; letter-spacing: 0; line-height: 22px; }
+.paliro-friend-requests .paliro-friend-requests-scroll { padding: 8px 24px calc(30px + env(safe-area-inset-bottom)); }
+.paliro-friend-requests-scroll > h2 { height: auto; margin: 12px 0 12px; font-size: 12px; line-height: 15px; }
+.paliro-incoming-request-list { display: grid; gap: 10px; }
+.paliro-incoming-request-list article { display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: center; gap: 12px; padding: 12px; border: 1px solid rgba(138, 141, 159, .26); border-radius: 14px; background: rgba(20, 18, 54, .7); box-shadow: inset 0 1px rgba(255, 255, 255, .035); }
+.paliro-incoming-request-list img { width: 52px; height: 52px; border: 1.5px solid rgba(46, 238, 232, .66); border-radius: 50%; object-fit: cover; object-position: center; box-shadow: 0 0 13px rgba(35, 232, 228, .12); }
 .paliro-incoming-request-list article > div { min-width: 0; }
-.paliro-incoming-request-list strong { display: block; overflow: hidden; color: #fff; font-size: 12px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
-.paliro-incoming-request-list p { display: -webkit-box; margin: 3px 0 7px; overflow: hidden; color: rgba(215, 210, 234, .54); font-size: 10px; line-height: 1.3; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-.paliro-incoming-request-list footer { display: grid; grid-column: 1 / -1; grid-template-columns: 1fr 1fr; gap: 8px; }
-.paliro-incoming-request-list footer button { min-height: 32px; border: 1px solid rgba(135, 128, 184, .38); border-radius: 999px; color: #fff; background: rgba(32, 29, 71, .75); font-size: 11px; font-weight: 800; }
-.paliro-incoming-request-list footer button:first-child { border: 0; color: #0d2546; background: linear-gradient(90deg, #2af0e9, #5aa1e8); }
+.paliro-incoming-request-list strong { display: block; overflow: hidden; color: #fff; font-size: 14px; font-weight: 800; line-height: 18px; text-overflow: ellipsis; white-space: nowrap; }
+.paliro-incoming-request-list p { display: -webkit-box; margin: 4px 0 0; overflow: hidden; color: rgba(215, 210, 234, .62); font-size: 11px; line-height: 1.4; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.paliro-incoming-request-list footer { display: grid; grid-column: 1 / -1; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 1px; }
+.paliro-incoming-request-list footer button { min-height: 36px; border: 1px solid rgba(135, 128, 184, .42); border-radius: 999px; color: #fff; background: rgba(25, 24, 61, .78); font-size: 12px; font-weight: 800; }
+.paliro-incoming-request-list footer button:first-child { border-color: transparent; color: #071b35; background: linear-gradient(90deg, #27ede7, #5b9fe7); box-shadow: 0 5px 14px rgba(29, 211, 226, .16); }
+.paliro-incoming-request-list footer button:active { transform: scale(.97); }
 .paliro-friendship-backdrop { position: fixed; z-index: 150; inset: 0; display: grid; min-height: 100dvh; padding: max(20px, env(safe-area-inset-top)) 24px max(20px, env(safe-area-inset-bottom)); background: rgba(1, 3, 14, .72); backdrop-filter: blur(8px) brightness(.6); place-items: center; }
 .paliro-friendship-dialog { display: grid; width: min(100%, 310px); gap: 11px; padding: 26px 22px 20px; border: 1px solid rgba(137, 151, 255, .35); border-radius: 20px; background: linear-gradient(145deg, rgba(37, 31, 80, .98), rgba(15, 15, 46, .98)); box-shadow: 0 22px 58px rgba(0, 0, 0, .52); text-align: center; }
 .paliro-friendship-avatars { display: flex; justify-content: center; align-items: center; height: 63px; }
@@ -616,45 +675,48 @@ button { cursor: pointer; }
 
 .paliro-me, .paliro-me-secondary { display: flex; flex-direction: column; padding: 0; background: radial-gradient(circle at 50% 22%, rgba(59, 34, 122, .54), transparent 30%), radial-gradient(circle at 5% 70%, rgba(10, 98, 143, .18), transparent 35%), linear-gradient(145deg, #090b2a 0%, #1c1136 53%, #05071d 100%); }
 .paliro-me-nav, .paliro-me-secondary-nav { position: relative; z-index: 2; display: grid; flex: 0 0 auto; grid-template-columns: 48px minmax(0, 1fr) 48px; align-items: center; min-height: 58px; padding: max(12px, env(safe-area-inset-top)) 24px 7px; }
-.paliro-me-nav { grid-template-columns: minmax(0, 1fr); }
+.paliro-me-nav { position: absolute; z-index: 3; top: 0; right: 0; left: 0; display: block; height: calc(env(safe-area-inset-top) + 67px); min-height: 67px; padding: 0 20px; pointer-events: none; }
 .paliro-me-nav h1, .paliro-me-secondary-nav h1 { margin: 0; color: #fff; font-size: 23px; font-weight: 800; letter-spacing: -.04em; line-height: 1.1; }
+.paliro-me-nav h1 { position: absolute; top: calc(env(safe-area-inset-top) + 24px); left: 20px; height: 34px; font-size: 28px; letter-spacing: 0; line-height: 34px; }
 .paliro-me-secondary-nav h1 { font-size: 18px; text-align: center; }
 .paliro-me-secondary-nav .paliro-back { border: 0; background: transparent; font-size: 32px; line-height: 1; }
 .paliro-me-scroll, .paliro-me-secondary-scroll { min-width: 0; min-height: 0; flex: 1; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; touch-action: pan-y; -webkit-overflow-scrolling: touch; }
 .paliro-me-scroll::-webkit-scrollbar, .paliro-me-secondary-scroll::-webkit-scrollbar { display: none; }
-.paliro-me-scroll { padding: 4px 24px calc(78px + env(safe-area-inset-bottom)); }
+.paliro-me-scroll { width: 100%; height: 100%; flex: 0 0 100%; padding: calc(env(safe-area-inset-top) + 67px) 24px calc(78px + env(safe-area-inset-bottom)); }
+.paliro-me-profile-skeleton { display: grid; align-content: start; }
+.paliro-me-skeleton-identity { display: grid; justify-items: center; }
+.paliro-me-skeleton-identity i, .paliro-me-skeleton-identity b, .paliro-me-skeleton-identity span, .paliro-me-skeleton-identity small, .paliro-me-skeleton-stats i, .paliro-me-skeleton-menu i { display: block; background: linear-gradient(100deg, #ffffff08 25%, #ffffff16 45%, #ffffff08 65%); background-size: 250% 100%; animation: paliro-list-shimmer 1.5s ease-in-out infinite; }
+.paliro-me-skeleton-identity i { width: 96px; height: 96px; border-radius: 50%; }
+.paliro-me-skeleton-identity b { width: 148px; height: 39px; margin-top: 8px; border-radius: 999px; }
+.paliro-me-skeleton-identity span { width: 172px; height: 22px; margin-top: 8px; border-radius: 7px; }
+.paliro-me-skeleton-identity small { width: min(270px, 82%); height: 13px; margin-top: 9px; border-radius: 6px; }
+.paliro-me-skeleton-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; margin: 39px 0 17px; }
+.paliro-me-skeleton-stats i { height: 62px; border-radius: 14px; }
+.paliro-me-skeleton-menu { display: grid; gap: 10px; }
+.paliro-me-skeleton-menu i { height: 44px; border-radius: 14px; }
 .paliro-me-identity { display: grid; justify-items: center; text-align: center; }
-.paliro-me-avatar-ring { display: grid; width: clamp(94px, 29vw, 122px); aspect-ratio: 1; padding: 3px; border: 2px solid #27f7ee; border-radius: 50%; background: radial-gradient(circle, rgba(38, 78, 142, .7), rgba(10, 10, 45, .9)); box-shadow: 0 0 0 4px rgba(39, 247, 238, .08), 0 0 25px rgba(25, 233, 238, .42); place-items: center; }
+.paliro-me-avatar-ring { display: grid; width: 96px; height: 96px; padding: 2px; border: 2px solid rgba(31, 255, 251, 1); border-radius: 50%; background: radial-gradient(circle, rgba(38, 78, 142, .7), rgba(10, 10, 45, .9)); box-shadow: 0 0 0 3px rgba(39, 247, 238, .08), 0 0 24px rgba(25, 233, 238, .42); place-items: center; }
 .paliro-me-avatar-ring img { width: 100%; height: 100%; border-radius: inherit; object-fit: cover; }
-.paliro-me-mood { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; margin: 9px 0 5px; padding: 4px 12px; border: 1px solid #24f1e9; border-radius: 999px; color: #39f7ef; background: rgba(8, 19, 47, .72); box-shadow: 0 0 15px rgba(24, 245, 236, .14); font-size: 11px; font-weight: 700; }
-.paliro-me-mood span { font-size: 15px; line-height: 1; }
-.paliro-me-identity h2 { max-width: 100%; margin: 0; overflow: hidden; color: #fff; font-size: clamp(20px, 6vw, 25px); font-weight: 800; letter-spacing: -.045em; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
-.paliro-me-identity > p:last-child { max-width: 320px; margin: 4px auto 0; color: rgba(210, 207, 231, .62); font-size: 11px; line-height: 1.35; }
-.paliro-me-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 18px 0 12px; }
-.paliro-me-stats button { display: grid; min-height: 51px; align-content: center; justify-items: center; padding: 5px; border: 1px solid rgba(145, 137, 196, .25); border-radius: 13px; color: inherit; background: rgba(21, 18, 53, .52); box-shadow: inset 0 1px rgba(255, 255, 255, .03); transition: border-color .16s ease, background .16s ease, transform .16s ease; }
+.paliro-me-mood { display: inline-flex; align-items: center; gap: 8px; height: 39px; margin: 8px 0 8px; padding: 0 14px; border: 1.5px solid rgba(31, 255, 251, 1); border-radius: 999px; color: rgba(31, 255, 251, 1); background: rgba(8, 19, 47, .72); box-shadow: 0 0 15px rgba(24, 245, 236, .14); font-size: 13px; font-weight: 700; line-height: 16px; }
+.paliro-me-mood span { display: grid; width: 23px; height: 23px; align-items: center; font-family: 'Apple Color Emoji', sans-serif; font-size: 20px; line-height: 23px; }
+.paliro-me-identity h2 { max-width: 100%; height: 27px; margin: 0; overflow: hidden; color: rgba(255, 255, 255, 1); font-size: 22px; font-weight: 800; letter-spacing: 0; line-height: 27px; text-overflow: ellipsis; white-space: nowrap; }
+.paliro-me-identity > p:last-child { width: min(303px, 100%); margin: 4px auto 0; overflow-wrap: anywhere; font-family: 'Paliro Montserrat', Montserrat, sans-serif; color: #8A8D9F; font-size: 13px; font-weight: 500; line-height: 16px; text-align: left; font-style: normal; text-transform: none; }
+.paliro-me-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; margin: 20px 0 17px; }
+.paliro-me-stats button { display: grid; height: 62px; align-content: center; justify-items: center; padding: 5px; border: 1px solid rgba(138, 141, 159, .28); border-radius: 14px; color: inherit; background: rgba(21, 18, 53, .52); box-shadow: inset 0 1px rgba(255, 255, 255, .03); transition: border-color .16s ease, background .16s ease, transform .16s ease; }
 .paliro-me-stats button:active { border-color: rgba(49, 244, 237, .72); background: rgba(29, 49, 83, .76); transform: scale(.975); }
 .paliro-me-stats button:focus-visible { outline: 2px solid #28f6ef; outline-offset: 2px; }
-.paliro-me-stats strong { color: #fff; font-size: 15px; font-weight: 800; line-height: 1.1; }
-.paliro-me-stats span { margin-top: 4px; color: rgba(205, 201, 225, .52); font-size: 9px; line-height: 1; }
-.paliro-me-menu { display: grid; gap: 7px; padding-bottom: 6px; }
-.paliro-me-menu button, .paliro-me-settings-group > button, .paliro-me-settings-group > div { display: grid; width: 100%; min-height: 42px; grid-template-columns: 25px minmax(0, 1fr) 18px; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid rgba(139, 132, 181, .27); border-radius: 12px; color: #fff; background: rgba(18, 16, 49, .62); text-align: left; transition: border-color .16s ease, background .16s ease, transform .16s ease; }
+.paliro-me-stats strong { height: 22px; color: rgba(255, 255, 255, 1); font-size: 18px; font-weight: 800; line-height: 22px; }
+.paliro-me-stats span { height: 13px; margin-top: 4px; color: rgba(138, 141, 159, 1); font-size: 11px; font-weight: 500; line-height: 13px; }
+.paliro-me-menu { display: grid; gap: 10px; padding-bottom: 6px; }
+.paliro-me-menu button { display: grid; width: 100%; height: 44px; grid-template-columns: 18px minmax(0, 1fr) 16px; align-items: center; gap: 12px; padding: 0 14px; border: 1px solid rgba(138, 141, 159, .28); border-radius: 14px; color: rgba(255, 255, 255, 1); background: rgba(18, 16, 49, .62); text-align: left; transition: border-color .16s ease, background .16s ease, transform .16s ease; }
+.paliro-me-settings-group > button, .paliro-me-settings-group > div { display: grid; width: 100%; min-height: 42px; grid-template-columns: 25px minmax(0, 1fr) 18px; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid rgba(139, 132, 181, .27); border-radius: 12px; color: #fff; background: rgba(18, 16, 49, .62); text-align: left; transition: border-color .16s ease, background .16s ease, transform .16s ease; }
 .paliro-me-menu button:active, .paliro-me-settings-group > button:active { border-color: rgba(49, 244, 237, .72); background: rgba(29, 49, 83, .76); transform: scale(.985); }
 .paliro-me-menu button:focus-visible, .paliro-me-settings-group > button:focus-visible, .paliro-me-language-option:focus-visible, .paliro-me-sign-out:focus-visible { outline: 2px solid #28f6ef; outline-offset: 2px; }
-.paliro-me-menu button > span:nth-child(2), .paliro-me-settings-group span { overflow: hidden; font-size: 12px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
-.paliro-me-menu i, .paliro-me-settings-group i { color: rgba(255, 255, 255, .55); font-size: 24px; font-style: normal; font-weight: 400; line-height: 1; text-align: right; }
-.paliro-me-menu-icon { position: relative; display: block; width: 17px; height: 17px; border: 1.5px solid #2cf1ed; border-radius: 5px; opacity: .92; }
-.paliro-me-menu-icon::after { position: absolute; content: ''; }
-.paliro-me-menu-icon.is-edit { border-radius: 3px; transform: rotate(-42deg) scale(.78); }
-.paliro-me-menu-icon.is-edit::after { top: 1px; right: 1px; width: 4px; height: 4px; border-radius: 50%; background: #2cf1ed; }
-.paliro-me-menu-icon.is-wallet::after { top: 5px; right: 2px; width: 3px; height: 3px; border-radius: 50%; background: #2cf1ed; }
-.paliro-me-menu-icon.is-videos { border-radius: 4px; }
-.paliro-me-menu-icon.is-videos::after { top: 4px; right: -4px; width: 4px; height: 7px; border: 1px solid #2cf1ed; border-left: 0; border-radius: 0 3px 3px 0; }
-.paliro-me-menu-icon.is-blocked { border-radius: 50%; }
-.paliro-me-menu-icon.is-blocked::after { top: 7px; left: -2px; width: 18px; height: 1.5px; background: #2cf1ed; transform: rotate(-45deg); }
-.paliro-me-menu-icon.is-language { border-radius: 50%; }
-.paliro-me-menu-icon.is-language::after { top: 2px; bottom: 2px; left: 6px; width: 3px; border-right: 1px solid #2cf1ed; border-left: 1px solid #2cf1ed; border-radius: 50%; }
-.paliro-me-menu-icon.is-settings { border-radius: 50%; box-shadow: 0 0 0 3px rgba(44, 241, 237, .18); }
-.paliro-me-menu-icon.is-settings::after { inset: 5px; border-radius: 50%; background: #2cf1ed; }
+.paliro-me-menu button > span:nth-child(2) { height: 17px; overflow: hidden; font-size: 14px; font-weight: 600; line-height: 17px; text-overflow: ellipsis; white-space: nowrap; }
+.paliro-me-settings-group span { overflow: hidden; font-size: 12px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.paliro-me-settings-group i { color: rgba(255, 255, 255, .55); font-size: 24px; font-style: normal; font-weight: 400; line-height: 1; text-align: right; }
+.paliro-me-menu-icon { display: block; width: 18px; height: 18px; object-fit: contain; }
+.paliro-me-menu-chevron { display: block; width: 16px; height: 16px; object-fit: contain; }
 .paliro-me-secondary-scroll { padding: 24px 24px calc(34px + env(safe-area-inset-bottom)); }
 .paliro-me-empty-state { display: grid; min-height: 100%; align-content: center; justify-items: center; padding: 28px 14px; text-align: center; }
 .paliro-me-empty-orbit { position: relative; width: 96px; aspect-ratio: 1; margin-bottom: 19px; border: 1px solid rgba(48, 242, 236, .52); border-radius: 50%; box-shadow: 0 0 26px rgba(47, 238, 233, .18), inset 0 0 20px rgba(73, 51, 157, .35); }
@@ -662,6 +724,7 @@ button { cursor: pointer; }
 .paliro-me-empty-orbit::after { transform: rotate(-35deg); }
 .paliro-me-empty-orbit span { position: absolute; top: 42%; left: 42%; width: 16px; aspect-ratio: 1; border-radius: 50%; background: #29f3eb; box-shadow: 0 0 17px #29f3eb; }
 .paliro-me-empty-orbit.is-clear { border-color: rgba(104, 178, 255, .6); }
+.paliro-me-secondary-scroll.paliro-me-empty-state { padding-inline: 24px; }
 .paliro-me-empty-state h2 { margin: 0 0 8px; color: #fff; font-size: 19px; font-weight: 800; letter-spacing: -.03em; }
 .paliro-me-empty-state p { max-width: 290px; margin: 0; color: rgba(218, 215, 234, .65); font-size: 13px; line-height: 1.55; }
 .paliro-social-detail-scroll { display: grid; align-content: start; gap: 15px; }
@@ -694,10 +757,19 @@ button { cursor: pointer; }
 .paliro-social-card > p { margin: 0 12px 10px; color: rgba(218, 215, 234, .68); font-size: 11px; line-height: 1.45; }
 .paliro-social-card footer { padding: 0 12px 9px; }
 .paliro-me-secondary-intro { margin: 0 0 14px; color: rgba(218, 215, 234, .62); font-size: 13px; line-height: 1.5; }
-.paliro-me-language-option { display: flex; width: 100%; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid rgba(139, 132, 181, .27); border-radius: 15px; color: #fff; background: rgba(18, 16, 49, .62); text-align: left; }
-.paliro-me-language-option span { display: grid; gap: 4px; }
-.paliro-me-language-option strong { font-size: 14px; }
-.paliro-me-language-option small, .paliro-me-secondary-note { color: rgba(218, 215, 234, .56); font-size: 11px; }
+/* Lanhu: 语言 / 版本1, 375 × 812. Native status bar replaces the design's status icons. */
+.paliro-language { display: flex; flex-direction: column; padding: 0; background: linear-gradient(90deg, rgba(11,12,40,1) 0%, rgba(30,18,51,1) 50%, rgba(6,7,30,1) 100%); }
+.paliro-language-nav { display: grid; flex: 0 0 auto; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; height: calc(max(44px, env(safe-area-inset-top)) + 76px); padding: max(44px, env(safe-area-inset-top)) 24px 0; }
+.paliro-language-nav h1 { margin: 0; color: rgba(255,255,255,1); font-family: 'Paliro Montserrat', Montserrat, 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif; font-size: 16px; font-weight: 800; line-height: 20px; letter-spacing: 0; text-align: center; }
+.paliro-language-back { display: grid; width: 44px; height: 44px; padding: 0; border: 0; background: transparent; color: rgba(255,255,255,1); align-items: center; justify-items: start; }
+.paliro-language-back svg { width: 24px; height: 24px; transform: translateX(-4px); }
+.paliro-language-scroll { min-height: 0; flex: 1; overflow-y: auto; padding: 4px 24px max(24px, env(safe-area-inset-bottom)); }
+.paliro-language-options { overflow: hidden; border-radius: 16px; background: rgba(26,26,46,.5); }
+.paliro-language-option { display: flex; align-items: center; justify-content: space-between; width: 100%; height: 45px; padding: 0 14px; border: 0; color: rgba(255,255,255,1); background: transparent; font-family: 'Paliro Montserrat', Montserrat, 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif; font-size: 14px; font-weight: 600; line-height: 17px; text-align: left; }
+.paliro-language-check { width: 12.4px; height: 8.8px; object-fit: contain; flex: 0 0 auto; }
+.paliro-language-option:active { background: rgba(255,255,255,.04); }
+.paliro-language-option:focus-visible, .paliro-language-back:focus-visible { outline: 2px solid rgba(31,255,251,1); outline-offset: -2px; }
+.paliro-me-secondary-note { color: rgba(218, 215, 234, .56); font-size: 11px; }
 .paliro-me-language-option i { display: grid; width: 20px; height: 20px; border: 1px solid rgba(218, 215, 234, .4); border-radius: 50%; color: transparent; font-style: normal; place-items: center; }
 .paliro-me-language-option.is-selected { border-color: #2cf1ed; box-shadow: 0 0 18px rgba(44, 241, 237, .16); }
 .paliro-me-language-option.is-selected i { border-color: #2cf1ed; color: #2cf1ed; }
@@ -709,7 +781,7 @@ button { cursor: pointer; }
 .paliro-me-blocked-list strong { overflow: hidden; color: #fff; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
 .paliro-me-blocked-list small { color: rgba(218, 215, 234, .55); font-size: 10px; }
 .paliro-me-blocked-list button { min-height: 30px; padding: 0 10px; border: 1px solid rgba(44, 241, 237, .68); border-radius: 999px; color: #47f7ef; background: transparent; font-size: 11px; font-weight: 700; }
-.paliro-profile-posts-scroll { padding: 12px 20px max(22px, env(safe-area-inset-bottom)); }
+.paliro-profile-posts-scroll { padding: 12px 24px max(22px, env(safe-area-inset-bottom)); }
 .paliro-profile-post-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 10px; }
 .paliro-profile-post-card { position: relative; min-width: 0; overflow: hidden; border: 1px solid rgba(113, 137, 207, .32); border-radius: 13px; background: rgba(18, 16, 49, .72); box-shadow: inset 0 1px rgba(255, 255, 255, .05); }
 .paliro-profile-post-card > video, .paliro-profile-box-post-art { display: block; width: 100%; aspect-ratio: .8; background: #0b0d29; object-fit: cover; }
@@ -719,11 +791,11 @@ button { cursor: pointer; }
 .paliro-profile-post-play { position: absolute; top: calc(40% - 16px); left: calc(50% - 16px); display: grid; width: 32px; height: 32px; padding-left: 2px; border: 1px solid rgba(255, 255, 255, .72); border-radius: 50%; color: #fff; background: rgba(6, 11, 33, .48); font-size: 13px; place-items: center; }
 .paliro-profile-post-delete { position: absolute; top: 7px; right: 7px; display: grid; width: 25px; height: 25px; padding: 0; border: 0; border-radius: 50%; color: #fff; background: rgba(4, 6, 24, .7); font-size: 14px; place-items: center; }.paliro-profile-post-delete:active { background: #b9395c; transform: scale(.92); }
 .paliro-profile-post-card > div:last-child { display: grid; gap: 3px; padding: 7px 8px 9px; }.paliro-profile-post-card strong, .paliro-profile-post-card small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.paliro-profile-post-card strong { color: #fff; font-size: 10px; font-weight: 800; }.paliro-profile-post-card small { color: rgba(219, 215, 237, .58); font-size: 9px; }
-.paliro-profile-post-empty { min-height: 56%; }.paliro-relation-scroll { padding: 9px 18px max(22px, env(safe-area-inset-bottom)); }
+.paliro-profile-post-empty { min-height: 56%; }.paliro-relation-scroll { padding: 9px 24px max(22px, env(safe-area-inset-bottom)); }
 .paliro-relation-search { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: center; min-height: 35px; gap: 2px; margin-bottom: 11px; padding: 0 10px; border: 1px solid rgba(138, 129, 186, .25); border-radius: 9px; color: rgba(221, 217, 238, .55); background: rgba(19, 17, 52, .72); }.paliro-relation-search span { font-size: 20px; line-height: 1; transform: rotate(-18deg); }.paliro-relation-search input { min-width: 0; border: 0; outline: 0; color: #fff; background: transparent; font-size: 10px; }.paliro-relation-search input::placeholder { color: rgba(221, 217, 238, .43); }
 .paliro-relation-list { display: grid; gap: 9px; }.paliro-relation-list article { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 9px; min-height: 57px; padding: 7px 9px; border: 1px solid rgba(137, 130, 184, .26); border-radius: 12px; background: rgba(19, 17, 52, .68); }.paliro-relation-member { display: grid; min-width: 0; grid-template-columns: 41px minmax(0, 1fr); align-items: center; gap: 9px; padding: 0; border: 0; color: #fff; background: transparent; text-align: left; }.paliro-relation-member img { width: 39px; height: 39px; border: 1px solid rgba(45, 242, 235, .67); border-radius: 50%; object-fit: cover; object-position: center; box-shadow: 0 0 12px rgba(41, 243, 235, .15); }.paliro-relation-member span { display: grid; min-width: 0; gap: 3px; }.paliro-relation-member strong, .paliro-relation-member small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.paliro-relation-member strong { color: #fff; font-size: 12px; font-weight: 800; }.paliro-relation-member small { color: rgba(212, 207, 233, .48); font-size: 8px; }
 .paliro-relation-list article > button:last-child { min-width: 69px; min-height: 27px; padding: 0 9px; border: 1px solid rgba(150, 142, 198, .38); border-radius: 999px; color: #fff; background: rgba(42, 38, 77, .8); font-size: 9px; font-weight: 800; }.paliro-relation-list article > button:last-child:not(.is-following) { border: 0; color: #082944; background: linear-gradient(90deg, #2af0e9, #5c9de7); }.paliro-relation-list article > button:last-child:disabled { opacity: .76; }.paliro-relation-member:focus-visible, .paliro-relation-list article > button:last-child:focus-visible, .paliro-profile-post-delete:focus-visible { outline: 2px solid #2cf1ed; outline-offset: 2px; }
-.paliro-blocked-users-scroll { padding: 10px 18px max(22px, env(safe-area-inset-bottom)); }.paliro-blocked-users-notice { display: grid; grid-template-columns: 17px minmax(0, 1fr); gap: 7px; margin: 0 0 12px; padding: 10px; border: 1px solid rgba(174, 55, 104, .35); border-radius: 11px; color: rgba(235, 202, 218, .71); background: rgba(87, 17, 60, .28); font-size: 9px; line-height: 1.42; }.paliro-blocked-users-notice span { display: grid; width: 15px; height: 15px; border: 1px solid #ec557b; border-radius: 50%; color: #ff6e91; font-size: 10px; font-weight: 800; place-items: center; }.paliro-me-blocked-avatar { height: 38px; object-fit: cover; object-position: center; }
+.paliro-blocked-users-scroll { padding: 10px 24px max(22px, env(safe-area-inset-bottom)); }.paliro-blocked-users-notice { display: grid; grid-template-columns: 17px minmax(0, 1fr); gap: 7px; margin: 0 0 12px; padding: 10px; border: 1px solid rgba(174, 55, 104, .35); border-radius: 11px; color: rgba(235, 202, 218, .71); background: rgba(87, 17, 60, .28); font-size: 9px; line-height: 1.42; }.paliro-blocked-users-notice span { display: grid; width: 15px; height: 15px; border: 1px solid #ec557b; border-radius: 50%; color: #ff6e91; font-size: 10px; font-weight: 800; place-items: center; }.paliro-me-blocked-avatar { height: 38px; object-fit: cover; object-position: center; }
 .paliro-me-settings-group { display: grid; overflow: hidden; border: 1px solid rgba(139, 132, 181, .27); border-radius: 14px; background: rgba(18, 16, 49, .62); }
 .paliro-me-settings-group > button, .paliro-me-settings-group > div { border: 0; border-radius: 0; background: transparent; }
 .paliro-me-settings-group > * + * { border-top: 1px solid rgba(139, 132, 181, .18); }
@@ -731,7 +803,8 @@ button { cursor: pointer; }
 .paliro-me-settings-group > div strong { color: #3df7ef; font-size: 11px; }
 .paliro-me-permission-copy { margin: 16px 4px -6px; color: rgba(218, 215, 234, .56); font-size: 11px; line-height: 1.5; }
 .paliro-me-sign-out { width: 100%; min-height: 47px; margin-top: 24px; border: 1px solid rgba(255, 123, 153, .54); border-radius: 999px; color: #ffc2d0; background: rgba(91, 24, 54, .26); font-size: 14px; font-weight: 800; }
-.paliro-profile-edit-scroll { display: grid; align-content: start; gap: 13px; padding-top: 9px; }
+.paliro-profile-edit .paliro-me-secondary-nav { padding-inline: 20px; }
+.paliro-profile-edit-scroll { padding-inline: 20px; display: grid; align-content: start; gap: 13px; padding-top: 9px; }
 .paliro-profile-edit-identity { display: grid; justify-items: center; margin: 1px 0 7px; }
 .paliro-profile-edit-avatar { position: relative; display: grid; width: clamp(82px, 25vw, 100px); aspect-ratio: 1; padding: 3px; border: 2px solid #29f5ef; border-radius: 50%; background: radial-gradient(circle, rgba(42, 105, 160, .58), rgba(12, 13, 47, .88)); box-shadow: 0 0 0 4px rgba(40, 243, 235, .08), 0 0 22px rgba(39, 241, 237, .4); place-items: center; }
 .paliro-profile-edit-avatar > img { width: 100%; height: 100%; border-radius: inherit; object-fit: cover; }
@@ -810,40 +883,42 @@ button { cursor: pointer; }
 .paliro-match-result-actions { display: grid; width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .paliro-match-result-actions button { height: clamp(46px, 14.4vw, 54px); padding: 0 10px; border: 1px solid transparent; border-radius: 999px; background: rgba(7, 20, 51, .98); box-shadow: 0 6px 17px rgba(2, 8, 28, .4); color: #fff; font: inherit; font-size: clamp(13px, 4.15vw, 16px); font-weight: 700; white-space: nowrap; }
 .paliro-match-result-actions button:last-child { border-color: #2e92f4; background: linear-gradient(100deg, #2b83dc, #0a2858); }
-.paliro-friend-profile { display: flex; min-height: 100%; flex-direction: column; padding: 0; background: linear-gradient(150deg, #090a28 0%, #180f34 52%, #07071c 100%); }
-.paliro-friend-profile-nav { position: absolute; z-index: 3; top: max(9px, env(safe-area-inset-top)); right: 12px; left: 12px; display: grid; grid-template-columns: 48px minmax(0, 1fr) 48px; align-items: center; }
-.paliro-friend-profile-nav .paliro-back { border: 0; background: transparent; color: #fff; font-size: 32px; line-height: 1; }
-.paliro-friend-profile-nav h1 { margin: 0; color: #fff; font-size: 17px; font-weight: 800; text-align: center; }
-.paliro-friend-profile-more { display: grid; width: 38px; height: 38px; justify-self: end; padding: 0; border: 0; border-radius: 50%; color: #fff; background: rgba(6, 9, 28, .36); font: inherit; font-size: 14px; font-weight: 900; letter-spacing: 1px; place-items: center; }
+.paliro-friend-profile { display: flex; min-height: 100%; flex-direction: column; padding: 0; color: #fff; background: linear-gradient(150deg, #090a28 0%, #180f34 52%, #07071c 100%); font-family: 'Paliro Montserrat', Montserrat, sans-serif; }
+.paliro-friend-profile-nav { position: absolute; z-index: 3; top: calc(env(safe-area-inset-top) + 16px); right: 24px; left: 24px; display: grid; height: 32px; grid-template-columns: 32px minmax(0, 1fr) 32px; align-items: center; }
+.paliro-friend-profile-nav .paliro-back { display: grid; width: 32px; height: 32px; padding: 0; border: 0; color: transparent; background: transparent; font-size: 0; place-items: center; }
+.paliro-friend-profile-nav .paliro-back::before { width: 12px; height: 12px; margin-left: 5px; border-bottom: 2px solid #fff; border-left: 2px solid #fff; content: ''; transform: rotate(45deg); }
+.paliro-friend-profile-more { display: grid; width: 32px; height: 32px; justify-self: end; padding: 0; border: 0; border-radius: 50%; color: #fff; background: rgba(6, 9, 28, .42); font: inherit; font-size: 13px; font-weight: 900; letter-spacing: 1px; place-items: center; }
 .paliro-friend-profile-more:active { background: rgba(40, 236, 231, .2); transform: scale(.92); }
-.paliro-friend-profile-scroll { min-height: 0; flex: 1; overflow-y: auto; padding: 0 0 calc(92px + env(safe-area-inset-bottom)); scrollbar-width: none; touch-action: pan-y; }
+.paliro-friend-profile-scroll { position: relative; z-index: 1; min-height: 0; flex: 1; overflow-y: auto; padding: 0 0 calc(92px + env(safe-area-inset-bottom)); scrollbar-width: none; touch-action: pan-y; }
 .paliro-friend-profile-scroll::-webkit-scrollbar { display: none; }
-.paliro-friend-profile-hero { position: relative; height: min(47vh, 354px); min-height: 278px; overflow: hidden; border-radius: 0 0 21px 21px; background: #14112f; }
-.paliro-friend-profile-hero::after { position: absolute; inset: 0; content: ''; background: linear-gradient(180deg, rgba(4, 7, 24, .02) 35%, rgba(7, 7, 28, .92) 100%); pointer-events: none; }
-.paliro-friend-profile-hero > img { width: 100%; height: 100%; object-fit: cover; object-position: center 28%; }
-.paliro-friend-profile-request { position: absolute; z-index: 1; bottom: 50px; left: 31px; min-width: 114px; min-height: 31px; padding: 0 15px; border: 0; border-radius: 999px; color: #fff; background: linear-gradient(90deg, #21eee8, #478ddd); box-shadow: 0 6px 16px rgba(27, 201, 225, .3); font: inherit; font-size: 12px; font-weight: 800; }
+.paliro-friend-profile-backdrop { position: absolute; z-index: 0; inset: 0; height: 100%; overflow: hidden; pointer-events: none; background: #14112f; }
+.paliro-friend-profile-hero { position: relative; height: clamp(292px, 45dvh, 360px); overflow: hidden; background: transparent; }
+.paliro-friend-profile-backdrop::after { position: absolute; inset: 0; content: ''; background: linear-gradient(180deg, rgba(2, 4, 18, .34) 0%, rgba(4, 6, 23, .14) 38%, rgba(7, 7, 28, .3) 64%, rgba(7, 7, 28, .98) 100%); pointer-events: none; }
+.paliro-friend-profile-backdrop > img { width: 100%; height: 100%; object-fit: cover; object-position: center 28%; }
+.paliro-friend-profile-request { position: absolute; z-index: 1; bottom: 51px; left: 24px; min-width: 114px; min-height: 32px; padding: 0 15px; border: 0; border-radius: 999px; color: #fff; background: linear-gradient(90deg, #21eee8, #478ddd); box-shadow: 0 6px 16px rgba(27, 201, 225, .3); font: inherit; font-size: 12px; font-weight: 800; }
 .paliro-friend-profile-request.is-pending, .paliro-friend-profile-request:disabled { color: rgba(255, 255, 255, .58); background: rgba(24, 29, 67, .82); box-shadow: none; }
-.paliro-friend-profile-mood { position: absolute; z-index: 1; bottom: 10px; left: 31px; display: inline-flex; min-height: 29px; align-items: center; gap: 6px; margin: 0; padding: 0 12px; border: 1px solid #29efec; border-radius: 999px; color: #4cf9f2; background: rgba(4, 12, 35, .72); font-size: 11px; font-weight: 800; }
+.paliro-friend-profile-mood { position: absolute; z-index: 1; bottom: 11px; left: 24px; display: inline-flex; min-height: 29px; align-items: center; gap: 6px; margin: 0; padding: 0 12px; border: 1px solid #29efec; border-radius: 999px; color: #4cf9f2; background: rgba(4, 12, 35, .72); font-size: 11px; font-weight: 800; }
 .paliro-friend-profile-mood span { font-size: 14px; }
-.paliro-friend-profile-body { padding: 9px 24px 25px; }
+.paliro-friend-profile-body { padding: 14px 24px 28px; }
 .paliro-friend-profile-name { display: flex; align-items: baseline; gap: 9px; }
-.paliro-friend-profile-name h2 { margin: 0; color: #fff; font-size: 22px; font-weight: 800; letter-spacing: -.04em; }
-.paliro-friend-profile-name span { color: rgba(221, 217, 237, .64); font-size: 14px; }
-.paliro-friend-profile-stats { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 11px; overflow: hidden; border: 1px solid rgba(124, 117, 166, .32); border-radius: 13px; background: rgba(21, 18, 55, .72); }
+.paliro-friend-profile-name h2 { min-width: 0; margin: 0; overflow: hidden; color: #fff; font-size: 22px; font-weight: 800; letter-spacing: -.04em; line-height: 27px; text-overflow: ellipsis; white-space: nowrap; }
+.paliro-friend-profile-name span { flex: 0 0 auto; color: rgba(221, 217, 237, .64); font-size: 14px; font-weight: 500; line-height: 18px; }
+.paliro-friend-profile-stats { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 13px; overflow: hidden; border: 1px solid rgba(124, 117, 166, .32); border-radius: 13px; background: rgba(21, 18, 55, .72); }
 .paliro-friend-profile-stats div { display: grid; gap: 2px; justify-items: center; padding: 10px 4px; }
 .paliro-friend-profile-stats div + div { border-left: 1px solid rgba(124, 117, 166, .22); }
 .paliro-friend-profile-stats strong { color: #fff; font-size: 14px; font-weight: 800; }
 .paliro-friend-profile-stats span { color: rgba(214, 210, 231, .55); font-size: 9px; }
 .paliro-friend-profile-about, .paliro-friend-profile-posts { margin-top: 17px; }
 .paliro-friend-profile-about h3, .paliro-friend-profile-posts h3 { margin: 0 0 8px; color: rgba(220, 216, 239, .68); font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
-.paliro-friend-profile-about p { margin: 0; color: rgba(255, 255, 255, .72); font-size: 11px; line-height: 1.45; }
+.paliro-friend-profile-about p { margin: 0; color: rgba(255, 255, 255, .78); font-size: 12px; line-height: 1.5; }
 .paliro-friend-profile-posts > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
-.paliro-friend-profile-posts article { min-width: 0; overflow: hidden; border-radius: 11px; background: rgba(23, 20, 55, .72); }
+.paliro-friend-profile-posts article { min-width: 0; overflow: hidden; border: 1px solid rgba(126, 122, 170, .18); border-radius: 11px; background: rgba(23, 20, 55, .72); }
 .paliro-friend-profile-post-media { position: relative; overflow: hidden; }
-.paliro-friend-profile-posts img, .paliro-friend-profile-posts video { display: block; width: 100%; aspect-ratio: 1.08; object-fit: cover; object-position: center; }
+.paliro-friend-profile-posts img, .paliro-friend-profile-posts video { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; object-position: center; }
 .paliro-friend-profile-post-media span { position: absolute; top: 7px; right: 7px; display: grid; width: 22px; height: 22px; border-radius: 50%; color: #fff; background: rgba(7, 9, 28, .68); font-size: 12px; place-items: center; }
-.paliro-friend-profile-post-play { position: absolute; z-index: 1; top: 50%; left: 50%; display: grid; width: 36px; height: 36px; padding: 0 0 0 2px; border: 1px solid rgba(255, 255, 255, .74); border-radius: 50%; color: #fff; background: rgba(6, 10, 31, .58); box-shadow: 0 3px 10px rgba(0, 0, 0, .28); font-size: 14px; place-items: center; transform: translate(-50%, -50%); }
-.paliro-friend-profile-post-play.is-playing { padding-left: 0; background: rgba(9, 16, 45, .66); }
+.paliro-friend-profile-post-play { position: absolute; z-index: 1; top: 50%; left: 50%; display: grid; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; color: #fff; background: transparent; filter: drop-shadow(0 3px 10px rgba(0, 0, 0, .38)); font-size: 13px; place-items: center; transform: translate(-50%, -50%); }
+.paliro-friend-profile-post-play > img { display: block; width: 40px; height: 40px; aspect-ratio: 1; object-fit: contain; }
+.paliro-friend-profile-post-play.is-playing { border: 1px solid rgba(255, 255, 255, .72); background: rgba(9, 16, 45, .64); }
 .paliro-friend-profile-post-play > span { position: static; width: auto; height: auto; border-radius: 0; background: transparent; font: inherit; }
 .paliro-friend-profile-post-play:active { transform: translate(-50%, -50%) scale(.9); }
 .paliro-friend-profile-posts article.is-box img { padding: 0; background: #14112f; object-fit: cover; }
@@ -851,14 +926,23 @@ button { cursor: pointer; }
 .paliro-friend-profile-posts p { overflow: hidden; margin: 7px 8px 2px; color: #fff; font-size: 10px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
 .paliro-friend-profile-posts article.is-box p { overflow: visible; white-space: normal; overflow-wrap: anywhere; line-height: 1.45; }
 .paliro-friend-profile-posts small { display: block; margin: 0 8px 8px; color: rgba(207, 203, 228, .58); font-size: 9px; }
-.paliro-friend-profile-actions { display: grid; flex: 0 0 auto; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 10px; padding: 10px 24px max(15px, env(safe-area-inset-bottom)); border-top: 1px solid rgba(132, 124, 171, .18); background: rgba(8, 8, 29, .96); }
-.paliro-friend-profile-actions button { min-width: 0; min-height: 38px; border: 1px solid rgba(108, 145, 231, .58); border-radius: 999px; color: #fff; background: rgba(17, 22, 56, .72); font: inherit; font-size: 12px; font-weight: 800; }
+.paliro-friend-profile-post-author { position: relative; z-index: 1; display: flex; height: 32px; align-items: center; gap: 4px; margin-top: -32px; padding: 6px; background: linear-gradient(180deg, transparent, rgba(0, 0, 0, .55)); pointer-events: none; }
+.paliro-friend-profile-post-author > img { width: 20px; height: 20px; flex: 0 0 20px; border-radius: 50%; object-fit: cover; }
+.paliro-friend-profile-post-author > strong { min-width: 0; overflow: hidden; color: #fff; font-size: 10px; font-weight: 500; line-height: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.paliro-friend-profile-actions { position: relative; z-index: 2; display: grid; flex: 0 0 auto; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 10px; padding: 11px 24px max(15px, env(safe-area-inset-bottom)); border-top: 1px solid rgba(132, 124, 171, .18); background: rgba(8, 8, 29, .97); }
+.paliro-friend-profile-actions button { min-width: 0; min-height: 42px; border: 1px solid rgba(108, 145, 231, .58); border-radius: 999px; color: #fff; background: rgba(17, 22, 56, .72); font: inherit; font-size: 12px; font-weight: 800; }
 .paliro-friend-profile-actions button:first-child:not(.is-followed) { border-color: transparent; background: linear-gradient(90deg, #20eee7, #4388dd); }
 .paliro-friend-profile-actions button.is-followed { color: rgba(255, 255, 255, .76); background: transparent; }
 .paliro-friend-profile-actions button.is-locked { color: rgba(255, 255, 255, .46); border-color: rgba(135, 133, 163, .3); background: rgba(23, 22, 46, .62); }
 .paliro-friend-profile-message { display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
-.paliro-friend-profile-actions .paliro-friend-profile-video { width: 40px; border-color: #28eeea; color: #2cf3ed; background: transparent; font-size: 16px; }
+.paliro-friend-profile-actions .paliro-friend-profile-video { width: 42px; border-color: #28eeea; color: #2cf3ed; background: transparent; font-size: 16px; }
 .paliro-friend-profile-video svg { display: block; width: 20px; height: 20px; margin: auto; }
+.paliro-friend-profile-actions.is-mutual { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 48px; gap: 8px; padding: 12px 24px max(16px, env(safe-area-inset-bottom)); border-top-color: transparent; background: linear-gradient(180deg, rgba(8, 8, 29, .84) 0%, rgba(8, 8, 29, .98) 42%); }
+.paliro-friend-profile-actions.is-mutual button { height: 48px; min-height: 48px; border-radius: 24px; font-family: 'Paliro Montserrat', Montserrat, sans-serif; font-size: 14px; font-weight: 700; line-height: 18px; }
+.paliro-friend-profile-actions.is-mutual button.is-followed { border: 1px solid rgba(255, 255, 255, .13); color: #fff; background: rgba(26, 26, 46, .5); }
+.paliro-friend-profile-actions.is-mutual .paliro-friend-profile-message { border: 1px solid #267cdc; color: #fff; background: linear-gradient(90deg, #267cdc 0%, #081127 100%); }
+.paliro-friend-profile-actions.is-mutual .paliro-friend-profile-video { width: 48px; height: 48px; border: 1px solid #267cdc; color: #1ffffb; background: rgba(26, 26, 46, .5); }
+.paliro-friend-profile-actions.is-mutual .paliro-friend-profile-video svg { width: 24px; height: 24px; stroke-width: 2; }
 .paliro-friend-profile-actions button:disabled { cursor: default; }
 .paliro-profile-safety-backdrop { position: fixed; z-index: 240; inset: 0; display: grid; align-items: end; background: rgba(1, 2, 12, .74); backdrop-filter: blur(5px); }
 .paliro-profile-safety-actions { display: grid; width: min(100%, 560px); gap: 1px; margin: 0 auto; padding: 9px 0 max(11px, env(safe-area-inset-bottom)); border: 1px solid rgba(118, 116, 160, .24); border-radius: 22px 22px 0 0; background: #0c0c12; }
@@ -874,19 +958,22 @@ button { cursor: pointer; }
 .paliro-profile-block-dialog p { min-height: 36px; margin: 0 auto 20px; color: rgba(255, 255, 255, .5); font-family: 'Paliro Montserrat', Montserrat, sans-serif; font-size: 13px; font-weight: 400; line-height: 18px; }
 .paliro-profile-block-dialog button { display: block; width: 100%; min-height: 52px; border: 0; border-radius: 40px; color: #fff; background: linear-gradient(90deg, #ff536b, #c91e43); box-shadow: 0 4px 16px rgba(255, 69, 95, .2); font: 800 15px/18px 'Paliro Montserrat', Montserrat, sans-serif; }
 .paliro-profile-block-dialog button + button { margin-top: 10px; border: 1px solid rgba(122, 128, 182, .38); background: rgba(26, 26, 46, .36); box-shadow: none; }
-.paliro-report-user { display: flex; z-index: 260; min-height: 100%; flex-direction: column; background: #030303; }
-.paliro-report-user .paliro-me-secondary-nav { position: sticky; top: 0; z-index: 2; margin: 0; background: #030303; }
-.paliro-report-scroll { display: flex; min-height: 0; flex: 1; flex-direction: column; overflow-y: auto; padding: 20px 22px max(24px, env(safe-area-inset-bottom)); scrollbar-width: none; }
+.paliro-report-user { display: flex; z-index: 260; min-height: 100%; flex-direction: column; padding: 0; background: #030303; }
+.paliro-report-user .paliro-report-nav { position: sticky; top: 0; z-index: 2; min-height: calc(env(safe-area-inset-top) + 64px); margin: 0; padding: calc(env(safe-area-inset-top) + 16px) 24px 10px; background: #030303; }
+.paliro-report-nav .paliro-back { display: grid; width: 32px; height: 32px; padding: 0; color: transparent; font-size: 0; place-items: center; }
+.paliro-report-nav .paliro-back::before { width: 12px; height: 12px; margin-left: 5px; border-bottom: 2px solid #fff; border-left: 2px solid #fff; content: ''; transform: rotate(45deg); }
+.paliro-report-nav h1 { font-family: 'Paliro Montserrat', Montserrat, sans-serif; font-size: 18px; font-weight: 800; letter-spacing: 0; line-height: 22px; }
+.paliro-report-scroll { display: flex; min-height: 0; flex: 1; flex-direction: column; overflow-y: auto; padding: 11px 24px max(24px, env(safe-area-inset-bottom)); scrollbar-width: none; }
 .paliro-report-scroll::-webkit-scrollbar { display: none; }
-.paliro-report-reasons { display: grid; gap: 8px; margin: 0; }
-.paliro-report-section-title, .paliro-report-details > span { margin: 0 0 2px; color: rgba(255, 255, 255, .74); font-size: 13px; font-weight: 600; line-height: 1.35; }
-.paliro-report-reasons button { display: grid; grid-template-columns: 18px minmax(0, 1fr); min-height: 41px; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid rgba(255, 255, 255, .09); border-radius: 10px; color: rgba(255, 255, 255, .9); background: #1b1b1b; font: inherit; font-size: 13px; line-height: 1.25; text-align: left; transition: border-color .16s ease, background .16s ease; }
+.paliro-report-reasons { display: grid; gap: 9px; margin: 0; }
+.paliro-report-section-title, .paliro-report-details > span { margin: 0 0 2px; color: rgba(255, 255, 255, .7); font-size: 12px; font-weight: 600; line-height: 17px; }
+.paliro-report-reasons button { display: grid; grid-template-columns: 18px minmax(0, 1fr); min-height: 41px; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid rgba(255, 255, 255, .07); border-radius: 9px; color: rgba(255, 255, 255, .86); background: #1b1b1b; font: inherit; font-size: 12px; line-height: 16px; text-align: left; transition: border-color .16s ease, background .16s ease; }
 .paliro-report-reasons button i { width: 17px; height: 17px; border: 2px solid rgba(255, 255, 255, .52); border-radius: 50%; }
 .paliro-report-reasons button.is-selected { border-color: rgba(39, 241, 235, .65); background: #202020; }
 .paliro-report-reasons button.is-selected i { border-color: #24f1eb; box-shadow: inset 0 0 0 3px #202020; background: #24f1eb; }
 .paliro-report-reasons button:focus-visible, .paliro-report-details textarea:focus-visible { outline: 2px solid #26f5ee; outline-offset: 2px; }
-.paliro-report-details { display: grid; gap: 8px; margin-top: 15px; }
-.paliro-report-details textarea { width: 100%; min-height: 104px; padding: 13px; border: 1px solid rgba(255, 255, 255, .1); border-radius: 10px; outline: 0; resize: vertical; color: #fff; background: #1b1b1b; font: inherit; font-size: 13px; line-height: 1.45; }
+.paliro-report-details { display: grid; gap: 7px; margin-top: 14px; }
+.paliro-report-details textarea { width: 100%; min-height: 104px; padding: 12px; border: 1px solid rgba(255, 255, 255, .07); border-radius: 9px; outline: 0; resize: vertical; color: #fff; background: #1b1b1b; font: inherit; font-size: 13px; line-height: 1.45; }
 .paliro-report-details textarea::placeholder { color: rgba(255, 255, 255, .35); }
 .paliro-report-details small { color: rgba(255, 255, 255, .38); font-size: 10px; text-align: right; }
 .paliro-report-scroll > .paliro-error { margin: 10px 0 0; }
@@ -902,8 +989,8 @@ button { cursor: pointer; }
 .paliro-friend-request-field span { color: rgba(218, 215, 234, .45); font-size: 10px; text-align: right; }
 .paliro-friend-request-dialog > p { margin: 13px 0 18px; color: rgba(218, 215, 234, .68); font-size: 11px; line-height: 1.52; }
 .paliro-friend-request-actions { display: grid; grid-template-columns: 1fr 1.28fr; gap: 10px; }
-.paliro-friend-request-actions button { min-height: 45px; border: 1px solid rgba(115, 144, 219, .46); border-radius: 999px; color: #fff; background: rgba(19, 20, 56, .76); font: inherit; font-size: 13px; font-weight: 800; }
-.paliro-friend-request-actions button:last-child { border-color: rgba(62, 246, 239, .84); background: linear-gradient(90deg, #20eee7, #4388dd); box-shadow: 0 7px 18px rgba(25, 204, 224, .23); }
+.paliro-friend-request-actions button { min-height: 45px; border: 1px solid rgba(115, 144, 219, .46); border-radius: 40px; color: #fff; background: #0b1c39; font: inherit; font-size: 13px; font-weight: 800; }
+.paliro-friend-request-actions button:last-child { border: 1px solid #267cdc; border-radius: 40px; background: linear-gradient(90deg, #267cdc 0%, #081127 100%); box-shadow: none; }
 .paliro-friend-request-actions button:disabled { opacity: .62; }
 .paliro-profile-reminder-backdrop { position: fixed; z-index: 170; inset: 0; display: grid; min-height: 100dvh; padding: max(20px, env(safe-area-inset-top)) 24px max(20px, env(safe-area-inset-bottom)); background: rgba(1, 3, 14, .74); backdrop-filter: blur(7px) brightness(.62); place-items: center; }
 .paliro-profile-reminder { width: min(100%, 280px); padding: 26px 20px 20px; border: 1px solid rgba(128, 138, 235, .35); border-radius: 22px; background: linear-gradient(145deg, #22244d, #10112d); box-shadow: 0 22px 55px rgba(0, 0, 0, .52); text-align: center; }
@@ -915,25 +1002,33 @@ button { cursor: pointer; }
 .paliro-profile-reminder.is-mutual-only h2 { min-height: 22px; margin: 0 0 8px; font-family: 'Paliro Montserrat', Montserrat, sans-serif; font-size: 18px; font-weight: 800; line-height: 22px; }
 .paliro-profile-reminder.is-mutual-only p { min-height: 36px; margin: 0 0 20px; color: rgba(255, 255, 255, .5); font-family: 'Paliro Montserrat', Montserrat, sans-serif; font-size: 13px; font-weight: 400; line-height: 18px; }
 .paliro-profile-reminder.is-mutual-only .paliro-home-modal-button { width: 100%; min-height: 52px; border-radius: 40px; background: linear-gradient(90deg, #1ffffb, #4285cb); box-shadow: 0 4px 16px rgba(31, 255, 251, .2); font-family: 'Paliro Montserrat', Montserrat, sans-serif; font-size: 15px; font-weight: 800; }
-.paliro-composer-backdrop, .paliro-media-source-backdrop { position: fixed; z-index: 130; inset: 0; display: grid; min-height: 100dvh; padding: max(18px, env(safe-area-inset-top)) 24px max(18px, env(safe-area-inset-bottom)); background: rgba(1, 3, 14, .7); backdrop-filter: blur(6px) brightness(.58); place-items: center; }
-.paliro-composer { position: relative; width: min(100%, 330px); padding: 28px 17px 18px; border: 1px solid rgba(168, 143, 255, .54); border-radius: 24px; background: linear-gradient(150deg, rgba(73, 65, 154, .98), rgba(48, 47, 115, .98)); box-shadow: 0 18px 48px rgba(0, 0, 0, .42); }
-.paliro-composer-close { position: absolute; top: 9px; right: 12px; width: 29px; height: 29px; padding: 0; border: 0; background: transparent; }
+.paliro-composer-backdrop { position: fixed; z-index: 130; inset: 0; display: grid; min-height: 100dvh; overflow: hidden; padding: max(4px, env(safe-area-inset-top)) 0 max(4px, env(safe-area-inset-bottom)); background: rgba(0, 0, 0, .7); place-items: center; }
+.paliro-composer { position: relative; width: 320px; height: 529px; padding: 0; border: 0; background: transparent; }
+.paliro-composer-card { position: relative; width: 320px; height: 473px; }
+.paliro-composer-frame { position: absolute; z-index: 0; inset: 0; display: block; width: 320px; height: 473px; pointer-events: none; }
+.paliro-composer-close { position: absolute; z-index: 3; top: calc(4.7% + 50px); right: calc(5.5% - 10px); width: 27px; height: 27px; padding: 0; border: 0; background: transparent; }
 .paliro-composer-close img { display: block; width: 100%; height: 100%; object-fit: contain; }
-.paliro-composer h2 { margin: 0 0 14px; color: #fff; font-size: 17px; font-weight: 800; text-align: center; }
-.paliro-composer-photo-label, .paliro-composer-message > span { display: block; margin: 0 0 8px; color: #fff; font-size: 12px; font-weight: 800; }
-.paliro-composer-images { display: flex; min-height: 69px; gap: 9px; margin-bottom: 16px; }
-.paliro-composer-images figure, .paliro-composer-add-image { position: relative; width: 69px; height: 69px; margin: 0; overflow: hidden; border: 1px dashed rgba(207, 204, 255, .64); border-radius: 7px; background: rgba(39, 38, 96, .68); }
-.paliro-composer-images img { width: 100%; height: 100%; object-fit: cover; }
-.paliro-composer-images figure button { position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; border: 0; border-radius: 50%; color: #fff; background: rgba(5, 7, 30, .72); font-weight: 800; }
-.paliro-composer-add-image { color: rgba(220, 218, 255, .72); font-size: 24px; }
-.paliro-composer-message { display: grid; }
-.paliro-composer-message textarea { width: 100%; min-height: 128px; padding: 13px; border: 0; border-radius: 15px; outline: 0; resize: none; color: #fff; background: rgba(106, 96, 183, .6); font: inherit; font-size: 12px; }
-.paliro-composer-message textarea::placeholder { color: rgba(255, 255, 255, .68); }
-.paliro-composer-message small { margin-top: 5px; color: rgba(255, 255, 255, .58); font-size: 10px; text-align: right; }
-.paliro-composer-requirements { margin: 9px 0 -5px; color: rgba(219, 221, 255, .66); font-size: 10px; line-height: 1.35; text-align: center; }
-.paliro-composer-post { display: grid; width: 138px; height: 40px; margin: 16px auto 0; padding: 0; border: 0; background: url('/assets/paliro-composer-post-button@2x.png') center / 100% 100% no-repeat; color: #fff; cursor: pointer; place-items: center; }
-.paliro-composer-post span { display: grid; width: 102px; height: 20px; overflow: hidden; color: #fff; font-family: 'Montserrat', sans-serif; font-size: 16px; font-style: normal; font-weight: 700; line-height: 20px; text-align: center; text-overflow: ellipsis; text-transform: none; white-space: nowrap; place-items: center; }
-.paliro-composer-post:disabled { cursor: default; opacity: .46; }
+.paliro-composer-content { position: absolute; z-index: 1; top: 71px; right: 14px; left: 14px; }
+.paliro-composer-photo-label, .paliro-composer-message > span { display: block; height: 24px; margin: 0; color: #fff; font: 800 12px/23.25px 'Paliro Montserrat', Montserrat, sans-serif; text-align: left; }
+.paliro-composer-images { display: flex; height: 80px; gap: 8px; margin: 5px 0 20px; }
+.paliro-composer-images figure, .paliro-composer-add-image { position: relative; box-sizing: border-box; width: 80px; height: 80px; flex: 0 0 80px; margin: 0; overflow: hidden; border: 1px solid #e2e5eb; border-radius: 6.4px; background: #54569e; }
+.paliro-composer-images figure > button { display: block; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; }
+.paliro-composer-images img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.paliro-composer-add-image { display: grid; padding: 0; place-items: center; }
+.paliro-composer-add-image > span { position: relative; display: block; width: 10px; height: 10px; }
+.paliro-composer-add-image > span::before, .paliro-composer-add-image > span::after { position: absolute; top: 50%; left: 50%; width: 10px; height: 1.6px; border-radius: 1px; background: #8a8d9f; content: ''; transform: translate(-50%, -50%); }
+.paliro-composer-add-image > span::after { transform: translate(-50%, -50%) rotate(90deg); }
+.paliro-composer-message { display: block; }
+.paliro-composer-message textarea { display: block; box-sizing: border-box; width: 292px; height: 191px; margin-top: 5px; padding: 11px 16px; border: 0; border-radius: 21.43px; outline: 0; resize: none; color: #fff; background: #54569e; font: 500 12px/23.25px 'Paliro Montserrat', Montserrat, sans-serif; }
+.paliro-composer-message textarea::placeholder { color: #fff; opacity: 1; }
+.paliro-composer-error { position: absolute; z-index: 2; right: 18px; bottom: 17px; left: 18px; margin: 0; overflow: hidden; color: #ffd2d8; font: 500 10px/14px 'Paliro Montserrat', Montserrat, sans-serif; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+.paliro-composer-post { display: grid; box-sizing: border-box; width: 152px; height: 52px; margin: 4px auto 0; padding: 0 20px; border: 1px solid transparent; border-radius: 40px; color: #fff; background: linear-gradient(90deg, #267cdc 0%, #081127 100%) padding-box, linear-gradient(90deg, #4aa2f5 0%, #1f63b1 100%) border-box; cursor: pointer; place-items: center; }
+.paliro-composer-post span { color: #fff; font: 700 14px/17px 'Paliro Montserrat', Montserrat, sans-serif; text-align: center; white-space: nowrap; }
+.paliro-composer-post:disabled { cursor: default; opacity: 1; }
+.paliro-media-source-backdrop { position: fixed; z-index: 140; inset: 0; display: grid; min-height: 100dvh; padding: max(18px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom)); background: rgba(1, 3, 14, .7); backdrop-filter: blur(6px) brightness(.58); }
+@media (max-width: 350px), (max-height: 700px) {
+  .paliro-composer { transform: scale(.84); }
+}
 .paliro-media-source-backdrop { z-index: 140; align-items: end; padding-bottom: max(24px, env(safe-area-inset-bottom)); }
 .paliro-media-source { display: grid; width: min(100%, 330px); gap: 8px; padding: 17px; border: 1px solid rgba(134, 145, 255, .35); border-radius: 20px; background: #171534; }
 .paliro-media-source h2 { margin: 0 0 4px; color: #fff; font-size: 16px; text-align: center; }
@@ -956,11 +1051,11 @@ button { cursor: pointer; }
 @keyframes paliro-make-box-trail { 0% { opacity: 0; transform: rotate(-32deg) scaleX(.08); } 30% { opacity: .9; } 100% { opacity: 0; transform: rotate(-32deg) scaleX(1); } }
 @media (prefers-reduced-motion: reduce) { .paliro-opening-machine, .paliro-opening-overlay.is-revealing .paliro-opening-machine, .paliro-opening-overlay.is-revealing .paliro-opening-spark, .paliro-match-result, .paliro-make-flight-experience, .paliro-make-flight-glow, .paliro-make-flight-overlay.is-flying .paliro-make-flight-experience, .paliro-make-flight-overlay.is-flying .paliro-make-flight-trail, .paliro-home-instruction.is-selection-alert { animation: none; } }
 
-.paliro-wallet { display: flex; min-height: 100%; flex-direction: column; padding: max(20px, env(safe-area-inset-top)) 20px 0; background: radial-gradient(circle at 50% 34%, rgba(69, 38, 136, .35), transparent 31%), linear-gradient(135deg, #0a0925 0%, #1b1031 48%, #07071d 100%); }
+.paliro-wallet { display: flex; min-height: 100%; flex-direction: column; padding: max(20px, env(safe-area-inset-top)) 24px 0; background: radial-gradient(circle at 50% 34%, rgba(69, 38, 136, .35), transparent 31%), linear-gradient(135deg, #0a0925 0%, #1b1031 48%, #07071d 100%); }
 .paliro-wallet-nav { position: relative; z-index: 2; display: grid; flex: 0 0 auto; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; min-height: 42px; }
 .paliro-wallet-nav .paliro-back { width: 42px; height: 42px; padding: 0; border: 0; background: transparent; color: #fff; font-size: 34px; font-weight: 400; line-height: 1; }
 .paliro-wallet-nav h1 { margin: 0; color: #fff; font-size: 17px; font-weight: 800; letter-spacing: -.02em; text-align: center; }
-.paliro-wallet-scroll { min-height: 0; flex: 1; overflow-x: hidden; overflow-y: auto; padding: 18px 9px 20px; scrollbar-width: none; touch-action: pan-y; }
+.paliro-wallet-scroll { min-height: 0; flex: 1; overflow-x: hidden; overflow-y: auto; padding: 18px 0 20px; scrollbar-width: none; touch-action: pan-y; }
 .paliro-wallet-scroll::-webkit-scrollbar { display: none; }
 .paliro-wallet-balance { display: grid; justify-items: center; padding: 10px 0 28px; }
 .paliro-wallet-balance img { width: 68px; height: 68px; object-fit: contain; filter: drop-shadow(0 8px 14px rgba(29, 211, 255, .32)); }
@@ -979,7 +1074,7 @@ button { cursor: pointer; }
 .paliro-wallet-pack-price { width: 100%; min-height: 26px; margin-top: 2px; border: 1px solid rgba(135, 135, 169, .3); border-radius: 999px; color: #fff; font-size: 13px; font-weight: 800; line-height: 24px; text-align: center; }
 .paliro-wallet-pack.is-selected .paliro-wallet-pack-price { border-color: transparent; background: linear-gradient(90deg, #18f2e9 0%, #3289db 100%); }
 .paliro-wallet-best-value { position: absolute; z-index: 1; top: -7px; right: -5px; padding: 2px 6px; border-radius: 999px; background: #1af0e6; color: #071029; font-size: 8px; font-weight: 900; letter-spacing: -.02em; }
-.paliro-wallet-footer { flex: 0 0 auto; padding: 9px 9px calc(11px + env(safe-area-inset-bottom)); }
+.paliro-wallet-footer { flex: 0 0 auto; padding: 9px 0 calc(11px + env(safe-area-inset-bottom)); }
 .paliro-wallet-purchase { width: 100%; min-height: 49px; border: 1px solid rgba(74, 201, 255, .88); border-radius: 999px; background: linear-gradient(90deg, #1cf1e9 0%, #3289db 100%); box-shadow: 0 8px 20px rgba(32, 201, 241, .16); color: #fff; font-size: 15px; font-weight: 800; }
 .paliro-wallet-purchase:disabled { border-color: rgba(135, 135, 169, .3); background: rgba(53, 51, 81, .68); box-shadow: none; color: #89869e; }
 .paliro-wallet-dialog-backdrop { position: fixed; z-index: 40; inset: 0; display: grid; padding: 24px; place-items: center; background: rgba(1, 3, 13, .74); backdrop-filter: blur(8px); }
@@ -997,68 +1092,109 @@ button { cursor: pointer; }
 .paliro-home-coin-modal p { margin: 0 4px 24px; color: rgba(255, 255, 255, .52); font-size: 12px; line-height: 1.45; }
 .paliro-home-coin-modal .paliro-home-coin-error { margin: -12px 4px 17px; color: #ffb6c5; font-size: 11px; font-weight: 700; }
 .paliro-home-modal-secondary { width: 100%; min-height: 42px; margin-top: 8px; border: 1px solid rgba(255, 255, 255, .2); border-radius: 999px; color: #fff; background: rgba(9, 10, 31, .42); font-size: 15px; font-weight: 700; }
-.paliro-rules-backdrop { position: fixed; z-index: 210; inset: 0; display: grid; place-items: center; overflow: hidden; background: rgba(1, 3, 13, .54); backdrop-filter: blur(4px) brightness(.58); }
+.paliro-rules-backdrop { position: fixed; z-index: 210; inset: 0; display: grid; place-items: center; overflow: hidden; background: rgba(0, 0, 0, .5); }
 .paliro-rules-experience { position: relative; width: min(100%, 480px); height: 100dvh; overflow: hidden; background: transparent; }
-.paliro-rules-experience::after { position: absolute; z-index: 0; inset: 0; content: ''; pointer-events: none; background: linear-gradient(180deg, rgba(2, 5, 19, .1), rgba(2, 5, 19, .24)); }
 .paliro-rules-sheet-enter-active, .paliro-rules-sheet-leave-active { transition: opacity .42s ease; }
 .paliro-rules-sheet-enter-active .paliro-rules-experience, .paliro-rules-sheet-leave-active .paliro-rules-experience { transition: transform .42s cubic-bezier(.22, .8, .24, 1), opacity .26s ease; }
 .paliro-rules-sheet-enter-from, .paliro-rules-sheet-leave-to { opacity: 0; }
 .paliro-rules-sheet-enter-from .paliro-rules-experience, .paliro-rules-sheet-leave-to .paliro-rules-experience { opacity: 0; transform: translateY(100%); }
-.paliro-rules-frame { position: absolute; z-index: 1; top: 30.3%; left: -1.07%; width: 102.4%; height: auto; pointer-events: none; }
-.paliro-rules-close { position: absolute; z-index: 3; top: 27.59%; right: 4.27%; width: 25px; height: 25px; padding: 0; border: 0; background: transparent; transition: transform .18s ease; }
+.paliro-rules-frame { position: absolute; z-index: 1; top: 30.3%; left: -1.067%; width: 102.4%; height: 75.985%; pointer-events: none; }
+.paliro-rules-close { position: absolute; z-index: 4; top: 27.586%; right: 4.267%; width: 6.667%; max-width: 32px; aspect-ratio: 1; padding: 0; border: 0; background: transparent; transition: transform .18s ease; }
 .paliro-rules-close:active { transform: scale(.9); }
 .paliro-rules-close img { display: block; width: 100%; height: 100%; }
-.paliro-rules-copy { position: absolute; z-index: 2; top: calc(49.5% - 40px); right: 11%; bottom: calc(170px + env(safe-area-inset-bottom)); left: 11%; overflow-y: auto; padding: 0 5px 14px; color: #fff; font-size: clamp(11px, 3.47vw, 13px); font-weight: 500; line-height: 1.42; text-align: center; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
-.paliro-rules-copy h2 { margin: 0 0 12px; color: #fff; font-size: clamp(18px, 5.33vw, 20px); font-weight: 800; line-height: 1.1; }
-.paliro-rules-copy p { margin: 0 0 15px; }
-.paliro-rules-card { position: absolute; z-index: 3; bottom: calc(-10px + env(safe-area-inset-bottom)); left: 50%; width: 48.8%; height: auto; transform: translateX(-50%); pointer-events: none; }
+.paliro-rules-copy { position: absolute; z-index: 2; top: 41.626%; right: 9.6%; left: 9.6%; height: 37.192%; color: #cce5ff; font-family: 'Paliro Montserrat', Montserrat, sans-serif; font-size: 12px; font-weight: 500; line-height: 18px; text-align: center; }
+.paliro-rules-copy h2 { height: 24px; margin: 0 0 8px; color: #fff; font-family: 'Paliro Montserrat', Montserrat, sans-serif; font-size: 20px; font-weight: 700; line-height: 24px; }
+.paliro-rules-copy-body { height: calc(100% - 32px); overflow-y: auto; padding: 0; overscroll-behavior: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.paliro-rules-copy-body::-webkit-scrollbar { display: none; }
+.paliro-rules-copy p { margin: 0 0 18px; }
+.paliro-rules-copy p:last-child { margin-bottom: 0; }
+.paliro-rules-card { position: absolute; z-index: 3; top: 78.818%; left: 26.121%; width: 48.824%; height: 17.488%; pointer-events: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .paliro-rules-sheet-enter-active, .paliro-rules-sheet-leave-active,
   .paliro-rules-sheet-enter-active .paliro-rules-experience, .paliro-rules-sheet-leave-active .paliro-rules-experience { transition: none; }
 }
 
-.paliro-test { padding: 0; background: #01091d; }
-.paliro-test-background { position: absolute; z-index: -1; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.paliro-test-back { position: absolute; top: max(39px, calc(env(safe-area-inset-top) + 9px)); left: 16px; width: 34px; height: 34px; padding: 0; border: 0; color: rgba(255, 255, 255, .65); background: transparent; font-size: 30px; line-height: 1; }
-.paliro-test-intro { position: absolute; top: 43.1%; right: 13.87%; left: 13.87%; text-align: center; }
-.paliro-test-intro p { margin: 0; color: rgba(71, 115, 220, 1); font-size: clamp(13px, 4.27vw, 16px); font-weight: 700; line-height: 1.5; }
-.paliro-test-primary { min-height: 48px; border: 0; border-radius: 999px; color: #fff; background: linear-gradient(90deg, #1ffffb, #4a95d9); box-shadow: 0 8px 20px rgba(31, 255, 251, .18); font-size: 16px; font-weight: 800; }
-.paliro-test-intro .paliro-test-primary { width: 100%; margin-top: 50px; }
-.paliro-test-progress { position: absolute; top: max(93px, calc(env(safe-area-inset-top) + 63px)); right: 6.4%; left: 6.4%; color: rgba(31, 255, 251, 1); font-size: 12px; font-weight: 700; }
-.paliro-test-progress > span { display: inline-block; }
-.paliro-test-progress > strong { float: right; font: inherit; }
-.paliro-test-progress > div { clear: both; height: 6px; margin-top: 8px; overflow: hidden; border-radius: 999px; background: rgba(69, 120, 220, .16); }
-.paliro-test-progress i { display: block; height: 100%; border-radius: inherit; background: rgba(31, 255, 251, 1); transition: width .25s ease; }
-.paliro-test-question { position: absolute; top: 28.57%; right: 6.4%; left: 6.4%; }
-.paliro-test-question h1 { min-height: 54px; margin: 0 0 28px; color: #fff; font-size: clamp(20px, 5.87vw, 22px); font-weight: 800; line-height: 1.12; letter-spacing: 0; }
-.paliro-test-options { display: grid; gap: 14px; }
-.paliro-test-options button { min-height: 48px; padding: 10px 14px; border: 1px solid rgba(255, 255, 255, .1); border-radius: 8px; color: #fff; background: rgba(20, 22, 50, .78); font-size: clamp(13px, 4vw, 15px); font-weight: 700; line-height: 1.25; text-align: left; transition: border-color .18s ease, background .18s ease, color .18s ease; }
-.paliro-test-options button.has-icon { display: flex; align-items: center; gap: 10px; padding: 4px 14px; }
-.paliro-test-option-icon { width: 28px; height: 28px; flex: 0 0 28px; object-fit: contain; }
-.paliro-test-options button.is-selected { border-color: rgba(31, 255, 251, 1); color: rgba(31, 255, 251, 1); background: rgba(10, 41, 68, .82); box-shadow: 0 0 16px rgba(31, 255, 251, .13); }
-.paliro-test-age-card { padding: 18px 15px 14px; border: 1px solid rgba(255, 255, 255, .1); border-radius: 8px; background: rgba(20, 22, 50, .78); }
-.paliro-test-age-card > div:first-child { display: flex; justify-content: space-between; color: rgba(255, 255, 255, .5); font-size: 13px; }
-.paliro-test-age-card strong { color: rgba(31, 255, 251, 1); font-size: 14px; }
-.paliro-test-range-row { position: relative; height: 31px; margin: 16px 0 3px; }
+.paliro-test {
+  --paliro-test-gutter: clamp(20px, 6.4%, 31px);
+  --paliro-test-content-top: max(calc(env(safe-area-inset-top) + 118px), min(38%, calc(100% - 370px - max(20px, env(safe-area-inset-bottom)))));
+  isolation: isolate;
+  padding: 0;
+  color: #fff;
+  background: #01091d;
+}
+.paliro-test::after { position: absolute; z-index: -1; inset: 0; content: ''; pointer-events: none; background: linear-gradient(180deg, rgba(1, 9, 29, .02), rgba(1, 9, 29, .08) 54%, rgba(1, 9, 29, .22)); }
+.paliro-test-background { position: absolute; z-index: -2; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; pointer-events: none; }
+.paliro-test-back { position: absolute; z-index: 3; top: calc(env(safe-area-inset-top) + 16px); left: var(--paliro-test-gutter); width: 32px; height: 32px; padding: 0; border: 0; color: transparent; background: transparent; font-size: 0; }
+.paliro-test-back::before { position: absolute; top: 10px; left: 9px; width: 10px; height: 10px; border-bottom: 2px solid rgba(255, 255, 255, .88); border-left: 2px solid rgba(255, 255, 255, .88); border-radius: 1px; content: ''; transform: rotate(45deg); }
+.paliro-test-back::after { position: absolute; top: 15px; left: 9px; width: 16px; height: 2px; border-radius: 2px; background: rgba(255, 255, 255, .88); content: ''; }
+.paliro-test-back:active { opacity: .72; transform: scale(.92); }
+
+.paliro-test-intro { position: absolute; top: max(43%, min(82vw, 393.6px)); bottom: max(24px, env(safe-area-inset-bottom)); overflow-y: auto; right: var(--paliro-test-gutter); left: var(--paliro-test-gutter); text-align: center; animation: paliro-test-content-in .38s ease-out both; }
+.paliro-test-intro p { max-width: 282px; margin: 0 auto; color: rgba(71, 115, 220, 1); font-size: clamp(12px, 3.47vw, 13px); font-style: italic; font-weight: 600; font-synthesis: style; line-height: 1.55; }
+.paliro-test-primary { display: grid; height: 48px; min-height: 48px; padding: 0 18px; border: 0; border-radius: 24px; color: rgba(255, 255, 255, 1); background: linear-gradient(90deg, rgba(66, 133, 203, 1) 0%, rgba(31, 255, 251, 1) 100%); box-shadow: 0 8px 20px rgba(31, 255, 251, .16); font-size: 14px; font-weight: 700; line-height: 17px; place-items: center; transition: filter .18s ease, transform .18s ease; }
+.paliro-test-primary:active:not(:disabled) { filter: brightness(1.08); transform: scale(.98); }
+.paliro-test-intro .paliro-test-primary { width: 100%; margin-top: 24px; }
+
+.paliro-test-progress { position: absolute; top: calc(env(safe-area-inset-top) + 68px); right: var(--paliro-test-gutter); left: var(--paliro-test-gutter); display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; color: rgba(31, 255, 251, 1); font-size: 12px; font-weight: 700; line-height: 15px; animation: paliro-test-content-in .3s ease-out both; }
+.paliro-test-progress > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.paliro-test-progress > strong { font: inherit; }
+.paliro-test-progress > div { grid-column: 1 / -1; height: 8px; margin-top: 10px; overflow: hidden; border: 1px solid rgba(66, 133, 203, .34); border-radius: 4px; background: rgba(8, 28, 70, .72); box-shadow: inset 0 1px 3px rgba(0, 0, 0, .32); }
+.paliro-test-progress i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, rgba(66, 133, 203, 1), rgba(31, 255, 251, 1)); box-shadow: 0 0 9px rgba(31, 255, 251, .46); transition: width .25s ease; }
+
+.paliro-test-question { position: absolute; top: var(--paliro-test-content-top); bottom: calc(max(20px, env(safe-area-inset-bottom)) + 68px); overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; padding: 2px 2px 12px; scrollbar-width: thin; scrollbar-color: #426d9b transparent; right: var(--paliro-test-gutter); left: var(--paliro-test-gutter); animation: paliro-test-content-in .34s ease-out both; }
+.paliro-test-question h1 { margin: 0 0 16px; color: rgba(255, 255, 255, 1); font-size: clamp(18px, 5vw, 20px); font-weight: 800; line-height: 1.23; letter-spacing: 0; text-shadow: 0 2px 14px rgba(32, 104, 255, .18); }
+.paliro-test-options { display: grid; gap: 12px; }
+.paliro-test-options button { display: flex; min-height: 52px; align-items: center; padding: 10px 16px; border: 1px solid rgba(138, 141, 159, .28); border-radius: 8px; color: rgba(255, 255, 255, 1); background: rgba(13, 20, 47, .76); box-shadow: inset 0 1px rgba(255, 255, 255, .025); font-size: clamp(13px, 3.73vw, 14px); font-weight: 600; line-height: 1.3; text-align: left; backdrop-filter: blur(5px); transition: border-color .18s ease, background .18s ease, box-shadow .18s ease, color .18s ease, transform .18s ease; }
+.paliro-test-options button:active { transform: scale(.985); }
+.paliro-test-options button.has-icon { gap: 12px; min-height: 56px; padding: 7px 14px; }
+.paliro-test-option-icon { width: 40px; height: 40px; flex: 0 0 40px; object-fit: contain; }
+.paliro-test-options button.is-selected { border-color: rgba(31, 255, 251, 1); color: rgba(31, 255, 251, 1); background: linear-gradient(90deg, rgba(11, 46, 79, .92), rgba(11, 31, 67, .86)); box-shadow: 0 0 0 1px rgba(31, 255, 251, .08), 0 0 16px rgba(31, 255, 251, .14); }
+
+.paliro-test-age-card { min-height: 132px; padding: 18px 16px 14px; border: 1px solid rgba(138, 141, 159, .28); border-radius: 8px; background: rgba(13, 20, 47, .76); box-shadow: inset 0 1px rgba(255, 255, 255, .025); backdrop-filter: blur(5px); }
+.paliro-test-age-card > div:first-child { display: flex; align-items: center; justify-content: space-between; color: rgba(255, 255, 255, .5); font-size: 13px; font-weight: 500; line-height: 16px; }
+.paliro-test-age-card strong { color: rgba(31, 255, 251, 1); font-size: 14px; font-weight: 700; }
+.paliro-test-range-row { position: relative; height: 31px; margin: 20px 0 7px; }
 .paliro-test-range-row input { position: absolute; inset: 7px 0; width: 100%; height: 18px; margin: 0; appearance: none; pointer-events: none; background: transparent; }
-.paliro-test-range-row input::-webkit-slider-runnable-track { height: 2px; border-radius: 999px; background: rgba(255, 255, 255, .25); }
-.paliro-test-range-row input::-webkit-slider-thumb { width: 14px; height: 14px; margin-top: -6px; appearance: none; border: 2px solid rgba(31, 255, 251, 1); border-radius: 50%; background: #fff; box-shadow: 0 0 10px rgba(31, 255, 251, .8); pointer-events: auto; }
-.paliro-test-age-card small { display: flex; justify-content: space-between; color: rgba(255, 255, 255, .45); font-size: 10px; }
-.paliro-test-next { position: absolute; top: 79.25%; right: 6.4%; left: 6.4%; width: auto; }
+.paliro-test-range-row input::-webkit-slider-runnable-track { height: 3px; border-radius: 999px; background: rgba(66, 133, 203, .54); }
+.paliro-test-range-row input::-webkit-slider-thumb { width: 16px; height: 16px; margin-top: -6.5px; appearance: none; border: 2px solid rgba(31, 255, 251, 1); border-radius: 50%; background: rgba(255, 255, 255, 1); box-shadow: 0 0 10px rgba(31, 255, 251, .72); pointer-events: auto; }
+.paliro-test-age-card small { display: flex; justify-content: space-between; color: rgba(255, 255, 255, .45); font-size: 10px; font-weight: 500; line-height: 12px; }
+
+.paliro-test-next { position: absolute; top: auto; bottom: max(20px, env(safe-area-inset-bottom)); right: var(--paliro-test-gutter); left: var(--paliro-test-gutter); width: auto; }
 .paliro-test-next:disabled { opacity: .42; box-shadow: none; }
-.paliro-test-complete { position: absolute; top: 61%; right: 13.87%; left: 13.87%; text-align: center; }
-.paliro-test-complete h1 { margin: 0 0 15px; color: rgba(99, 132, 249, 1); font-size: clamp(16px, 4.27vw, 18px); font-weight: 800; line-height: 1.25; letter-spacing: 0; }
-.paliro-test-complete > p { margin: 0 0 25px; color: rgba(255, 255, 255, .65); font-size: 12px; line-height: 1.46; }
+.paliro-test-complete { position: absolute; top: 61%; right: var(--paliro-test-gutter); left: var(--paliro-test-gutter); text-align: center; animation: paliro-test-content-in .4s ease-out both; }
+.paliro-test-complete h1 { max-width: 310px; margin: 0 auto 12px; color: rgba(99, 132, 249, 1); font-size: clamp(16px, 4.27vw, 18px); font-weight: 800; line-height: 1.3; letter-spacing: 0; }
+.paliro-test-complete > p { max-width: 312px; margin: 0 auto 22px; color: rgba(255, 255, 255, .65); font-size: 12px; font-weight: 500; line-height: 1.5; }
 .paliro-test-complete .paliro-test-primary { width: 100%; }
-.paliro-test-repeat { width: 100%; min-height: 42px; margin-top: 9px; border: 1px solid rgba(31, 255, 251, .55); border-radius: 999px; color: rgba(31, 255, 251, 1); background: rgba(4, 32, 57, .66); font-size: 14px; font-weight: 800; }
-.paliro-test-complete .paliro-test-reward, .paliro-test-complete .paliro-test-retake-note { margin: 14px 0 0; padding: 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+.paliro-test-repeat { width: 100%; min-height: 42px; margin-top: 10px; border: 1px solid rgba(31, 255, 251, .55); border-radius: 21px; color: rgba(31, 255, 251, 1); background: rgba(4, 32, 57, .66); font-size: 13px; font-weight: 700; }
+.paliro-test-complete .paliro-test-reward, .paliro-test-complete .paliro-test-retake-note { max-width: none; margin: 12px 0 0; padding: 8px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; line-height: 1.35; }
 .paliro-test-complete .paliro-test-reward { border: 1px solid rgba(31, 255, 251, .4); color: rgba(31, 255, 251, 1); background: rgba(4, 32, 57, .7); }
 .paliro-test-complete .paliro-test-retake-note { border: 1px solid rgba(116, 143, 221, .35); color: rgba(194, 210, 255, .85); background: rgba(12, 22, 54, .7); }
 
+@keyframes paliro-test-content-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-height: 740px) {
+  .paliro-test-complete { top: 53%; }
+  .paliro-test-question h1 { margin-bottom: 12px; font-size: 18px; }
+  .paliro-test-options { gap: 9px; }
+  .paliro-test-options button { min-height: 44px; padding-block: 7px; }
+  .paliro-test-options button.has-icon { min-height: 48px; }
+  .paliro-test-option-icon { width: 34px; height: 34px; flex-basis: 34px; }
+  .paliro-test-complete > p { margin-bottom: 15px; line-height: 1.4; }
+  .paliro-test-complete .paliro-test-reward, .paliro-test-complete .paliro-test-retake-note { margin-top: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paliro-test-intro, .paliro-test-progress, .paliro-test-question, .paliro-test-complete { animation: none; }
+  .paliro-test-progress i, .paliro-test-primary, .paliro-test-options button { transition: none; }
+}
+
 .paliro-policy { display: flex; flex-direction: column; padding-top: max(22px, env(safe-area-inset-top)); background: linear-gradient(135deg, #090b2a 0%, #1d1236 50%, #06071e 100%); }
 .paliro-policy-nav .paliro-back { border: 0; background: transparent; font-size: 32px; line-height: 1; }
-.paliro-policy-copy { width: 100%; min-width: 0; min-height: 0; flex: 1; overflow-x: hidden; overflow-y: auto; margin-top: 28px; padding: 0 7px calc(28px + env(safe-area-inset-bottom)) 0; color: rgba(255, 255, 255, .76); line-height: 1.6; overscroll-behavior: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; }
+.paliro-policy-copy { width: 100%; min-width: 0; min-height: 0; flex: 1; overflow-x: hidden; overflow-y: auto; margin-top: 28px; padding: 0 0 calc(28px + env(safe-area-inset-bottom)); color: rgba(255, 255, 255, .76); line-height: 1.6; overscroll-behavior: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; }
 .paliro-policy-copy section { padding: 0 0 21px; }
 .paliro-policy-copy h2 { margin: 0 0 7px; color: #b6faff; font-size: 16px; line-height: 1.3; letter-spacing: -.015em; }
 .paliro-policy-copy p { margin: 0 0 10px; font-size: 14px; }
@@ -1098,13 +1234,4 @@ button { cursor: pointer; }
   .paliro-setup-scroll { margin-top: 18px; }
 }
 
-/* Keep the home artwork on the BlueLake 520:1126 canvas on short iPhones. */
-@media (max-width: 430px) and (max-height: 740px) {
-  .paliro-home-artboard {
-    top: 50%;
-    left: 50%;
-    width: 46.1813dvh;
-    height: 100%;
-    transform: translate(-50%, -50%);
-  }
-}
+/* Home uses the full viewport width; percentage anchors adapt on short iPhones. */

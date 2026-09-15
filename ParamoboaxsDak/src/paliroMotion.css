@@ -105,21 +105,7 @@
 .paliro-video-comment-like .paliro-state-value { font-size: inherit; line-height: inherit; }
 .paliro-video-comment-like .paliro-state-feedback-count { font-size: 10px; line-height: 1.1; }
 
-.paliro-reward-art { position: relative; width: 74px; height: 74px; margin: 0 auto; }
-.paliro-reward-art::before {
-  position: absolute; inset: -18px; border-radius: 50%; content: ''; pointer-events: none;
-  background: radial-gradient(circle, rgba(77,255,246,.3), transparent 68%);
-  animation: paliro-reward-halo .7s ease-out both;
-}
-.paliro-reward-art img { position: relative; animation: paliro-reward-arrive .55s var(--paliro-motion-ease) both; }
-.paliro-reward-art > span {
-  position: absolute; top: 2px; right: -14px; padding: 3px 7px; border-radius: 12px;
-  color: #071337; background: #4dfff6; font-size: 12px; font-weight: 800;
-  animation: paliro-reward-arrive .4s .12s var(--paliro-motion-ease) both;
-}
 .paliro-home-progress.is-rewarded { animation: paliro-reward-progress .95s ease-out; }
-@keyframes paliro-reward-halo { from { opacity: 0; transform: scale(.6); } 45% { opacity: 1; } to { opacity: 0; transform: scale(1.4); } }
-@keyframes paliro-reward-arrive { from { opacity: 0; transform: translateY(8px) scale(.88); } to { opacity: 1; transform: none; } }
 @keyframes paliro-reward-progress { 0%, 100% { box-shadow: none; } 35% { box-shadow: 0 0 14px rgba(77,255,246,.7); border-color: #4dfff6; } }
 
 @media (prefers-reduced-motion: reduce) {
@@ -133,10 +119,14 @@
   .paliro-floating-box-target::before { transition: none; }
   .paliro-floating-box-target.is-selected.is-selection-changing::after,
   .paliro-opening-overlay.is-opening .paliro-opening-experience::before,
-  .paliro-match-result, .paliro-reward-art::before, .paliro-reward-art img, .paliro-reward-art > span,
+  .paliro-match-result,
   .paliro-state-like-enter-active.is-positive, .paliro-state-follow-enter-active.is-positive { animation: none; }
   .paliro-state-value { transition-duration: 0ms; }
   /* Complete the one-shot reward lifecycle without displaying a flash. */
   .paliro-home-progress.is-rewarded { animation: paliro-reward-progress-reduced 1ms; }
   @keyframes paliro-reward-progress-reduced { from { opacity: 1; } to { opacity: 1; } }
 }
+
+/* Let the selected peripheral box charge before the existing reveal takes over. */
+.paliro-opening-overlay.is-opening { background: transparent; }
+.paliro-opening-experience.is-slot-opening { opacity: 0; }

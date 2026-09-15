@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import vm from 'node:vm'
 import { readFileSync } from 'node:fs'
-import { paliroSeedUsers, paliroGetAvailableMatchMembers, paliroSendFriendRequest, paliroGetConversations, paliroGetConversation, paliroMarkConversationRead, paliroCanChatWithMember, paliroSendConversationMessage, paliroSendConversationAudioMessage, paliroBlockMember, paliroGetIncomingFriendRequests, paliroAcceptIncomingFriendRequest } from '../src/services/paliroLocalStore.js'
+import { paliroGetOrCreateConversation, paliroGetMockMembers, paliroSeedUsers, paliroGetAvailableMatchMembers, paliroSendFriendRequest, paliroGetConversations, paliroGetConversation, paliroMarkConversationRead, paliroCanChatWithMember, paliroSendConversationMessage, paliroSendConversationAudioMessage, paliroBlockMember, paliroGetIncomingFriendRequests, paliroAcceptIncomingFriendRequest } from '../src/services/paliroLocalStore.js'
 
 function withStore(run) {
   const values = new Map()
@@ -13,6 +13,25 @@ function withStore(run) {
   } }
   try { run(paliroSeedUsers()[0].id, values) } finally { delete globalThis.window }
 }
+
+test('test account seeds only two English conversations and migrates cached Korean fixtures', () => withStore((userID, values) => {
+  const original = paliroGetConversations(userID)
+  assert.equal(original.length, 2)
+  assert.ok(original.every(c => c.member.language === 'en' && !/[가-힣]/u.test(c.messages[0].body)))
+  const legacy = ['haneul', 'minji', 'seoyun'].map((name, index) => ({
+    member: paliroGetMockMembers('ko')[index], unreadCount: 2,
+    messages: [{ id: `paliro-message-${name}-1`, sender: 'friend', body: 'Legacy fixture' }],
+  }))
+  const english = JSON.parse(values.get('paliro.conversations'))[userID]
+  values.set('paliro.conversations', JSON.stringify({ [userID]: [...english, ...legacy], other: legacy }))
+  for (let i = 0; i < 3; i++) assert.deepEqual(paliroGetConversations(userID), original)
+  assert.deepEqual(JSON.parse(values.get('paliro.conversations')).other, legacy)
+  assert.equal(paliroGetConversations('new-user').length, 0)
+  // Removing old examples must not cap the list or prevent new chats with those members.
+  const created = paliroGetOrCreateConversation(userID, paliroGetMockMembers('ko')[0])
+  assert.equal(paliroGetConversations(userID).length, 3)
+  assert.equal(paliroGetConversation(userID, created.member.id).messages.length, created.messages.length)
+}))
 
 test('one request creates one locked conversation with the original message, time and language', () => withStore((userID, values) => {
   for (const language of ['en', 'ko']) {
@@ -63,6 +82,7 @@ test('accepting an incoming request unlocks the existing row and retains the sen
   assert.ok(paliroMarkConversationRead(userID, incoming.member.id))
   assert.equal(paliroSendConversationMessage(userID, incoming.member.id, 'Now we can chat').type, 'success')
   assert.equal(paliroGetConversation(userID, incoming.member.id).messages.filter(m => m.type === 'friend-request').length, 1)
+  paliroGetOrCreateConversation(userID, paliroGetMockMembers('ko')[0])
   const original = paliroGetConversations(userID).find(c => c.member.id === incoming.member.id)
   for (const language of ['en', 'ko', 'en']) {
     assert.deepEqual(paliroGetConversations(userID, language).find(c => c.member.id === incoming.member.id), original)
@@ -78,11 +98,18 @@ test('blocking removes a pending conversation and prevents another request', () 
   assert.equal(paliroSendFriendRequest(userID, member.id, 'Again').type, 'blocked')
 }))
 
-test('untouched demo rows stay localized while personal replies survive repeated language changes', () => withStore(userID => {
+test('all conversations retain their order, unread counts and history across language changes', () => withStore(userID => {
+  paliroGetOrCreateConversation(userID, paliroGetMockMembers('ko')[0])
+  const original = paliroGetConversations(userID)
+  assert.ok(original.some(c => c.member.language === 'en'))
+  assert.ok(original.some(c => c.member.language === 'ko'))
+  for (const language of ['en', 'ko', 'en']) {
+    assert.deepEqual(paliroGetConversations(userID, language), original)
+  }
   for (const language of ['en', 'ko']) {
     const opposite = language === 'en' ? 'ko' : 'en'
     const conversation = paliroGetConversations(userID, language).find(c => c.member.language === language)
-    assert.ok(!paliroGetConversations(userID, opposite).some(c => c.member.id === conversation.member.id))
+    assert.ok(paliroGetConversations(userID, opposite).some(c => c.member.id === conversation.member.id))
     assert.equal(paliroSendConversationMessage(userID, conversation.member.id, 'Hello! 안녕하세요!').type, 'success')
     const saved = paliroGetConversations(userID, language).find(c => c.member.id === conversation.member.id)
     for (const locale of [opposite, language, opposite]) {
