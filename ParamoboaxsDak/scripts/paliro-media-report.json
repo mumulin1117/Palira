@@ -1,0 +1,2105 @@
+{
+  "created": "2026-09-16T02:05:19.108625+00:00",
+  "backup": "/Users/linqian/Documents/PaliroMediaOriginals-20260916",
+  "files": [
+    {
+      "path": "PaDlroliroBox/PaDlroliroBox/Assets.xcassets/AppIcon.appiconset/Contents.json",
+      "before": 213,
+      "after": 213,
+      "originalSHA256": "db2c857558ae0dc4a2148b573bf0afc4f1af5bbe23258a3ccd1d0cd84be5b693",
+      "resultSHA256": "db2c857558ae0dc4a2148b573bf0afc4f1af5bbe23258a3ccd1d0cd84be5b693",
+      "result": "unchanged"
+    },
+    {
+      "path": "PaDlroliroBox/PaDlroliroBox/Assets.xcassets/AppIcon.appiconset/paliraoon.jpg",
+      "before": 485464,
+      "after": 485464,
+      "originalSHA256": "740651f0a805e6431673859604be2f7b06d13ee221fb945f414031959dfff253",
+      "resultSHA256": "740651f0a805e6431673859604be2f7b06d13ee221fb945f414031959dfff253",
+      "result": "unchanged"
+    },
+    {
+      "path": "PaDlroliroBox/PaDlroliroBox/Assets.xcassets/Contents.json",
+      "before": 63,
+      "after": 63,
+      "originalSHA256": "0fd49ba3c3585c709678e0046a821c3c60685ec7063720d30d3a3448be3a208b",
+      "resultSHA256": "0fd49ba3c3585c709678e0046a821c3c60685ec7063720d30d3a3448be3a208b",
+      "result": "unchanged"
+    },
+    {
+      "path": "PaDlroliroBox/PaDlroliroBox/Assets.xcassets/PaliroLaunchKorean.imageset/Contents.json",
+      "before": 295,
+      "after": 295,
+      "originalSHA256": "01db06dc3a1f55a3bcad92a976d2ae57951a21ac34993f2d9be5ad79b9a69514",
+      "resultSHA256": "01db06dc3a1f55a3bcad92a976d2ae57951a21ac34993f2d9be5ad79b9a69514",
+      "result": "unchanged"
+    },
+    {
+      "path": "PaDlroliroBox/PaDlroliroBox/Assets.xcassets/PaliroLaunchKorean.imageset/paliro-launch-screen-ko@2x.png",
+      "before": 417506,
+      "after": 417506,
+      "originalSHA256": "5b7c62b007d46c9f86e8ef69a779215fd55cb3f85562c9a86047f534824d916e",
+      "resultSHA256": "5b7c62b007d46c9f86e8ef69a779215fd55cb3f85562c9a86047f534824d916e",
+      "result": "already compact"
+    },
+    {
+      "path": "PaDlroliroBox/PaDlroliroBox/Assets.xcassets/PaliroLaunchKorean.imageset/paliro-launch-screen-ko@3x.png",
+      "before": 759761,
+      "after": 735016,
+      "originalSHA256": "c2c7c3278092678fbc6096ed8488b5f4be54b697cc923c736afadcb7cd06df04",
+      "resultSHA256": "252156a27b9d001de1ab547ed3de982b7ba2abaf5b5f0a573723478b58be89c9",
+      "result": "optimized"
+    },
+    {
+      "path": "PaDlroliroBox/PaDlroliroBox/Assets.xcassets/PaliroLaunchLogo.imageset/Contents.json",
+      "before": 189,
+      "after": 189,
+      "originalSHA256": "94680a53d32aae5b3f830503818bd38eb754b522c287681e6b785d58b68fc621",
+      "resultSHA256": "94680a53d32aae5b3f830503818bd38eb754b522c287681e6b785d58b68fc621",
+      "result": "unchanged"
+    },
+    {
+      "path": "PaDlroliroBox/PaDlroliroBox/Assets.xcassets/PaliroLaunchLogo.imageset/paliro-launch-logo.pdf",
+      "before": 489464,
+      "after": 489464,
+      "originalSHA256": "9a44f33d8eb1ae2853c7309e5040e242825b9d77754799e58f2213366ee464de",
+      "resultSHA256": "9a44f33d8eb1ae2853c7309e5040e242825b9d77754799e58f2213366ee464de",
+      "result": "unchanged"
+    },
+    {
+      "path": "PaDlroliroBox/PaDlroliroBox/Assets.xcassets/PaliroLaunchSpace.imageset/Contents.json",
+      "before": 332,
+      "after": 332,
+      "originalSHA256": "469807f3e538bc5619ae3c6c5f54a6b27e37193dfaf37ff06e5352b6fb2711e1",
+      "resultSHA256": "469807f3e538bc5619ae3c6c5f54a6b27e37193dfaf37ff06e5352b6fb2711e1",
+      "result": "unchanged"
+    },
+    {
+      "path": "PaDlroliroBox/PaDlroliroBox/Assets.xcassets/PaliroLaunchSpace.imageset/paliro-welcome-space-background@2x.png",
+      "before": 1048208,
+      "after": 645094,
+      "originalSHA256": "b05c9cb31ac8dfc6669f2c7cbe7caddbbae8ec7c3e9dd3e403a284a231474611",
+      "resultSHA256": "7b6ffb18854a7c833769ddd73de283f6c800952a3641c57edecc4a1fad0794a9",
+      "result": "optimized"
+    },
+    {
+      "path": "PaDlroliroBox/PaDlroliroBox/Assets.xcassets/appaliguaungld.imageset/Contents.json",
+      "before": 359,
+      "after": 359,
+      "originalSHA256": "76999b6866ef69cd05b3c6c6ab3fe0785656f230e0f8ee90811b527e269de88f",
+      "resultSHA256": "76999b6866ef69cd05b3c6c6ab3fe0785656f230e0f8ee90811b527e269de88f",
+      "result": "unchanged"
+    },
+    {
+      "path": "PaDlroliroBox/PaDlroliroBox/Assets.xcassets/appaliguaungld.imageset/appaliguaungld@2x.png",
+      "before": 793351,
+      "after": 717518,
+      "originalSHA256": "a1e71aca9c6f9b001bbbf482524a3a7f0da63dfbfc3131ae132ad065ff528b2b",
+      "resultSHA256": "1c6535fc94e1cfc4b8976699383ba9a8ea01354bf4823d689f3c8d4943b277f4",
+      "result": "optimized"
+    },
+    {
+      "path": "PaDlroliroBox/PaDlroliroBox/Assets.xcassets/appaliguaungld.imageset/appaliguaungld@3x.png",
+      "before": 1277589,
+      "after": 1157229,
+      "originalSHA256": "2ffe798b29fc32543330438d940f1a4791316b56c4b30d3fa33f43558f6570f3",
+      "resultSHA256": "9e5d4b4cc985fa490d4510a9ebf3a0c5a4d1bb3608603fad40039c7a3479bf12",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/Montserrat-Bold.ttf",
+      "before": 191648,
+      "after": 191648,
+      "originalSHA256": "447b848269bdae2e8e30f385a95f24dcc54a80304b00452159cdd3f687d6cfc3",
+      "resultSHA256": "447b848269bdae2e8e30f385a95f24dcc54a80304b00452159cdd3f687d6cfc3",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/Montserrat-ExtraBold.ttf",
+      "before": 191644,
+      "after": 191644,
+      "originalSHA256": "26e5eef9ea4153cc665c44fadcd7f90854d51e03b050df440e491f0c8e6ebe90",
+      "resultSHA256": "26e5eef9ea4153cc665c44fadcd7f90854d51e03b050df440e491f0c8e6ebe90",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/Montserrat-Medium.ttf",
+      "before": 192488,
+      "after": 192488,
+      "originalSHA256": "a4d412d818d5fc0215a4593b23d8b5dea20a607e4f1510509f0a7366ca6b931b",
+      "resultSHA256": "a4d412d818d5fc0215a4593b23d8b5dea20a607e4f1510509f0a7366ca6b931b",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/Montserrat-Regular.ttf",
+      "before": 190648,
+      "after": 190648,
+      "originalSHA256": "d104de3cd2bcab4493c69f0456c5e423e143fa86ddd13439f1839740e1f479dd",
+      "resultSHA256": "d104de3cd2bcab4493c69f0456c5e423e143fa86ddd13439f1839740e1f479dd",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/Montserrat-SemiBold.ttf",
+      "before": 192268,
+      "after": 192268,
+      "originalSHA256": "d26efb0dcc5b153bb38c8600fe0e5c3ed3ee2c8be163e73d30fd99ad691cf010",
+      "resultSHA256": "d26efb0dcc5b153bb38c8600fe0e5c3ed3ee2c8be163e73d30fd99ad691cf010",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/Paliro-BalooBhai2-OFL.txt",
+      "before": 4384,
+      "after": 4384,
+      "originalSHA256": "ad09b05dc8bc678c9daf7c4c5f7ef1f55e5726127f4330b2e98e40b9dffcb860",
+      "resultSHA256": "ad09b05dc8bc678c9daf7c4c5f7ef1f55e5726127f4330b2e98e40b9dffcb860",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/Paliro-BalooBhai2.ttf",
+      "before": 710488,
+      "after": 710488,
+      "originalSHA256": "b85b68f85cb82924b1647b3eb74ebc75301aee4839eb87ee8f03d600d446b304",
+      "resultSHA256": "b85b68f85cb82924b1647b3eb74ebc75301aee4839eb87ee8f03d600d446b304",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/Paliro-MiltonianTattoo-OFL.txt",
+      "before": 4411,
+      "after": 4411,
+      "originalSHA256": "aa5d677391db4e54ad324b6888792e533c5d800de7ab713302a2fc8bff2f4f6e",
+      "resultSHA256": "aa5d677391db4e54ad324b6888792e533c5d800de7ab713302a2fc8bff2f4f6e",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/Paliro-MiltonianTattoo.ttf",
+      "before": 107880,
+      "after": 107880,
+      "originalSHA256": "b4e9f4c263fc1e7beb14b09572ecb21ba893ce8d5e5cec1e5727c79d5c8583dc",
+      "resultSHA256": "b4e9f4c263fc1e7beb14b09572ecb21ba893ce8d5e5cec1e5727c79d5c8583dc",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-avatar-blue@2x.png",
+      "before": 245415,
+      "after": 154009,
+      "originalSHA256": "58efb2de481328517aae6ff21966ff1c4bf0fd4bc48a0a7e902d4e45b6b18b15",
+      "resultSHA256": "e21ee9d8b9db219f18bb5eac1f47314d2d98b69ab788a3d892ffadab4d747e15",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-avatar-coral@2x.png",
+      "before": 248836,
+      "after": 155866,
+      "originalSHA256": "2ac50811a926879ae90c4d42d029e9368b15a05bacb4487a3abd0831b4ddba6e",
+      "resultSHA256": "ed378c5f2a38c878ba2b38bea6eca173b13d03f9e4a3741336784ff6512be524",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-avatar-golden@2x.png",
+      "before": 274480,
+      "after": 179994,
+      "originalSHA256": "c4bd804608a6ce9add37f529067749a7f4a5233e72708f4349a3c27d23d3ba84",
+      "resultSHA256": "03d4c557ac784be7921c771fb50c27c0d5463d0bc756aff4475d8ab2e1e31f89",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-avatar-mint@2x.png",
+      "before": 257900,
+      "after": 162626,
+      "originalSHA256": "ac91e85b2b0eaaac496d8e82787ac6099b9969445db3556d2d6170970a952975",
+      "resultSHA256": "055df59fd1aad1a2f1da7053e53f3ce3ff28e5ee3b31bef3f4f9ab3772015cc3",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-avatar-violet@2x.png",
+      "before": 276506,
+      "after": 182691,
+      "originalSHA256": "d7b8bea97893b657bd072f627a1e721c1ee480441a04b16d599d1170567302e4",
+      "resultSHA256": "fefd0011aee0d31aa2b01eea7aa48d9faa86363e2fd5a61b1859c78015067774",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-01.jpg",
+      "before": 147614,
+      "after": 147614,
+      "originalSHA256": "189e1dc47e783c16f6d17663d5d38ff2cdbdf34647516ed71a82140d06c7bdcc",
+      "resultSHA256": "189e1dc47e783c16f6d17663d5d38ff2cdbdf34647516ed71a82140d06c7bdcc",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-02.jpg",
+      "before": 65998,
+      "after": 65998,
+      "originalSHA256": "25b0a404348280cb445239bf61acfcdcc33f35ee238641e3b1cc6f5f18bc0e90",
+      "resultSHA256": "25b0a404348280cb445239bf61acfcdcc33f35ee238641e3b1cc6f5f18bc0e90",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-03.jpg",
+      "before": 68480,
+      "after": 68480,
+      "originalSHA256": "29eb463f8e991d41fa4c78d7c852c4e994a81ab5d190c644f7a3983d7fa59848",
+      "resultSHA256": "29eb463f8e991d41fa4c78d7c852c4e994a81ab5d190c644f7a3983d7fa59848",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-04.jpg",
+      "before": 66884,
+      "after": 66884,
+      "originalSHA256": "05c1d8ab145909d15967d5e6573d48bafeac9407bb554c80307678547b53477b",
+      "resultSHA256": "05c1d8ab145909d15967d5e6573d48bafeac9407bb554c80307678547b53477b",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-05.jpg",
+      "before": 57326,
+      "after": 57326,
+      "originalSHA256": "37b82fa7ecc76a3f7ba1113c4ba6fa5a4fb9a6a6f5312eebbe52e4e363d7623f",
+      "resultSHA256": "37b82fa7ecc76a3f7ba1113c4ba6fa5a4fb9a6a6f5312eebbe52e4e363d7623f",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-06.jpg",
+      "before": 48408,
+      "after": 48408,
+      "originalSHA256": "a42ecb36a977bc8dc4c0afff38dcbcbc86ffcd6d25eee8046cdb4b2a3ef33cf7",
+      "resultSHA256": "a42ecb36a977bc8dc4c0afff38dcbcbc86ffcd6d25eee8046cdb4b2a3ef33cf7",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-07.jpg",
+      "before": 95640,
+      "after": 95640,
+      "originalSHA256": "21ed40a6adda4aee7555b4ede599eab92b42494b9e573673e2517bc8f310fa35",
+      "resultSHA256": "21ed40a6adda4aee7555b4ede599eab92b42494b9e573673e2517bc8f310fa35",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-08.jpg",
+      "before": 69342,
+      "after": 69342,
+      "originalSHA256": "400749196a703f6b2fadf05eec8ec886ddd6284b1b261377001b2c207652524b",
+      "resultSHA256": "400749196a703f6b2fadf05eec8ec886ddd6284b1b261377001b2c207652524b",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-09.jpg",
+      "before": 98311,
+      "after": 98311,
+      "originalSHA256": "79cb45e5e0dac645ec058334571a49a758d6944dbe98d931bb48128577b09afb",
+      "resultSHA256": "79cb45e5e0dac645ec058334571a49a758d6944dbe98d931bb48128577b09afb",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-10.jpg",
+      "before": 188791,
+      "after": 188791,
+      "originalSHA256": "506d1443aa64fcd8e6bc79cb58bc757634ae10e611b8ce7054ffdd487eb1f231",
+      "resultSHA256": "506d1443aa64fcd8e6bc79cb58bc757634ae10e611b8ce7054ffdd487eb1f231",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-11.jpg",
+      "before": 60530,
+      "after": 60530,
+      "originalSHA256": "b7cd194a1566c6cdf656023f4ba4547d854d67c62fa0a4eabad81a9b60732eb8",
+      "resultSHA256": "b7cd194a1566c6cdf656023f4ba4547d854d67c62fa0a4eabad81a9b60732eb8",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-12.jpg",
+      "before": 100225,
+      "after": 100225,
+      "originalSHA256": "e2beede81e6384424ac564e50dd8472106decd5273eee9f8dab90acc17f01bc7",
+      "resultSHA256": "e2beede81e6384424ac564e50dd8472106decd5273eee9f8dab90acc17f01bc7",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-13.jpg",
+      "before": 56468,
+      "after": 56468,
+      "originalSHA256": "5d3a8e832717f81380340e41de6da3341f66cb32d1f19d733616c2b285c4d006",
+      "resultSHA256": "5d3a8e832717f81380340e41de6da3341f66cb32d1f19d733616c2b285c4d006",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-14.jpg",
+      "before": 83254,
+      "after": 83254,
+      "originalSHA256": "a7a915aed00f8e135cd638cc4cd09b6b641b5450891173c236236bfc31dff9a1",
+      "resultSHA256": "a7a915aed00f8e135cd638cc4cd09b6b641b5450891173c236236bfc31dff9a1",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-15.jpg",
+      "before": 25967,
+      "after": 25967,
+      "originalSHA256": "958955a67f361fa33b38e6992fc19db3aec2a94976e0c438b95a250e87b7f7ba",
+      "resultSHA256": "958955a67f361fa33b38e6992fc19db3aec2a94976e0c438b95a250e87b7f7ba",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-16.jpg",
+      "before": 90759,
+      "after": 90759,
+      "originalSHA256": "a92d387bcefa8abd4b416048523d06fe0f10dcaa78a5c444fd35808999516bca",
+      "resultSHA256": "a92d387bcefa8abd4b416048523d06fe0f10dcaa78a5c444fd35808999516bca",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-17.jpg",
+      "before": 93557,
+      "after": 93557,
+      "originalSHA256": "f4de42cf56bf5363e8d54e3ab7935a5256b698987992d4af08f81d9301532467",
+      "resultSHA256": "f4de42cf56bf5363e8d54e3ab7935a5256b698987992d4af08f81d9301532467",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-18.jpg",
+      "before": 91772,
+      "after": 91772,
+      "originalSHA256": "1e5a54c433cf0a3ba14f18e7dc94ce897d77e5827a9eb0231582df76ce2a31a8",
+      "resultSHA256": "1e5a54c433cf0a3ba14f18e7dc94ce897d77e5827a9eb0231582df76ce2a31a8",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-19.jpg",
+      "before": 95418,
+      "after": 95418,
+      "originalSHA256": "961ad64922d7cb82f6fe17632ae9ef6409d286ce5460bc6dc0b3506c3d0922ca",
+      "resultSHA256": "961ad64922d7cb82f6fe17632ae9ef6409d286ce5460bc6dc0b3506c3d0922ca",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-en-20.jpg",
+      "before": 149140,
+      "after": 149140,
+      "originalSHA256": "d5725871995209a40fad0a7a0275a6e8125f0d91e4d86e3254982a7e82543f19",
+      "resultSHA256": "d5725871995209a40fad0a7a0275a6e8125f0d91e4d86e3254982a7e82543f19",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-01.jpg",
+      "before": 41025,
+      "after": 41025,
+      "originalSHA256": "25985378e2c9f6473186481dc2eb75b9999612a3f66eb76b8c55d39e2e415122",
+      "resultSHA256": "25985378e2c9f6473186481dc2eb75b9999612a3f66eb76b8c55d39e2e415122",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-02.jpg",
+      "before": 39177,
+      "after": 39177,
+      "originalSHA256": "5f26ed1f9f88b9121122224563d6a7555244b7a4b5b8493e4530153591ca4ecf",
+      "resultSHA256": "5f26ed1f9f88b9121122224563d6a7555244b7a4b5b8493e4530153591ca4ecf",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-03.jpg",
+      "before": 73503,
+      "after": 73503,
+      "originalSHA256": "2b40e0614ceda712570a46d8cf0fa0e5d2b951923ede4e103c191c04bea58917",
+      "resultSHA256": "2b40e0614ceda712570a46d8cf0fa0e5d2b951923ede4e103c191c04bea58917",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-04.jpg",
+      "before": 63069,
+      "after": 63069,
+      "originalSHA256": "10304b84826effc465a402cb24eda329bc6a4e8fe0d3bf56b670ffec471a0f3d",
+      "resultSHA256": "10304b84826effc465a402cb24eda329bc6a4e8fe0d3bf56b670ffec471a0f3d",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-05.jpg",
+      "before": 138931,
+      "after": 138931,
+      "originalSHA256": "91bbf24ca8ffd356f0f5fb51b7acedbaeb7fea6c34b38854977bbfbd1f68d251",
+      "resultSHA256": "91bbf24ca8ffd356f0f5fb51b7acedbaeb7fea6c34b38854977bbfbd1f68d251",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-06.jpg",
+      "before": 58453,
+      "after": 58453,
+      "originalSHA256": "83e08d3ca88bf74de1137e18ee02961bc6d630c3edcd5aaf83f0885d8588bf56",
+      "resultSHA256": "83e08d3ca88bf74de1137e18ee02961bc6d630c3edcd5aaf83f0885d8588bf56",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-07.jpg",
+      "before": 81270,
+      "after": 81270,
+      "originalSHA256": "d7d0d85fbbd2ad8ba1f937ef00de2df53f61efa2b358a23cf6db94357ad7cd26",
+      "resultSHA256": "d7d0d85fbbd2ad8ba1f937ef00de2df53f61efa2b358a23cf6db94357ad7cd26",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-08.jpg",
+      "before": 47187,
+      "after": 47187,
+      "originalSHA256": "46d8ebf8a966a680ad3fa935f53d1112df4d8d6c640f0807d5c18b9939b7b216",
+      "resultSHA256": "46d8ebf8a966a680ad3fa935f53d1112df4d8d6c640f0807d5c18b9939b7b216",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-09.jpg",
+      "before": 161727,
+      "after": 161727,
+      "originalSHA256": "1e43ca827c8521a4cacc65a0bffaf82725ea07f70cd0b2771fa34044dbf7e762",
+      "resultSHA256": "1e43ca827c8521a4cacc65a0bffaf82725ea07f70cd0b2771fa34044dbf7e762",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-10.jpg",
+      "before": 94960,
+      "after": 94960,
+      "originalSHA256": "f041abab6b4d9f3d342fe658f6e95a76f978f90d3a6e21b09cb19cfe1d2a0048",
+      "resultSHA256": "f041abab6b4d9f3d342fe658f6e95a76f978f90d3a6e21b09cb19cfe1d2a0048",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-11.jpg",
+      "before": 92515,
+      "after": 92515,
+      "originalSHA256": "0582aed5fc327a25fb961cee4bf8848df6730d1f0f2be3aefd3f2a9a5282fdb7",
+      "resultSHA256": "0582aed5fc327a25fb961cee4bf8848df6730d1f0f2be3aefd3f2a9a5282fdb7",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-12.jpg",
+      "before": 56527,
+      "after": 56527,
+      "originalSHA256": "302e3b0575eb8ad40c0cadd033706229bc445ab493b4cb7eb0d8359252f4791c",
+      "resultSHA256": "302e3b0575eb8ad40c0cadd033706229bc445ab493b4cb7eb0d8359252f4791c",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-13.jpg",
+      "before": 65678,
+      "after": 65678,
+      "originalSHA256": "e52bf3b53baf08ba23737b1dfc65273dbd60e947ca6fd8adb29d00c37c692385",
+      "resultSHA256": "e52bf3b53baf08ba23737b1dfc65273dbd60e947ca6fd8adb29d00c37c692385",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-14.jpg",
+      "before": 88437,
+      "after": 88437,
+      "originalSHA256": "80b655e492eaab286927bcd4188501e960c692791ee5c1a38a0dd9cb54be7db9",
+      "resultSHA256": "80b655e492eaab286927bcd4188501e960c692791ee5c1a38a0dd9cb54be7db9",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-15.jpg",
+      "before": 52271,
+      "after": 52271,
+      "originalSHA256": "25cbf6629e0456792056358f5359db569469c763666ee19627808e584b81f637",
+      "resultSHA256": "25cbf6629e0456792056358f5359db569469c763666ee19627808e584b81f637",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-16.jpg",
+      "before": 47664,
+      "after": 47664,
+      "originalSHA256": "9965f4a9bee1016af5a2a84a09e8dc0dde5a3da07def8ba069981536a5c5d0a9",
+      "resultSHA256": "9965f4a9bee1016af5a2a84a09e8dc0dde5a3da07def8ba069981536a5c5d0a9",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-17.jpg",
+      "before": 65315,
+      "after": 65315,
+      "originalSHA256": "38f72802cafa28b392ab598ca80081ea0b83099a24a08f8a6923fe47e5acf4c9",
+      "resultSHA256": "38f72802cafa28b392ab598ca80081ea0b83099a24a08f8a6923fe47e5acf4c9",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-18.jpg",
+      "before": 31704,
+      "after": 31704,
+      "originalSHA256": "9234078bc14972977571a05d49379a7e619217af07f0307307b46986dc57f676",
+      "resultSHA256": "9234078bc14972977571a05d49379a7e619217af07f0307307b46986dc57f676",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-box-ko-19.jpg",
+      "before": 63899,
+      "after": 63899,
+      "originalSHA256": "9f4e942fb0b7a7b9aa3cba57da0163c0ff3a7dbf7710b8952d40d0e4b35b5139",
+      "resultSHA256": "9f4e942fb0b7a7b9aa3cba57da0163c0ff3a7dbf7710b8952d40d0e4b35b5139",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-chat-mic@2x.png",
+      "before": 2108,
+      "after": 1346,
+      "originalSHA256": "4dc2e8a7cd1d424e4fe8422299186b31cc4cb07a6b2b2062f9b14b5a337a0151",
+      "resultSHA256": "d13e0540f74da5831a79ce7f6906406957d10a7c9948b9bc7e3355d9c021594d",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-composer-close@2x.png",
+      "before": 3062,
+      "after": 1755,
+      "originalSHA256": "b1adf302384aeab0b313b621036df664c576ed2ec4279f063ce981072f05beb3",
+      "resultSHA256": "da50ad3a1c5ecf4ab108841d09cbf2454af3a0b4201c7f93b5449b945d225a28",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-composer-post-button@2x.png",
+      "before": 19968,
+      "after": 6446,
+      "originalSHA256": "5d6a14034813216ac0c1aad796ec909e5fb0660d64d6c8b496b6bcded6783bbd",
+      "resultSHA256": "d5dcb2d979f3677dd07c504ce37a90de159e1c90a7c9643cc7195fdad289ea79",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-en-01-cover.png",
+      "before": 192772,
+      "after": 192772,
+      "originalSHA256": "57cc35f29fd4610d2337d45beee8d58825c660e263636ff722e72a7d6aeaeb43",
+      "resultSHA256": "57cc35f29fd4610d2337d45beee8d58825c660e263636ff722e72a7d6aeaeb43",
+      "result": "kept original: PNG non-IDAT chunks changed"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-en-01.mp4",
+      "before": 1148012,
+      "after": 1148012,
+      "originalSHA256": "6793db2ac95a9cad35fe7662dc599967e07c802f9d5df1c635a0cb7ff5a69ae7",
+      "resultSHA256": "6793db2ac95a9cad35fe7662dc599967e07c802f9d5df1c635a0cb7ff5a69ae7",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-en-02-cover.png",
+      "before": 203479,
+      "after": 203479,
+      "originalSHA256": "396c18d055ce929a19592e133b37751464da32ecc31e283b41f960f077b3e403",
+      "resultSHA256": "396c18d055ce929a19592e133b37751464da32ecc31e283b41f960f077b3e403",
+      "result": "kept original: PNG non-IDAT chunks changed"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-en-02.mp4",
+      "before": 1485144,
+      "after": 1485144,
+      "originalSHA256": "9f839023ad4e20c5fd633337c59ecdf9cb8cd1952ac8e1b942b9d00f821a66d4",
+      "resultSHA256": "9f839023ad4e20c5fd633337c59ecdf9cb8cd1952ac8e1b942b9d00f821a66d4",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-en-03-cover.png",
+      "before": 162657,
+      "after": 162657,
+      "originalSHA256": "9647643439c926f8363a2ec52f8404a5d35dab804861f17b728bfb22271db89f",
+      "resultSHA256": "9647643439c926f8363a2ec52f8404a5d35dab804861f17b728bfb22271db89f",
+      "result": "kept original: PNG non-IDAT chunks changed"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-en-03.mp4",
+      "before": 3991470,
+      "after": 3991470,
+      "originalSHA256": "8b9b2f28e55d0a159757628265143ac20c2767f4d9952915af7ca419eedbc70d",
+      "resultSHA256": "8b9b2f28e55d0a159757628265143ac20c2767f4d9952915af7ca419eedbc70d",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-en-04-cover.png",
+      "before": 271276,
+      "after": 271276,
+      "originalSHA256": "2b20255ba2e86833a152b620687725df2e1802c762e43df81799256861374320",
+      "resultSHA256": "2b20255ba2e86833a152b620687725df2e1802c762e43df81799256861374320",
+      "result": "kept original: PNG non-IDAT chunks changed"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-en-04.mp4",
+      "before": 643069,
+      "after": 643069,
+      "originalSHA256": "b267571b3f7ce205d973dc652eaba192cf053dd9e413421246a1eebbf8e92fc9",
+      "resultSHA256": "b267571b3f7ce205d973dc652eaba192cf053dd9e413421246a1eebbf8e92fc9",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-en-05-cover.png",
+      "before": 328667,
+      "after": 328667,
+      "originalSHA256": "2a54a3003eebe53529cd296057946dc81ecddcd909c20182b8381a807992dd24",
+      "resultSHA256": "2a54a3003eebe53529cd296057946dc81ecddcd909c20182b8381a807992dd24",
+      "result": "kept original: PNG non-IDAT chunks changed"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-en-05.mp4",
+      "before": 1913030,
+      "after": 1913030,
+      "originalSHA256": "7a892ff5345abcd685253cc9766770d3658db95ebef7d4e943f80148e2273302",
+      "resultSHA256": "7a892ff5345abcd685253cc9766770d3658db95ebef7d4e943f80148e2273302",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-en-06-cover.png",
+      "before": 309222,
+      "after": 309222,
+      "originalSHA256": "8be42adad6af6a11babd6c36abdc9460bfcb3ee3f22f26d25b0b7a0e77f6eb7a",
+      "resultSHA256": "8be42adad6af6a11babd6c36abdc9460bfcb3ee3f22f26d25b0b7a0e77f6eb7a",
+      "result": "kept original: PNG non-IDAT chunks changed"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-en-06.mp4",
+      "before": 1674844,
+      "after": 1674844,
+      "originalSHA256": "cb0d863243d2351e94b3352cc395485c8454e29def45d83498d644a78119117f",
+      "resultSHA256": "cb0d863243d2351e94b3352cc395485c8454e29def45d83498d644a78119117f",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-ko-01-cover.png",
+      "before": 395624,
+      "after": 395624,
+      "originalSHA256": "4d05ce70aee7658e4cb9f96d1d605119649a8f96fc8f9271ff915ae6f324f783",
+      "resultSHA256": "4d05ce70aee7658e4cb9f96d1d605119649a8f96fc8f9271ff915ae6f324f783",
+      "result": "kept original: PNG non-IDAT chunks changed"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-ko-01.mp4",
+      "before": 4920599,
+      "after": 4920599,
+      "originalSHA256": "0db899611aeacd8cdabc2dd7bb9ea331aa35c0fad524875571467be4f077a5bc",
+      "resultSHA256": "0db899611aeacd8cdabc2dd7bb9ea331aa35c0fad524875571467be4f077a5bc",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-ko-02-cover.png",
+      "before": 360217,
+      "after": 360217,
+      "originalSHA256": "4e7c3b32fd3128143b0330bcdddf5e9ce62f96cb58dea18c0589ff960efc8f11",
+      "resultSHA256": "4e7c3b32fd3128143b0330bcdddf5e9ce62f96cb58dea18c0589ff960efc8f11",
+      "result": "kept original: PNG non-IDAT chunks changed"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-ko-02.mp4",
+      "before": 1470630,
+      "after": 1470630,
+      "originalSHA256": "00ec60717d4c9ee896287dbd8a4dd70a3f8d1e18b30070858840d8a0b803dfff",
+      "resultSHA256": "00ec60717d4c9ee896287dbd8a4dd70a3f8d1e18b30070858840d8a0b803dfff",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-ko-03-cover.png",
+      "before": 358055,
+      "after": 358055,
+      "originalSHA256": "bee7e0f609bcfd5f07dfd8946e212582941233d6b6dd56fe66559df4606faa69",
+      "resultSHA256": "bee7e0f609bcfd5f07dfd8946e212582941233d6b6dd56fe66559df4606faa69",
+      "result": "kept original: PNG non-IDAT chunks changed"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-feed-ko-03.mp4",
+      "before": 2562326,
+      "after": 2562326,
+      "originalSHA256": "d4eafe15c9f7b457a3d02ef78ab752bb6b0fa7502a490b5626b60dd4819cc85f",
+      "resultSHA256": "d4eafe15c9f7b457a3d02ef78ab752bb6b0fa7502a490b5626b60dd4819cc85f",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-home-chest@2x.png",
+      "before": 316786,
+      "after": 310436,
+      "originalSHA256": "6b7c17aeaa281cc7cad3ca9436e52523f3ccc8d1bc9e8caa334520010d27d2e7",
+      "resultSHA256": "1fbf189c561892c0c0d648532978a890295f9fcfccddc89c288ddbb1b031add5",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-home-chest@4x.png",
+      "before": 1096174,
+      "after": 976806,
+      "originalSHA256": "f12f4b3b60db7eb90ef16460b116f507c8c2cc4d7b1aea8a33d3f7d069225078",
+      "resultSHA256": "cb308ab096a25c3bd595ea583823957b7cebab102642fff12bc00f18b96d6a11",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-home-coin-modal-art@2x.png",
+      "before": 97399,
+      "after": 93571,
+      "originalSHA256": "560c7d2ed0599d6a1a203c24acf563b1b830f86003394897356114fff320912c",
+      "resultSHA256": "6040e2eb5fe57aa77fcc9aa08e65068c0048037d59db19b37d58f99ad19c277b",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-home-coin-star@2x.png",
+      "before": 3003,
+      "after": 3003,
+      "originalSHA256": "833a4dbeadf2dc771bffd7f98734d61c373ff819808e7056f7ec196fe00fad0d",
+      "resultSHA256": "833a4dbeadf2dc771bffd7f98734d61c373ff819808e7056f7ec196fe00fad0d",
+      "result": "already compact"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-home-floating-boxes.gif",
+      "before": 9698854,
+      "after": 8205931,
+      "originalSHA256": "132fb2719ccfa3882bfa67ed78d4ac3a33f68a8966ed4d5aac34953c78f42ad2",
+      "resultSHA256": "7838e166b68fff67dc5a383c5649bbecdade37ff89d152cdc168c2fe9b7374a3",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-home-guide-button@2x.png",
+      "before": 18406,
+      "after": 16522,
+      "originalSHA256": "64d0df82d0909c42c3c784ad78b9ffb6c9dce6d6b9086cd47cda04af4c4db936",
+      "resultSHA256": "bd4b19e1f4f51da86f9722f6ae2fb8ae3ddf1fb275fdee5399f10cfa27981d04",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-home-make-button@2x.png",
+      "before": 42941,
+      "after": 38573,
+      "originalSHA256": "18428ccda544498a6abc722663eb4a05a5885f2a4fde3edf2c43cc8733614b06",
+      "resultSHA256": "7b9704a9483e21dc2b094b3801411ea0d9e10713e8f11b04786df68e1131a905",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-home-progress-star@2x.png",
+      "before": 2162,
+      "after": 2162,
+      "originalSHA256": "cc5d4f0b67659359f7b455df3a83156cf237b1a83b71e67be74c13cbb666663f",
+      "resultSHA256": "cc5d4f0b67659359f7b455df3a83156cf237b1a83b71e67be74c13cbb666663f",
+      "result": "already compact"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-home-rule-button-ko@2x.png",
+      "before": 19442,
+      "after": 13552,
+      "originalSHA256": "ae4a256bbfb89da57b1619f456987a933febd18af93079f7c8b4798f6d98bdb5",
+      "resultSHA256": "3449671629c4ecc9f24088d5927357b55168c780643b70c07bb6ce91c41164a8",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-home-rule-button@2x.png",
+      "before": 19192,
+      "after": 17842,
+      "originalSHA256": "b8ebd96e651163babc20556602fa843214d9eaabe3456cb0dadc09967ba3ee46",
+      "resultSHA256": "fbe49c4d7f8557988ca4bbc6fbbb643ac6857ae35af734cb1f025993d517ce0a",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-home-space@2x.png",
+      "before": 1695406,
+      "after": 1457363,
+      "originalSHA256": "406429dbda2070b890336b1997f10de6876897d609c22dbcab9390a33b5ab41e",
+      "resultSHA256": "a59fc0893f0e0a1bc70891a9e663cbb652c466e92e1b9a70f71ef2c1606985dc",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-home-take-button@2x.png",
+      "before": 42310,
+      "after": 37782,
+      "originalSHA256": "72f54144f2ee900ea867167b6b3616a6696c5baf902db501bd05785f3fc43aff",
+      "resultSHA256": "20ebbe1de58fb3b88c1d5fb170283e15c5faf17f2aeff3f8dff4bb8cc37574c5",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-home-test-icon@2x.png",
+      "before": 8218,
+      "after": 7691,
+      "originalSHA256": "cfa47ef5754a09e94e38a74cab2a701a245b436ba40a31decfb3fd2aab9e6af5",
+      "resultSHA256": "5299f22f6501b5fa6ecfb3b28c52fefbeb98c18e7267ad80b940a53a4c9a7296",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-home-title-ko@2x.png",
+      "before": 23873,
+      "after": 14685,
+      "originalSHA256": "1a1e9ec54e9db7a91b76cbbd9eda355ea83315b4534614257aa38696ae609459",
+      "resultSHA256": "d075075a799a5fef69afbfb51b028f165b60720b71377f0ba546ce4b69c53ba9",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-home-title@2x.png",
+      "before": 37505,
+      "after": 35541,
+      "originalSHA256": "9843857cfd223ae3a7df83edf5d5f858e6c758344570558dca1f9cee68a24e2e",
+      "resultSHA256": "e1ad8469b8f16e25f502e80e3b7af70ac7ddbebc11014d81695a682b18102eaf",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-language-check@4x.png",
+      "before": 671,
+      "after": 390,
+      "originalSHA256": "7fe417bb503d9b495b1c12c89cc976c6cc7765fbb0ad0610c7285a2d0d905be2",
+      "resultSHA256": "9b294b628437e2026dd1f3c224602130665b3991ade76763f80653518c759818",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-launch-logo@2x.png",
+      "before": 31168,
+      "after": 31168,
+      "originalSHA256": "42f8ca77597ce611a828d2f8d9f5c12e9f5ac1a9194622b0fa67d503d1d65fcb",
+      "resultSHA256": "42f8ca77597ce611a828d2f8d9f5c12e9f5ac1a9194622b0fa67d503d1d65fcb",
+      "result": "kept original: PNG non-IDAT chunks changed"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-launch-logo@3x.png",
+      "before": 62339,
+      "after": 62339,
+      "originalSHA256": "e282aad0df450faa6dcc9782987065c2185e65d72426855f1dbb29355729b8bb",
+      "resultSHA256": "e282aad0df450faa6dcc9782987065c2185e65d72426855f1dbb29355729b8bb",
+      "result": "kept original: PNG non-IDAT chunks changed"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-launch-screen-ko@2x.png",
+      "before": 417506,
+      "after": 417506,
+      "originalSHA256": "5b7c62b007d46c9f86e8ef69a779215fd55cb3f85562c9a86047f534824d916e",
+      "resultSHA256": "5b7c62b007d46c9f86e8ef69a779215fd55cb3f85562c9a86047f534824d916e",
+      "result": "already compact"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-launch-screen-ko@3x.png",
+      "before": 759761,
+      "after": 735016,
+      "originalSHA256": "c2c7c3278092678fbc6096ed8488b5f4be54b697cc923c736afadcb7cd06df04",
+      "resultSHA256": "252156a27b9d001de1ab547ed3de982b7ba2abaf5b5f0a573723478b58be89c9",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-launch-screen@2x.png",
+      "before": 793351,
+      "after": 717518,
+      "originalSHA256": "a1e71aca9c6f9b001bbbf482524a3a7f0da63dfbfc3131ae132ad065ff528b2b",
+      "resultSHA256": "1c6535fc94e1cfc4b8976699383ba9a8ea01354bf4823d689f3c8d4943b277f4",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-login-book@2x.png",
+      "before": 78082,
+      "after": 73291,
+      "originalSHA256": "43ebf8780e610b5f49f57cd2880d6891b9a9ad87f57797cac0991c3cae06f84e",
+      "resultSHA256": "8f4c02b809f621bfd104b4f8e3c3aa27ab898ed7e31d14b73465ac9a8c535b5e",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-make-box-composer-frame@2x.png",
+      "before": 653198,
+      "after": 339483,
+      "originalSHA256": "6db6955a31c264122d78dadd58f6514e2923e6092513d2139ad737a27217e1bc",
+      "resultSHA256": "5c1c627ad9c3777fa63e151be9c3651e9c81b6bf1578da8c60f0dc32b05b3cf2",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-make-box-flight@2x.png",
+      "before": 53458,
+      "after": 44563,
+      "originalSHA256": "3cb43dc963598364879fd14e44008f1cf7b3a432ab2fe80eb958bfca66c8334c",
+      "resultSHA256": "2c99db0077bee216170a30e51f6bbcf017c0166347706f04331e94957b993d85",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-match-add-friend@2x.png",
+      "before": 23335,
+      "after": 16729,
+      "originalSHA256": "aa5c6ae5f04131fddeb2216f800cda98bc45f68eef38a414ed4af380b331dab6",
+      "resultSHA256": "09a9e0694a52ce43db79ab224a1c6b30de625e9a663de1f2ec7fcd7da51c0c56",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-match-card@2x.png",
+      "before": 459612,
+      "after": 384824,
+      "originalSHA256": "2dd9d57a63f45910794e3867fcfb2a229f2ea33dde0aa3c10b78d604cca806e5",
+      "resultSHA256": "56abc4eb675306492df0702657e8acf8f7d21569540f526f29ba03e3de51470a",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-match-report@2x.png",
+      "before": 1871,
+      "after": 905,
+      "originalSHA256": "3a825a20c5639283b0e7407370bcaeb586373f78a61d98a70f542cb14bebadbb",
+      "resultSHA256": "ec5be753fc7a92350b02f7eccf3730761734f777994e8a20f203a254ea413700",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-me-blocked@2x.png",
+      "before": 1616,
+      "after": 1335,
+      "originalSHA256": "93de20f3762c59c89d058c32f5c1f6c0025802856c772ba0ae6eb02ecbdc48a0",
+      "resultSHA256": "19f36297ab00930598ac21c8d509103aa7fadc8c655ea4061b57c4eeb166a36c",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-me-chevron@2x.png",
+      "before": 850,
+      "after": 503,
+      "originalSHA256": "7507ba7cf93c644eb0523ee68a9d77f9be95bcb63ea1ae9b4d24a2ef91305a0c",
+      "resultSHA256": "59b433325077bf424991fb010a31e827613cce1ffad7829698e47af9dd7480fd",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-me-edit@2x.png",
+      "before": 1678,
+      "after": 1369,
+      "originalSHA256": "d4233c67d7e49c950a8e48e77d79a799f2b811c8dedd7f73dd32bbbdf8a70a37",
+      "resultSHA256": "4aca88d49d3c9aefa4dedc3f6188be9361bd5b11b2ee0d55d2a15a54925eff5d",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-me-language.svg",
+      "before": 405,
+      "after": 405,
+      "originalSHA256": "e27efe507158466feedc60f303bad602a69ceb69b0cde2b3c1c25b693dd38ea5",
+      "resultSHA256": "e27efe507158466feedc60f303bad602a69ceb69b0cde2b3c1c25b693dd38ea5",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-me-settings@2x.png",
+      "before": 1912,
+      "after": 1554,
+      "originalSHA256": "c85af11042015873d9eaa9bd09607743f226ae7cfa13f02078036dfccf6ac04c",
+      "resultSHA256": "45af3036cc9b1b4ce0c0256fd52793431e58107f13dd279b4c03cc012005d77f",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-me-videos@2x.png",
+      "before": 953,
+      "after": 822,
+      "originalSHA256": "1df8fb85da66289bc8bcfe76c677d09f7bcbeb46109caeb1eadb2982e254f64c",
+      "resultSHA256": "05907983291dc993d47ea673b09a9bdb004e4404d71c706dd069b069c2359c52",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-me-wallet@2x.png",
+      "before": 1034,
+      "after": 869,
+      "originalSHA256": "d8a88bddad63836ca0b7879f80e2a606fbba47ee33d5d728462d49e9d62bc3bf",
+      "resultSHA256": "6ae129e5fb3b191174c2cedb38a5e49aa8acad17ec17f065bdaf34245ef3567f",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-01-photo.png",
+      "before": 542982,
+      "after": 389960,
+      "originalSHA256": "9f1c1ad9f330f37da5a050e3949d45b6b1ba1c0ec7bfe42c85240eb0c153f8c7",
+      "resultSHA256": "dacd9835a1a87d1392c446d5bbf7b8462f5991aadb12b1cb4789174ae3876b4e",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-02-photo.png",
+      "before": 625873,
+      "after": 456422,
+      "originalSHA256": "44a53443df262f0ab1eeb1360d583275953c0ce7f1fe23e3a1dc0f67a670dcf1",
+      "resultSHA256": "f85228ad70bba72bd3c6bc4f550608ea2dfafc0cd932ce2d5320a9a52a9456c9",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-03-photo.png",
+      "before": 239763,
+      "after": 147215,
+      "originalSHA256": "fce1dea307460a60188b4db1b3508d9dd93e47935a390ef2358affd0b894674b",
+      "resultSHA256": "4a513797be9db8a7188f41fd12a323f8747a2556d7f880708ce216c976c30f0d",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-04-photo.png",
+      "before": 593971,
+      "after": 415446,
+      "originalSHA256": "c577cc19a4b3681b8429612de9f93c018e5fc072edfa383fe2ec78e5b0701a59",
+      "resultSHA256": "128e489c6755270a3648070362b1f52d9de240e0c84ba2f93f2bd40238cb65fb",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-05-photo.png",
+      "before": 521129,
+      "after": 351916,
+      "originalSHA256": "a124db78349bec1a4e405c9c361743d5afb519b3316b13c7e4c4a3649f9412a5",
+      "resultSHA256": "2080732e5a9961d4f28c19b22d478699fe8e8f4c4754a9f55aeb64b2fcc55918",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-06-photo.png",
+      "before": 592502,
+      "after": 416857,
+      "originalSHA256": "0cdb36c26b32ab1d6bba387fd0d975e100000f733a47485fbb87fb062f5d2090",
+      "resultSHA256": "c3d1e5d65ec134cb41ac7ff58b15cc88e0ad2948c72327bd569214929fe7033d",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-07-photo.png",
+      "before": 802104,
+      "after": 650954,
+      "originalSHA256": "e23f110881e0e38f74fed759046428edaa01900f28e06656b70fe4a4dd66c150",
+      "resultSHA256": "76416e6f73ecb23a8b3a441b6f2c936ca3bcc5936b5755e49ddf6398d8d9bd80",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-08-photo.png",
+      "before": 741557,
+      "after": 566399,
+      "originalSHA256": "94c2d3767b54066ac1ef94b86bca661f7ac86debf7d28386409773523a34b6af",
+      "resultSHA256": "d819b24002272d58e4b6d498850b625427455e85ba790d56a66755d4af7f252b",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-09-photo.png",
+      "before": 568793,
+      "after": 411707,
+      "originalSHA256": "1a3784f1f330aec7ce9bee588be56ffc580da63086a3ada24344c01c465a5c00",
+      "resultSHA256": "e8d609911b094ea80c031a7ac75db6d232ea63cfb5308227bd08e3858f5b0464",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-10-photo.png",
+      "before": 657134,
+      "after": 483764,
+      "originalSHA256": "78a908ce942fc2394a727c1951362fe1b7780c5faa738912d559ab83f483da7c",
+      "resultSHA256": "df98677e314a7cc18752ddca07ab24c15f7d88ac5978db4b9c2dd9dc3ce4d561",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-11-photo.png",
+      "before": 793485,
+      "after": 576873,
+      "originalSHA256": "d208d9f71bd8a2876a07178bb534111522c887b4acd4311416b96efebe9dd4a8",
+      "resultSHA256": "00611e40304e8c41d3eceec40738fd38490e627589e60bb827b508782c020a09",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-12-photo.png",
+      "before": 856420,
+      "after": 609993,
+      "originalSHA256": "72048c5da9f5f13b486010e81c9d564d16dd49812861668894e0435a3da0f2a5",
+      "resultSHA256": "61a1c70191bb8e10c89117725987868820035dabeca67141cc92ab19aa9d3c64",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-13-photo.png",
+      "before": 663661,
+      "after": 450225,
+      "originalSHA256": "368829465b1e886d32a2e6f92815202f1a66cde72cf0252166a15f6be8fe10ee",
+      "resultSHA256": "5e4ee7c316cfc288282668d8b7ae37fe1267a7c7f813ddeb10d60adb9cdf971f",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-14-photo.png",
+      "before": 659193,
+      "after": 444594,
+      "originalSHA256": "a4df7bbddc81921778414c606b69fc161c88e73b09124cdd1f0b0d6abaf8ac94",
+      "resultSHA256": "376cff42167551032ffb212fb47240114e262f5605928b1263b074295cbe8965",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-15-photo.png",
+      "before": 588751,
+      "after": 383530,
+      "originalSHA256": "9db0af748eb5afe3ebd7fa5d62bc2bc0382cbaa04108ad6ea29852d0cf5ee3f8",
+      "resultSHA256": "7a40bc40d41cdb5c3a0d931b66377fabca08d1b92ef045132f876686e073ef4b",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-16-photo.png",
+      "before": 911316,
+      "after": 673396,
+      "originalSHA256": "3c88c2a57a1e7e9e7186f6731f13a48c49c1ba9ba7d7966439ac4e1f9c534a27",
+      "resultSHA256": "3028c109539afb7b6d0f85fe21d3c9c3694530ed86b9e38ca26a7dac39105345",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-17-photo.png",
+      "before": 911019,
+      "after": 686985,
+      "originalSHA256": "56a5a0a60831600c20d9f254a99c94c977d434be493ae165a1e4bcab52265106",
+      "resultSHA256": "a327ba1a87df6d1e417de2f42d65a47168de31c5c3850b8a1dd6931c727b3d10",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-18-photo.png",
+      "before": 647231,
+      "after": 415627,
+      "originalSHA256": "97eeae87e909fe3aa9cbc842647d4ec8694020b0626955bd914e68aa99119a53",
+      "resultSHA256": "40be8709f516fa67a972eb54a3b1e0050e5f74f92d2255bfb9aa89b2564bb9b6",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-19-photo.png",
+      "before": 622009,
+      "after": 412765,
+      "originalSHA256": "11b2b7f56dd3830c3a2bb610f92f16471ef3f36c27c08ea906ccfc4d328215e1",
+      "resultSHA256": "019b181c4a27b27a049c40882ff39833ceaf2a6d6ade4eb42f08668656a71028",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-en-20-photo.png",
+      "before": 567019,
+      "after": 381019,
+      "originalSHA256": "96ff357f656eb7cc5bc2b27d9d6376d3015b2995cf6a7dd535bdb89ac59bddc5",
+      "resultSHA256": "fc45efc8dbb4c69a2105a3d91844390ab923e00a87f209a7d07164ed29f2b993",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-01-photo.png",
+      "before": 497144,
+      "after": 332981,
+      "originalSHA256": "e0c91c2bd3b92c20761f94efa4ca98ddf149120c6bd3d72ec683a0e0b2848cfd",
+      "resultSHA256": "a02a4bba0ee70af7cfd9f6e09774654b2607c1294c6bc3e2343c615a5dc1245c",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-02-photo.png",
+      "before": 556679,
+      "after": 396136,
+      "originalSHA256": "680594db60da3dbbe11435d1cec51a11afd5c3ba0e894575d5f04fd325c5d97e",
+      "resultSHA256": "c1493ed824ac5b07a19319404dbe4fe2c5bfcebed2af340d2913adff478bdc35",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-03-photo.png",
+      "before": 577605,
+      "after": 387724,
+      "originalSHA256": "053495aa0fecd2fbda44332f5eb68c82f8280ed89ec5e442b45760ff54d8cb4c",
+      "resultSHA256": "f498f48bd2d41997f92fadc527046ab40be835058980eb7e05bc357bf9c353a0",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-04-photo.png",
+      "before": 650813,
+      "after": 442869,
+      "originalSHA256": "49f4625a49a94cd432c32d557edc995ac9ac516c7c007d34d0997d45cfc7217a",
+      "resultSHA256": "c801100d90ea5e2d2913da992358bacf09eb764caeb52bf08cdc2c25ddbeb63c",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-05-photo.png",
+      "before": 591753,
+      "after": 427590,
+      "originalSHA256": "c8250d08d79003c8b815cc13054ab8f7e89085fbe44819f7d7dcbf795015e1f2",
+      "resultSHA256": "775061144c1025c694dcb0dc9ab9c2748d45287704e88d84d3a1ba9c315f44a1",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-06-photo.png",
+      "before": 720211,
+      "after": 524242,
+      "originalSHA256": "01ae2616673dad5225fcc932cb5126e1de156b84637273b0dec677d48abf13b7",
+      "resultSHA256": "6504441d5d525647e59943b4c5ca2116e65e675441e74b9ec56041ccb27c6643",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-07-photo.png",
+      "before": 569344,
+      "after": 394446,
+      "originalSHA256": "552b4bb8f576593d3e4ddddf0b864292603c5d5d665190703a1b6a4f7af6a4db",
+      "resultSHA256": "1b04f063f321362256d9e0add5a895d68c35ff91e8029fb4944f479726c3d323",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-08-photo.png",
+      "before": 563354,
+      "after": 392493,
+      "originalSHA256": "1df9c835f2d2cc565ad5e401891f61d596fd7451b7d9d6d4a8b6b97086f43986",
+      "resultSHA256": "792cccc69bc5ff8c802744d2f64fbfdb4269cf1dbfa1a7aea3d35a45c61c6fcf",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-09-photo.png",
+      "before": 516546,
+      "after": 345274,
+      "originalSHA256": "7cb474e3a6815c9f5ffa1c2b9a140483c9c7f9150cd5e75f514f0677e025cd15",
+      "resultSHA256": "7c93f559066409fae0de2d884297356f3a1084363f9d98586df0597c89ba468f",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-10-photo.png",
+      "before": 696552,
+      "after": 505713,
+      "originalSHA256": "8f09e4d18ac08d7c54292b411adc69b148228537c53ef8d08cfd53db56675437",
+      "resultSHA256": "c235479d9b0b463f1db79bbe05cf2c4864902e7fc0ad2537ff1045d829bc4322",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-11-photo.png",
+      "before": 732868,
+      "after": 524125,
+      "originalSHA256": "9151cdbe84cc3f469137c3d4cedea541f559ebcd37efc656eee4ea435ffc19d7",
+      "resultSHA256": "bd75e3e1759c117c72dd15a0704a0c78221b9adea04953c6537c035d5de5154f",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-12-photo.png",
+      "before": 831345,
+      "after": 604301,
+      "originalSHA256": "07baface68c2b0dba180486c8a62c8bc16132c62b7ea6868977ff3345ae4f375",
+      "resultSHA256": "86bc7c19611e502eeea0fd372794451f0367b9f8f76f6bc6602e75b885805303",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-13-photo.png",
+      "before": 653144,
+      "after": 445216,
+      "originalSHA256": "2a63ebf01e8feded31b3beb9857a1671af0b78cb791f90b6fe0c833461e5e6b9",
+      "resultSHA256": "34e16ee7055fa8574bdf3fae90c7233f05820a2ac7afc4d914af56f82eb4f083",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-14-photo.png",
+      "before": 737784,
+      "after": 518790,
+      "originalSHA256": "6f4f61d3497263db306c281b638d909e68acd34085b53c67738527a20042c1d0",
+      "resultSHA256": "197653ab0ab0e9850a7b288b0e0b889974e43c890639b7d8e915cfc5037881c8",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-15-photo.png",
+      "before": 698540,
+      "after": 482581,
+      "originalSHA256": "79ce423722aca6258b749a47df418fa32f7fe5b1422d8177c18fca650c8133a1",
+      "resultSHA256": "f49be0e5eaad2332dd0b66ff86fb19c2cf0b3a9e681c06ed1d3c3ed5cf05bb31",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-16-photo.png",
+      "before": 671730,
+      "after": 470090,
+      "originalSHA256": "4b8c380314de4cdb1c35da19e3d0dddf22be1de6ba99e5170989ed7766e3a697",
+      "resultSHA256": "f0c675bce4e89c39c3ea2d1b714f66d3f908b0f7cddea1ac070555bb2aa32f9e",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-17-photo.png",
+      "before": 874847,
+      "after": 628114,
+      "originalSHA256": "c97991fc12f42df9594d7ca853739974aee31ddf61881aa6745a191e1244b945",
+      "resultSHA256": "8d9d9e494a49f3eecb7467d5eb3153a948c75010a41b4123041f384f636859c7",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-18-photo.png",
+      "before": 661895,
+      "after": 457359,
+      "originalSHA256": "1451304d842ec41a9c07ab33775b8d941684a7413811b2cbc4bed67f25b31fa8",
+      "resultSHA256": "055c3ea5d9bead7ee08499457c77da6eb76c50efbbe4e9fd62d20dce7edc6a6f",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-member-ko-19-photo.png",
+      "before": 846010,
+      "after": 590845,
+      "originalSHA256": "5bdbdbe299399c9878a6e51901d3fe0806d8d537f8577070feba90db97fc6b0a",
+      "resultSHA256": "9751de3bd89aab3d1cc977a86157d0b72267e05043567565a37f9c07b1358124",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-message-notification@2x.png",
+      "before": 2618,
+      "after": 1956,
+      "originalSHA256": "3a374b740e36e8c66f2dcce397d1583d92b917f0d0531617bd81a7605f9501ea",
+      "resultSHA256": "4ad74c7dd392423efb09652b5a51fbb0652c74b2d2899b8bd622ef7ccfa7a3aa",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-message-search.svg",
+      "before": 266,
+      "after": 266,
+      "originalSHA256": "664ad16fb58af7562deeae5d1d22a466bf307508b676b52efafa126e78cdd2ab",
+      "resultSHA256": "664ad16fb58af7562deeae5d1d22a466bf307508b676b52efafa126e78cdd2ab",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-en-avatar-01.png",
+      "before": 542982,
+      "after": 389960,
+      "originalSHA256": "9f1c1ad9f330f37da5a050e3949d45b6b1ba1c0ec7bfe42c85240eb0c153f8c7",
+      "resultSHA256": "dacd9835a1a87d1392c446d5bbf7b8462f5991aadb12b1cb4789174ae3876b4e",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-en-avatar-02.png",
+      "before": 556679,
+      "after": 396136,
+      "originalSHA256": "680594db60da3dbbe11435d1cec51a11afd5c3ba0e894575d5f04fd325c5d97e",
+      "resultSHA256": "c1493ed824ac5b07a19319404dbe4fe2c5bfcebed2af340d2913adff478bdc35",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-en-avatar-03.png",
+      "before": 625873,
+      "after": 456422,
+      "originalSHA256": "44a53443df262f0ab1eeb1360d583275953c0ce7f1fe23e3a1dc0f67a670dcf1",
+      "resultSHA256": "f85228ad70bba72bd3c6bc4f550608ea2dfafc0cd932ce2d5320a9a52a9456c9",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-en-avatar-04.png",
+      "before": 563990,
+      "after": 395678,
+      "originalSHA256": "14ac83ffaf6cdae6d8c9e58f0cbba9f41bf361a8e78ce39e52d8673e1e6c660e",
+      "resultSHA256": "29b120b6d2826a98f3e173679648129d929abcb4a7a12d5c06dd5c35569729dd",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-en-avatar-05.png",
+      "before": 239763,
+      "after": 147215,
+      "originalSHA256": "fce1dea307460a60188b4db1b3508d9dd93e47935a390ef2358affd0b894674b",
+      "resultSHA256": "4a513797be9db8a7188f41fd12a323f8747a2556d7f880708ce216c976c30f0d",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-en-video-01.png",
+      "before": 663661,
+      "after": 450225,
+      "originalSHA256": "368829465b1e886d32a2e6f92815202f1a66cde72cf0252166a15f6be8fe10ee",
+      "resultSHA256": "5e4ee7c316cfc288282668d8b7ae37fe1267a7c7f813ddeb10d60adb9cdf971f",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-en-video-02.png",
+      "before": 659193,
+      "after": 444594,
+      "originalSHA256": "a4df7bbddc81921778414c606b69fc161c88e73b09124cdd1f0b0d6abaf8ac94",
+      "resultSHA256": "376cff42167551032ffb212fb47240114e262f5605928b1263b074295cbe8965",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-en-video-03.png",
+      "before": 588751,
+      "after": 383530,
+      "originalSHA256": "9db0af748eb5afe3ebd7fa5d62bc2bc0382cbaa04108ad6ea29852d0cf5ee3f8",
+      "resultSHA256": "7a40bc40d41cdb5c3a0d931b66377fabca08d1b92ef045132f876686e073ef4b",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-en-video-04.png",
+      "before": 911316,
+      "after": 673396,
+      "originalSHA256": "3c88c2a57a1e7e9e7186f6731f13a48c49c1ba9ba7d7966439ac4e1f9c534a27",
+      "resultSHA256": "3028c109539afb7b6d0f85fe21d3c9c3694530ed86b9e38ca26a7dac39105345",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-en-video-05.png",
+      "before": 911019,
+      "after": 686985,
+      "originalSHA256": "56a5a0a60831600c20d9f254a99c94c977d434be493ae165a1e4bcab52265106",
+      "resultSHA256": "a327ba1a87df6d1e417de2f42d65a47168de31c5c3850b8a1dd6931c727b3d10",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-ko-avatar-01.png",
+      "before": 497144,
+      "after": 332981,
+      "originalSHA256": "e0c91c2bd3b92c20761f94efa4ca98ddf149120c6bd3d72ec683a0e0b2848cfd",
+      "resultSHA256": "a02a4bba0ee70af7cfd9f6e09774654b2607c1294c6bc3e2343c615a5dc1245c",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-ko-avatar-02.png",
+      "before": 556679,
+      "after": 396136,
+      "originalSHA256": "680594db60da3dbbe11435d1cec51a11afd5c3ba0e894575d5f04fd325c5d97e",
+      "resultSHA256": "c1493ed824ac5b07a19319404dbe4fe2c5bfcebed2af340d2913adff478bdc35",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-ko-avatar-03.png",
+      "before": 577605,
+      "after": 387724,
+      "originalSHA256": "053495aa0fecd2fbda44332f5eb68c82f8280ed89ec5e442b45760ff54d8cb4c",
+      "resultSHA256": "f498f48bd2d41997f92fadc527046ab40be835058980eb7e05bc357bf9c353a0",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-ko-avatar-04.png",
+      "before": 650813,
+      "after": 442869,
+      "originalSHA256": "49f4625a49a94cd432c32d557edc995ac9ac516c7c007d34d0997d45cfc7217a",
+      "resultSHA256": "c801100d90ea5e2d2913da992358bacf09eb764caeb52bf08cdc2c25ddbeb63c",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-ko-avatar-05.png",
+      "before": 591753,
+      "after": 427590,
+      "originalSHA256": "c8250d08d79003c8b815cc13054ab8f7e89085fbe44819f7d7dcbf795015e1f2",
+      "resultSHA256": "775061144c1025c694dcb0dc9ab9c2748d45287704e88d84d3a1ba9c315f44a1",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-ko-video-01.png",
+      "before": 516546,
+      "after": 345274,
+      "originalSHA256": "7cb474e3a6815c9f5ffa1c2b9a140483c9c7f9150cd5e75f514f0677e025cd15",
+      "resultSHA256": "7c93f559066409fae0de2d884297356f3a1084363f9d98586df0597c89ba468f",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-ko-video-02.png",
+      "before": 696552,
+      "after": 505713,
+      "originalSHA256": "8f09e4d18ac08d7c54292b411adc69b148228537c53ef8d08cfd53db56675437",
+      "resultSHA256": "c235479d9b0b463f1db79bbe05cf2c4864902e7fc0ad2537ff1045d829bc4322",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-ko-video-03.png",
+      "before": 732868,
+      "after": 524125,
+      "originalSHA256": "9151cdbe84cc3f469137c3d4cedea541f559ebcd37efc656eee4ea435ffc19d7",
+      "resultSHA256": "bd75e3e1759c117c72dd15a0704a0c78221b9adea04953c6537c035d5de5154f",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-ko-video-04.png",
+      "before": 831345,
+      "after": 604301,
+      "originalSHA256": "07baface68c2b0dba180486c8a62c8bc16132c62b7ea6868977ff3345ae4f375",
+      "resultSHA256": "86bc7c19611e502eeea0fd372794451f0367b9f8f76f6bc6602e75b885805303",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mock-ko-video-05.png",
+      "before": 653144,
+      "after": 445216,
+      "originalSHA256": "2a63ebf01e8feded31b3beb9857a1671af0b78cb791f90b6fe0c833461e5e6b9",
+      "resultSHA256": "34e16ee7055fa8574bdf3fae90c7233f05820a2ac7afc4d914af56f82eb4f083",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mutual-friend-reminder@2x.png",
+      "before": 49328,
+      "after": 35910,
+      "originalSHA256": "0e4a7f3c919ead564d812108eceff9495466acd5b46c738b1677777bf43e91e5",
+      "resultSHA256": "ddc8f186a1c6c1b2062b85712af9e748caac69ebbcd64ea012a2e740eb8465cd",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-mutual-friend-reminder@3x.png",
+      "before": 95346,
+      "after": 66394,
+      "originalSHA256": "720ac653777ed88f5ad9349a615dfc2f84ac71b56a83d5a17b59b246403f6562",
+      "resultSHA256": "fb55cb5f7cb595949587722e2b56e7fa05d94e5a7067dd0d5fc744ab8f9dcdbb",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-open-box-machine.gif",
+      "before": 1657991,
+      "after": 1657991,
+      "originalSHA256": "dfde22c4d1903cd566dc832b7520c42912026a5488153087e6ae3c07c91b84a7",
+      "resultSHA256": "dfde22c4d1903cd566dc832b7520c42912026a5488153087e6ae3c07c91b84a7",
+      "result": "kept original: Decoded pixels, frames, duration or loop changed"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-profile-calendar@2x.png",
+      "before": 816,
+      "after": 703,
+      "originalSHA256": "b7101dd9b4474fcac11a063989785789acfa00fe5c2774b69af56ef9da606661",
+      "resultSHA256": "0ca359f4fc38a42e31d3232d5ccf007c72d7a15d1bd52f189293007cbae94300",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-profile-camera@2x.png",
+      "before": 1617,
+      "after": 951,
+      "originalSHA256": "756de04547ffc8cb390faf1d3ebe018439012138fca202b8c7e55d3d8872ab8c",
+      "resultSHA256": "c831b300049dfa5c7013de50b01253b999228e9f0259763293e86c93c351e56b",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-rules-card@2x.png",
+      "before": 67034,
+      "after": 64199,
+      "originalSHA256": "aee7796536d74b4faea48824eaf724f2203e88461a0fa1badaeb48ff453a765b",
+      "resultSHA256": "aaf132cc8d11c9b80aa87eed1089737f74664504dcffbe1ba644aaa46b869b69",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-rules-close@2x.png",
+      "before": 4476,
+      "after": 3186,
+      "originalSHA256": "7e3f78e4c51b4ed0773dfd0e02556806fc050b1c2829e3b2418379f20ed76901",
+      "resultSHA256": "8d207033453f59cbe841be1f402cc01e4938e5e75cc3b308b789e92e07181950",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-rules-frame@2x.png",
+      "before": 1139714,
+      "after": 1046637,
+      "originalSHA256": "e4fa22c176d67297bda3e1b2dc295fdab49f18f1a309131b5da2f04f68cb1a72",
+      "resultSHA256": "6e650cdaf8f8033765b76d28b806497d40ab697abca8298a0dd6f8d57d0d554c",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-signup-witch@2x.png",
+      "before": 80486,
+      "after": 52606,
+      "originalSHA256": "cb244a1a5f22c2fbbec6a700dcdb0b638cc4860d519ae1eab4ad919275297360",
+      "resultSHA256": "5a705e2d0cb2ad7b668706da285c4d0d81e2e8c32a0b88e4a7ce3e7db81b2351",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-splash-box@2x.png",
+      "before": 6970,
+      "after": 6970,
+      "originalSHA256": "4fdcd5c3351f9f5f5f8256991dc147fd4503e0de769cc58469e5a6125953a3e4",
+      "resultSHA256": "4fdcd5c3351f9f5f5f8256991dc147fd4503e0de769cc58469e5a6125953a3e4",
+      "result": "already compact"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-splash-friend@2x.png",
+      "before": 37971,
+      "after": 11575,
+      "originalSHA256": "b3b63d6ef2b3d049a6b52e7972d9e8cd2e6bf741680a4677206fc00ec4ec5ac1",
+      "resultSHA256": "14d0ed82bc0c68c5ac92bac5abaaebb09676939f1cf5bb87ace41eb6639f809e",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-splash-host@2x.png",
+      "before": 216617,
+      "after": 189055,
+      "originalSHA256": "e6839e538d3c36b911d7c1edb75fb6f56d3cfc3cb9b71eb0cdf0603d67348c57",
+      "resultSHA256": "e896f38ada9369dc1e82b916445ed1747bbb04292aae7de2d55f5cee94b506e2",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-splash-new-friend@2x.png",
+      "before": 210257,
+      "after": 187799,
+      "originalSHA256": "f853956495fb5eb3ebe055b8ca50950af521f0b40b90737c97dc1bda78c3ac2d",
+      "resultSHA256": "1f26cafd0c430c4cd7b0ca0c9aebfa1b1939fb43b302e9f81543908b4df167a3",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-splash-spark@2x.png",
+      "before": 50313,
+      "after": 49581,
+      "originalSHA256": "3cf912af765aade5ffb2116033e6af8d20c9864d9604a6868ed8ffd7a57572e0",
+      "resultSHA256": "300ec0777a81f8b4db56504888ff6dea9f9ff9d13a94fcffd8dc9176d433d52a",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-splash-token@2x.png",
+      "before": 53467,
+      "after": 44928,
+      "originalSHA256": "4ede97f4fe8deddaead014a0deee759eed814c7ccca41040d61104960d4f1906",
+      "resultSHA256": "389fa618cb7f21479c31002bc9659c713b7ee5cfc5e005a04be132c4a2a0a37f",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-tab-home-default@2x.png",
+      "before": 824,
+      "after": 435,
+      "originalSHA256": "ebfbbebdb2207ad87f32443acb8f582284dd5f30f9b7e85175ee7fdfd8881d16",
+      "resultSHA256": "f7b0c5212e28fbb65eaf832e7c9c11c16fe268d8c3bede0b78c3ad3189a1d569",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-tab-home-selected@2x.png",
+      "before": 3049,
+      "after": 1989,
+      "originalSHA256": "280ac5672a191036941f0f39be0c52455d95eeaf68f7e346464ba6f4d4bbd1da",
+      "resultSHA256": "94d59817938fcc19035ddff272729cf3ade5f64c41339789c52386d47937cfe8",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-tab-message-default@2x.png",
+      "before": 856,
+      "after": 479,
+      "originalSHA256": "8ad52fb1fabbc2e3e751ef0c88923e23f084b1e6d144b7e1b750e789d279326c",
+      "resultSHA256": "112450b2563a3357b0696fb49f4e2ae7a02395fd017a83fe3dc5079458ad72c9",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-tab-message-selected@2x.png",
+      "before": 2740,
+      "after": 1821,
+      "originalSHA256": "5fd1dc9961fe7d4839d8dcd8652866e5ee194d0f058c68f33cadc8b6cb755b9e",
+      "resultSHA256": "533df6960b39cbc75675bcb91a2daaf5f507ff941a7207f9cea00e0a595855ac",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-tab-profile-default@2x.png",
+      "before": 1226,
+      "after": 660,
+      "originalSHA256": "a9fa2d76d2a9009efeffca46b9ab661a6c3039b635cdba9aea159e1540f710bb",
+      "resultSHA256": "71dcd907941f495d93bf0b045c15b662cd363f08f9cadc4060571790d415c5d8",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-tab-profile-selected@2x.png",
+      "before": 2492,
+      "after": 1676,
+      "originalSHA256": "b10cee4089ce06bb4426f3edefcfa3a963b94b9f741685a04023d16ac7f126f2",
+      "resultSHA256": "577ebf47ff138ad903ba709f13d4580dae6574b68289295da99379b1b17870bc",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-tab-video-default@2x.png",
+      "before": 1224,
+      "after": 670,
+      "originalSHA256": "e3e661ffeda6816d473d19f081edceef7c4f5dc92d43fc9b0682ee5e8652ccdf",
+      "resultSHA256": "1c843139a8f2012103e854e373e84cb8711a3d7fd8f95c1b4b43bd8f22f25071",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-tab-video-selected@2x.png",
+      "before": 3230,
+      "after": 2134,
+      "originalSHA256": "de258444fecbf9477a3ee48b977d3d232e012cca4490897eb31b27dd25780eb0",
+      "resultSHA256": "60fbfb952b1e57a59240b16aabb2fd80b8aacf8a41b7c647300e1260a0fd6082",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-ambition-default@2x.png",
+      "before": 2398,
+      "after": 1178,
+      "originalSHA256": "a33972befa4e8dae87a2655bd6a7a90eb655cbe92becbb9a060cbe374a403cc8",
+      "resultSHA256": "09b5ae35a5d2a2581e62eca66467619e4e44549ab24fd702cf58bd6f18ce49c9",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-ambition-selected@2x.png",
+      "before": 2348,
+      "after": 1122,
+      "originalSHA256": "e7a1becf892139195061ebf57f1e670540bd1e1e068f671a72d036a6499a8ef1",
+      "resultSHA256": "482abdc8022f04f0affcb2bc8528605b74a8aa880bec5f2fd79160306c727cc9",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-background@2x.png",
+      "before": 955725,
+      "after": 777358,
+      "originalSHA256": "d441a4bcfa5208139e6958d3a1f7f8006598581f9b2754336aea93c3b0a07d73",
+      "resultSHA256": "30dba2cbc488358b1034e4e7ab8667c73207c411a5bd4160e1c743686f13586e",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-calm-planner-default@2x.png",
+      "before": 2540,
+      "after": 1307,
+      "originalSHA256": "6b10ec414764aa5f734dab3c75b04a9333bac00eec60d5864b3c46352ba18a73",
+      "resultSHA256": "251b5673eda37d175f68d9a2f9e308601f2b1ea9ae43d3d96e4daf0d36c5b5b1",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-calm-planner-selected@2x.png",
+      "before": 2701,
+      "after": 1418,
+      "originalSHA256": "698e9c24a594a39ecc60ae0ae44ae7a949df628e7846f92c1cca47af1ce99445",
+      "resultSHA256": "a5c1067ee350bd837d8d1cf9899d44bc510789432ae810239adebeb424a44ac4",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-complete-background@2x.png",
+      "before": 1135056,
+      "after": 949672,
+      "originalSHA256": "d9cbb4298fc5c7b2cdac99c030ddf4abd9df22fce823d275a1db126d634a5e9a",
+      "resultSHA256": "7ce421494f6598d287e85b5cdc6691d90eefed285151899ec2bd90e243aec967",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-early-bird-default@2x.png",
+      "before": 3174,
+      "after": 1509,
+      "originalSHA256": "8a92ecc38059476dfbca58b86e1b12426fd4cdaf11977163b86e7ea782245826",
+      "resultSHA256": "40beab93208461ca84ccfe742d046860911f96eb5f02ed5054abed783b29d0ff",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-early-bird-selected@2x.png",
+      "before": 3308,
+      "after": 1601,
+      "originalSHA256": "9936f49a31ce7491658d9afe5b38c9bbc322d93f3cc5b1b29aa09c64348f784a",
+      "resultSHA256": "102227af0a068c093c2c3ec2543f1cd28a23c737737bebe9a0eb6e279bbba38e",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-emotional-depth-default@2x.png",
+      "before": 2808,
+      "after": 1497,
+      "originalSHA256": "eeb7d16cc5d0f1007727cfe885686e2895b86b533cd86993b9dd04d820e289a2",
+      "resultSHA256": "0eb159ae966f63e9be312986baef1017beff7da7b94e970b55c2b459174051b4",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-emotional-depth-selected@2x.png",
+      "before": 2815,
+      "after": 1435,
+      "originalSHA256": "4fb41055f83aa6375f0a050ae002e1515cdb2a80b2070c1c9240e7b1af0c619e",
+      "resultSHA256": "d5766b224fee662b92b702579f624041be1c2003585d561a54b1c8b42ad8d394",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-night-owl-default@2x.png",
+      "before": 3161,
+      "after": 1576,
+      "originalSHA256": "2275a68abec258174ef659b42666829afe17a882222661f3ba76bfe3f186ab5b",
+      "resultSHA256": "57df6c3fbaa945a757efea10e52205c55521394db6e0c9f9a689456ddb6129cc",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-night-owl-selected@2x.png",
+      "before": 3222,
+      "after": 1641,
+      "originalSHA256": "a26d19018146625f77a75ba134ccf9eef9afc9a7f01b3b926351906de499ad9b",
+      "resultSHA256": "63340c8144883ebd7816c83591fe7c2dd718e63b6a044c0414c58e0bbf7ed9a6",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-question-1-background@2x.png",
+      "before": 1205173,
+      "after": 733943,
+      "originalSHA256": "063efbdbfdbfb2eb6460c27ccdf0e08708dfb3c7555e4717cbd9cb1e6080ae06",
+      "resultSHA256": "06f08d0d977c1578dea98837d5e026ed3a23a3e8f9b2549a7c8d471a1b1c8ec1",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-question-2-background@2x.png",
+      "before": 1222216,
+      "after": 737471,
+      "originalSHA256": "6717fe02233f5ac2c9180f21082e8158ebf1eb270efa2f95238b5e71f24315f7",
+      "resultSHA256": "0be43d5b71ffd5a74eee6036f03ea788ad2ec62be4a4f1f0c08bd294e3b3462a",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-question-3-background@2x.png",
+      "before": 1259282,
+      "after": 767547,
+      "originalSHA256": "7b5a831b0912db24e4af77a3e1c0f1e441867199beb213014578909e40bdc727",
+      "resultSHA256": "99883a24a13adea95aa54afb97cd04b0538b647cc6bb20ba6ba2ca77e01111fe",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-question-4-background@2x.png",
+      "before": 1186996,
+      "after": 721069,
+      "originalSHA256": "3b00284fef6e1603c4f1e25fbdc9d0402555c05198312cf5767af6eb83233785",
+      "resultSHA256": "98338a7cf23c3fc25d7f2b67914d63a78d4481afb5cacbe152dd2789e9ea4f9e",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-question-5-background@2x.png",
+      "before": 1152433,
+      "after": 711727,
+      "originalSHA256": "f8284a955de8f1600f3bc18efb4bd9d23c4b36dc668ca3b9bb2ac5ce0fdba683",
+      "resultSHA256": "4833e732b6c2f29b3a37f89886733d00dc857746ee1ada72528ac7133d412f02",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-sense-of-humor-default@2x.png",
+      "before": 3655,
+      "after": 1741,
+      "originalSHA256": "f21539a4b2ea63c065595fef8cd61e3fec9f25eba2e6d162c654f37529998500",
+      "resultSHA256": "e7a520f132c69320aa0e9c45687053e574c40acb9e759bf5231f09a14940a46d",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-sense-of-humor-selected@2x.png",
+      "before": 3791,
+      "after": 1723,
+      "originalSHA256": "700012542bddcdbf7e76ddd03265b33c14d98330017537ded6453566daa2a1ed",
+      "resultSHA256": "2046fbe1c4fb87c05a587b07041b070961b37158a67c09e404eb49d929342130",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-shared-interests-default@2x.png",
+      "before": 3652,
+      "after": 1728,
+      "originalSHA256": "97fd8d14512127c1105a8fed48a4f3cce202a25c8168dcf566aa6b899c9125f0",
+      "resultSHA256": "b28e51e6d1bf28c4d217299973c0b79dfa6e92c070e75d5cdfc69124f4026c68",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-shared-interests-selected@2x.png",
+      "before": 3758,
+      "after": 1720,
+      "originalSHA256": "4c44992f96760f2f80522ee31706868169cb62d277957f996033b9710a7dc556",
+      "resultSHA256": "efda24b48d823cb615c4aa6dbefeee9803e76334b7d1ae086cf5360e21f64879",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-spontaneous-explorer-default@2x.png",
+      "before": 3678,
+      "after": 1756,
+      "originalSHA256": "8b842bd92a4aa18689e042c0ee63130ef0a13cf68c1867ea27c50618e5c8311e",
+      "resultSHA256": "6e3a04949d2e2bd0b01c5ccd55c4b3fff9c6d35991020a8ac121f68b3bafaddb",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-test-spontaneous-explorer-selected@2x.png",
+      "before": 3792,
+      "after": 1867,
+      "originalSHA256": "398c5a0774fd3eb25d96fabdeb66549ed453d031e5f34d63ab7e6b54f41850af",
+      "resultSHA256": "82a91c1e4d0938cb739f8bac339e0e0ef65b740f491f948eea362d8a9cab152e",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-block-action.svg",
+      "before": 1640,
+      "after": 1640,
+      "originalSHA256": "e9037efa7dcf9baaa0c41115e0204d235ec95aa7df2ca5ff341e71593b6ac50f",
+      "resultSHA256": "e9037efa7dcf9baaa0c41115e0204d235ec95aa7df2ca5ff341e71593b6ac50f",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-comment@2x.png",
+      "before": 4142,
+      "after": 1844,
+      "originalSHA256": "eeb7207732d1b15359cc5b78eb215c8208160aca510ab6d0a9fd5c3ac3fc4644",
+      "resultSHA256": "1049297b13fd4d663bf6986fb74214586d73ed4f9b3ce486ddcfd1a841de75e6",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-following@2x.png",
+      "before": 1207,
+      "after": 662,
+      "originalSHA256": "991e9fcbfdd0ba6e17f5047f6118c7a966fe6355d7bfb0855b6a5126635061b1",
+      "resultSHA256": "e62d876464153f55dd852e32cbbcb61f205b95ce35444ccad8c3fbc06385f350",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-en-01-avatar.jpg",
+      "before": 31040,
+      "after": 31040,
+      "originalSHA256": "607b1d1f086e643c5382f691a3ac67f6a8af5a6e1bcea737ee1265146ae2ddd9",
+      "resultSHA256": "607b1d1f086e643c5382f691a3ac67f6a8af5a6e1bcea737ee1265146ae2ddd9",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-en-01-hero.jpg",
+      "before": 63289,
+      "after": 63289,
+      "originalSHA256": "53731fcff175f59569964b3dcdceef0ebc3566b6fb0291290d6aad62e9d940d6",
+      "resultSHA256": "53731fcff175f59569964b3dcdceef0ebc3566b6fb0291290d6aad62e9d940d6",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-en-02-avatar.jpg",
+      "before": 73633,
+      "after": 73633,
+      "originalSHA256": "6f1a0acd31c481360d8f618d97ce179dc33eb156e30c02a91b4bd8630b47242a",
+      "resultSHA256": "6f1a0acd31c481360d8f618d97ce179dc33eb156e30c02a91b4bd8630b47242a",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-en-02-hero.jpg",
+      "before": 194007,
+      "after": 194007,
+      "originalSHA256": "93e0120a54bc8335f9982358f861be17cc023e716e05922b038399f3a10e602e",
+      "resultSHA256": "93e0120a54bc8335f9982358f861be17cc023e716e05922b038399f3a10e602e",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-en-03-avatar.jpg",
+      "before": 16782,
+      "after": 16782,
+      "originalSHA256": "391fc2cf07dac705c80bd9f2396cf3b2d111e6d7692f8b33c9ca63fc627e6b90",
+      "resultSHA256": "391fc2cf07dac705c80bd9f2396cf3b2d111e6d7692f8b33c9ca63fc627e6b90",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-en-03-hero.jpg",
+      "before": 36646,
+      "after": 36646,
+      "originalSHA256": "c1f77b80072d093819fe7844cb3f94e25be04172ba6b83a8ec866919c970ccd6",
+      "resultSHA256": "c1f77b80072d093819fe7844cb3f94e25be04172ba6b83a8ec866919c970ccd6",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-en-04-avatar.jpg",
+      "before": 26765,
+      "after": 26765,
+      "originalSHA256": "d5c658089c34fc6ed3e63f1fab4adbf789d90ccb15f6801fbd19076b130726ce",
+      "resultSHA256": "d5c658089c34fc6ed3e63f1fab4adbf789d90ccb15f6801fbd19076b130726ce",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-en-04-hero.jpg",
+      "before": 56987,
+      "after": 56987,
+      "originalSHA256": "0f873fe81e4e9909251d64f72c4f79f24445c169c890b74401a740a8f52d4238",
+      "resultSHA256": "0f873fe81e4e9909251d64f72c4f79f24445c169c890b74401a740a8f52d4238",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-en-05-avatar.jpg",
+      "before": 42803,
+      "after": 42803,
+      "originalSHA256": "a8bd6945dee10ab47c31b10bd37bb17f5a0470b9ef7971c5970f7d3f606519c6",
+      "resultSHA256": "a8bd6945dee10ab47c31b10bd37bb17f5a0470b9ef7971c5970f7d3f606519c6",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-en-05-hero.jpg",
+      "before": 111587,
+      "after": 111587,
+      "originalSHA256": "468909005349b3406686cbcb79ffa6ecd0437f1c9a8b8c8ea293733f0a04dbf6",
+      "resultSHA256": "468909005349b3406686cbcb79ffa6ecd0437f1c9a8b8c8ea293733f0a04dbf6",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-en-06-avatar.jpg",
+      "before": 35180,
+      "after": 35180,
+      "originalSHA256": "b6af7788c2dec496e1bf8d42c908c3ef7a194c001447a41b3f326304a98145bc",
+      "resultSHA256": "b6af7788c2dec496e1bf8d42c908c3ef7a194c001447a41b3f326304a98145bc",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-en-06-hero.jpg",
+      "before": 74721,
+      "after": 74721,
+      "originalSHA256": "6c219f7c09157738309f9f8cab41cf081e8c03c43439ecfa6f406bf1e47d6d29",
+      "resultSHA256": "6c219f7c09157738309f9f8cab41cf081e8c03c43439ecfa6f406bf1e47d6d29",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-ko-01-avatar.jpg",
+      "before": 53585,
+      "after": 53585,
+      "originalSHA256": "f53b220a573de2694e383f05d57fcbe7ecf46b27b7b398c02bd557df4b80e83b",
+      "resultSHA256": "f53b220a573de2694e383f05d57fcbe7ecf46b27b7b398c02bd557df4b80e83b",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-ko-01-hero.jpg",
+      "before": 94745,
+      "after": 94745,
+      "originalSHA256": "e65afa880b43d5e28611751f165e49a6e8a4a7275b6ec8650b1f5ae8a82c51d1",
+      "resultSHA256": "e65afa880b43d5e28611751f165e49a6e8a4a7275b6ec8650b1f5ae8a82c51d1",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-ko-02-avatar.jpg",
+      "before": 40202,
+      "after": 40202,
+      "originalSHA256": "c1666457a4152a1dc89cb0c72e134d28682974d322a0450e190276f7abf28f02",
+      "resultSHA256": "c1666457a4152a1dc89cb0c72e134d28682974d322a0450e190276f7abf28f02",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-ko-02-hero.jpg",
+      "before": 90363,
+      "after": 90363,
+      "originalSHA256": "d14285fa96d9a1e9977381aeeb859369ac743134bdda7fa09d18eab2238e9d89",
+      "resultSHA256": "d14285fa96d9a1e9977381aeeb859369ac743134bdda7fa09d18eab2238e9d89",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-ko-03-avatar.jpg",
+      "before": 19509,
+      "after": 19509,
+      "originalSHA256": "6af9c6f6897be32bdedb5827f9b6aec29f5cce86f7c3e98871a247bcb59a61b8",
+      "resultSHA256": "6af9c6f6897be32bdedb5827f9b6aec29f5cce86f7c3e98871a247bcb59a61b8",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-identity-ko-03-hero.jpg",
+      "before": 39227,
+      "after": 39227,
+      "originalSHA256": "2f9e2cd2673175be34ee6c2e41e1c3e49ed7eea6817be827498b568163d0ec88",
+      "resultSHA256": "2f9e2cd2673175be34ee6c2e41e1c3e49ed7eea6817be827498b568163d0ec88",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-like-active@2x.png",
+      "before": 3891,
+      "after": 1860,
+      "originalSHA256": "39ae92c999e7bb287e46b0ed74c8032c319de1138c8e6699371c2127a04fde61",
+      "resultSHA256": "4b98af6d05c9291fc829b2c8f81844e1cdc8adf9e00c8020008347b8442712d0",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-like@2x.png",
+      "before": 3888,
+      "after": 1865,
+      "originalSHA256": "bc80c9e00c04cbebabe398bad619cde44ba0246d16965215d9b51d0bc857c359",
+      "resultSHA256": "3f10c91ed4fd640af4be9ff43606a32165be25766e3dc94dc8b1286800a10389",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-not-interested.svg",
+      "before": 915,
+      "after": 915,
+      "originalSHA256": "3e5c6bda46dc2a564d6fa2455abcbd8e63c2585b095bf748ddb3168e05a2e508",
+      "resultSHA256": "3e5c6bda46dc2a564d6fa2455abcbd8e63c2585b095bf748ddb3168e05a2e508",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-play@2x.png",
+      "before": 2093,
+      "after": 1031,
+      "originalSHA256": "752f7e7f2e204be324b27907e11668434fc99cf3eadda43a646eac301f879989",
+      "resultSHA256": "892fe73889731128aacb82ef7477600d2a95587fe22c396e3251107f1db66ef4",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-publish-reward-box@4x.png",
+      "before": 166449,
+      "after": 149162,
+      "originalSHA256": "9bb50516592062982fd5fc905dc8e55db0e0d81f3f881f4b61f168820ff3588c",
+      "resultSHA256": "a8a0cf80739b1153b438eb6be96cec5d3265fa8bc0b51809b60ec26a4c86cb88",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-publish@2x.png",
+      "before": 4316,
+      "after": 2735,
+      "originalSHA256": "e9d6c3eb1282cace1be9ec59dced4a7e1fb53f84056261c14996901f0c82ded2",
+      "resultSHA256": "f55cf26d0726ec7b78d49494707aae444cffc5277727f62b965adc57ab83805e",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-report-action.svg",
+      "before": 865,
+      "after": 865,
+      "originalSHA256": "17fb2b6ae16af2331fad71e074637f1a5b5074fe1f1d875d1b394134eb89a19a",
+      "resultSHA256": "17fb2b6ae16af2331fad71e074637f1a5b5074fe1f1d875d1b394134eb89a19a",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-report@2x.png",
+      "before": 4212,
+      "after": 1825,
+      "originalSHA256": "926301d041ca7d167ace37ea29fe9bd7214bef711a2c1fc95dbc499162895b0a",
+      "resultSHA256": "30fb16714d8cdb89526a7575bc1ebd36d2447ba031286f1ed2a2538d221f54c7",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-upload-camera.svg",
+      "before": 1025,
+      "after": 1025,
+      "originalSHA256": "c09462106c4fbe240801f750ddc5317ee0b71c03dd2c32bb71a9ced9c8f23d59",
+      "resultSHA256": "c09462106c4fbe240801f750ddc5317ee0b71c03dd2c32bb71a9ced9c8f23d59",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-upload-gallery.svg",
+      "before": 650,
+      "after": 650,
+      "originalSHA256": "71318c09f48bc4402ce93510014dbf101b416e11c6a92eca4065bae40e143068",
+      "resultSHA256": "71318c09f48bc4402ce93510014dbf101b416e11c6a92eca4065bae40e143068",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-video-upload-plus.svg",
+      "before": 292,
+      "after": 292,
+      "originalSHA256": "5297f9860bc09d0134f7e3824813ae8e0cd3eadefc0ea1e886c6ade7d1b5d73c",
+      "resultSHA256": "5297f9860bc09d0134f7e3824813ae8e0cd3eadefc0ea1e886c6ade7d1b5d73c",
+      "result": "unchanged"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-welcome-hero@2x.png",
+      "before": 162580,
+      "after": 154841,
+      "originalSHA256": "aed0fc8f3df7b53818873b4b6758fb0db127be3ef012e413838333212c64b2b6",
+      "resultSHA256": "fe573b787fa25e205c5d0e1462de399a92437fec8ed9f24d6a2019a09b5d0dad",
+      "result": "optimized"
+    },
+    {
+      "path": "ParamoboaxsDak/public/assets/paliro-welcome-space-background@2x.png",
+      "before": 1048208,
+      "after": 645094,
+      "originalSHA256": "b05c9cb31ac8dfc6669f2c7cbe7caddbbae8ec7c3e9dd3e403a284a231474611",
+      "resultSHA256": "7b6ffb18854a7c833769ddd73de283f6c800952a3641c57edecc4a1fad0794a9",
+      "result": "optimized"
+    }
+  ],
+  "before": 103047494,
+  "after": 84803832,
+  "saved": 18243662
+}

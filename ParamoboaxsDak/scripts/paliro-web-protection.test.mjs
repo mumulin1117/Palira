@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { inflateRawSync } from 'node:zlib'
 import test from 'node:test'
+import { paliroPhysicalResourcePath } from './paliro-native-bundle-layout.mjs'
 import {
   PALIRO_ASSET_ARCHIVE_PREFIX,
   PALIRO_BOOTSTRAP_ARCHIVE,
@@ -73,8 +74,12 @@ test('Web resources are compressed and double-encrypted as two whole archives', 
     assert.equal(existsSync(join(root, 'assets/app.js')), false)
     assert.equal(existsSync(join(root, 'assets/photo.png')), false)
     assert.equal(existsSync(join(root, 'assets/movie.mp4')), false)
-    assert.equal(existsSync(join(root, 'assets/paliro-welcome-hero@2x.png')), true)
-    assert.equal(existsSync(join(root, 'assets/Montserrat-Bold.ttf')), true)
+    assert.equal(existsSync(join(root, 'assets/paliro-welcome-hero@2x.png')), false)
+    assert.equal(existsSync(join(root, 'assets/Montserrat-Bold.ttf')), false)
+    assert.equal((await readFile(join(root, paliroPhysicalResourcePath('assets/paliro-welcome-hero@2x.png')))).toString(), 'plain-auth-art')
+    assert.equal((await readFile(join(root, paliroPhysicalResourcePath('assets/Montserrat-Bold.ttf')))).toString(), 'plain-font')
+    assert.notEqual(paliroPhysicalResourcePath('assets/paliro-welcome-hero@2x.png'), paliroPhysicalResourcePath('other/paliro-welcome-hero@2x.png'))
+    assert.deepEqual((await readdir(root)).sort(), ['PaliroBloomMedia', 'PaliroDewArchive'])
 
     const vaultFiles = await readdir(join(root, PALIRO_WEB_VAULT_DIRECTORY))
     assert.equal(vaultFiles.length, 2)
@@ -103,8 +108,8 @@ test('the native loader opens whole archives and persists one protected main-ass
   const controller = readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroCelestialCanvas.swift', import.meta.url), 'utf8')
   assert.equal((native.match(/AES\.GCM\.open/g) ?? []).length, 2)
   assert.match(native, /decompressed\(using: \.zlib\)/)
-  assert.match(native, /paliro-bootstrap\.pwb/)
-  assert.match(native, /paliro-assets-/)
+  assert.match(native, /PaliroFirstBloom\.pwb/)
+  assert.match(native, /PaliroLunarPetals-/)
   assert.match(native, /PaliroWebCache/)
   assert.match(native, /completeUntilFirstUserAuthentication/)
   assert.match(native, /isExcludedFromBackup = true/)

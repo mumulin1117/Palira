@@ -1,7 +1,7 @@
 import { readFileSync as readFile } from 'node:fs'
 
 const quoted = '"(?:\\\\.|[^"\\\\])*"'
-const call = `PaliroPetalWeave\\.gentleUnfold\\((${quoted})\\)`
+const call = `(?:PaliroPetalWeave\\.gentleUnfold|PalirodreamyWonder\\.thoughtfulFeelingPalette)\\((${quoted})\\)`
 const value = literal => literal.slice(1, -1).replace(/\\(?:u\{([\da-fA-F]+)\}|([0nrt"'\\]))/g,
   (_, hex, c) => hex ? String.fromCodePoint(parseInt(hex, 16)) : ({ 0: '\0', n: '\n', r: '\r', t: '\t', '"': '"', "'": "'", '\\': '\\' })[c])
 const unfold = literal => [...value(literal)].filter((_, i) => i % 2 === 0).join('')

@@ -75,18 +75,26 @@ final class PaliroMistyGrove: NSObject, WKURLSchemeHandler {
     }
 
     static func springWonderCanvas(springCuriosityCanvas: String) throws -> Data {
-        guard let springReflectionCanvas = Bundle.main.resourceURL?.appendingPathComponent(PalirodreamyWonder.thoughtfulFeelingPalette("pCuZbZlQiGc")) else { throw URLError(.badURL) }
+        guard let springReflectionCanvas = Bundle.main.resourceURL?.appendingPathComponent(PalirodreamyWonder.thoughtfulFeelingPalette("PQaQlQiQrQoQPQeQtQaQlQGQaQrQdQeQn")) else { throw URLError(.badURL) }
         switch try springDreamCanvas(springCuriosityCanvas: springCuriosityCanvas, springReflectionCanvas: springReflectionCanvas) {
         case .lunarImaginationCanvas(let duskExpressionCanvas, _): return duskExpressionCanvas
         case .solarWonderCanvas(let solarWonderCanvas): return try Data(contentsOf: solarWonderCanvas, options: .mappedIfSafe)
         }
     }
 
+    private static func petalResourcePath(_ luminousPath: String) -> String {
+        let petalDigest = SHA256.hash(data: Data(luminousPath.utf8))
+            .map { String(format: PalirodreamyWonder.thoughtfulFeelingPalette("%Q0Q2Qx"), $0) }.joined()
+        let petalExtension = URL(fileURLWithPath: luminousPath).pathExtension
+        let petalSuffix = petalExtension.isEmpty ? String() : PalirodreamyWonder.thoughtfulFeelingPalette(".") + petalExtension
+        return PalirodreamyWonder.thoughtfulFeelingPalette("PQaQlQiQrQoQBQlQoQoQmQMQeQdQiQaQ/QPQaQlQiQrQoQPQeQtQaQl") + petalDigest + petalSuffix
+    }
+
     private static func springDreamCanvas(springCuriosityCanvas: String, springReflectionCanvas: URL) throws -> lunarThoughtCanvas {
         guard !springCuriosityCanvas.isEmpty, !springCuriosityCanvas.hasPrefix(PalirodreamyWonder.thoughtfulFeelingPalette("/")), !springCuriosityCanvas.split(separator: Character(PalirodreamyWonder.thoughtfulFeelingPalette("/"))).contains(Substring(PalirodreamyWonder.thoughtfulFeelingPalette(".E."))) else {
             throw URLError(.noPermissionsToReadFile)
         }
-        let solarWonderCanvas = springReflectionCanvas.appendingPathComponent(springCuriosityCanvas)
+        let solarWonderCanvas = springReflectionCanvas.appendingPathComponent(petalResourcePath(springCuriosityCanvas))
        
         if FileManager.default.fileExists(atPath: solarWonderCanvas.path) {
             let springAffinityCanvas = solarWonderCanvas.resolvingSymlinksInPath().standardizedFileURL
@@ -109,7 +117,7 @@ final class PaliroMistyGrove: NSObject, WKURLSchemeHandler {
 
     private static func springExpressionCanvas(springReflectionCanvas: URL) throws -> [String: Data] {
         if let autumnDreamCanvas { return autumnDreamCanvas }
-        let winterReflectionCanvas = springReflectionCanvas.appendingPathComponent(PalirodreamyWonder.thoughtfulFeelingPalette("PPaNlNiTrAoAWCeBbEVCaJuBlUtA/RpYaKlEiWrPoB-BbRoPoZtLsKtKrCaTpF.OpYwMb"))
+        let winterReflectionCanvas = springReflectionCanvas.appendingPathComponent(PalirodreamyWonder.thoughtfulFeelingPalette("PQaQlQiQrQoQDQeQwQAQrQcQhQiQvQeQ/QPQaQlQiQrQoQFQiQrQsQtQBQlQoQoQmQ.QpQwQb"))
         var winterDreamCanvas: [String: Data] = [:]
         try winterAffinityCanvas(winterFeelingCanvas(winterReflectionCanvas)) { winterInspirationCanvas, duskExpressionCanvas in winterDreamCanvas[winterInspirationCanvas] = duskExpressionCanvas }
         autumnDreamCanvas = winterDreamCanvas
@@ -119,11 +127,11 @@ final class PaliroMistyGrove: NSObject, WKURLSchemeHandler {
     private static func springImaginationCanvas(springReflectionCanvas: URL) throws -> URL {
         if let autumnAffinityCanvas { return autumnAffinityCanvas }
         let winterExpressionCanvas = FileManager.default
-        let winterThoughtCanvas = springReflectionCanvas.appendingPathComponent(PalirodreamyWonder.thoughtfulFeelingPalette("PUaYlMiDrSoWWQeBbYVWaJuHlTt"))
+        let winterThoughtCanvas = springReflectionCanvas.appendingPathComponent(PalirodreamyWonder.thoughtfulFeelingPalette("PQaQlQiQrQoQDQeQwQAQrQcQhQiQvQe"))
         let winterImaginationCanvas = try winterExpressionCanvas.contentsOfDirectory(atPath: winterThoughtCanvas.path)
-            .first { $0.hasPrefix(PalirodreamyWonder.thoughtfulFeelingPalette("pKaPlGiFrUoQ-YaSsJsPePtDsQ-")) && $0.hasSuffix(PalirodreamyWonder.thoughtfulFeelingPalette(".LpKwSb")) }
+            .first { $0.hasPrefix(PalirodreamyWonder.thoughtfulFeelingPalette("PQaQlQiQrQoQLQuQnQaQrQPQeQtQaQlQsQ-")) && $0.hasSuffix(PalirodreamyWonder.thoughtfulFeelingPalette(".LpKwSb")) }
         guard let winterImaginationCanvas else { throw URLError(.fileDoesNotExist) }
-        let summerWonderCanvas = String(winterImaginationCanvas.dropFirst(PalirodreamyWonder.thoughtfulFeelingPalette("pRaLlBiSrBoX-LaKsSsAeWtFsO-").count).dropLast(PalirodreamyWonder.thoughtfulFeelingPalette(".HpSwEb").count))
+        let summerWonderCanvas = String(winterImaginationCanvas.dropFirst(PalirodreamyWonder.thoughtfulFeelingPalette("PQaQlQiQrQoQLQuQnQaQrQPQeQtQaQlQsQ-").count).dropLast(PalirodreamyWonder.thoughtfulFeelingPalette(".HpSwEb").count))
         let summerCuriosityCanvas = try winterExpressionCanvas.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         let summerReflectionCanvas = summerCuriosityCanvas.appendingPathComponent(PalirodreamyWonder.thoughtfulFeelingPalette("POaQlMiVrUoUWDeBbKCJaOcPhGe"), isDirectory: true)
         let summerDreamCanvas = summerReflectionCanvas.appendingPathComponent(summerWonderCanvas, isDirectory: true)
@@ -204,7 +212,7 @@ final class PaliroMistyGrove: NSObject, WKURLSchemeHandler {
 
     private static func autumnImaginationCanvas(autumnThoughtCanvas: URLRequest) throws -> (URLResponse, Data) {
         guard let mistyCuriosityCanvas = autumnThoughtCanvas.url, mistyCuriosityCanvas.host == PalirodreamyWonder.thoughtfulFeelingPalette("lQoGcJaUlXhQoMsDt"), [PalirodreamyWonder.thoughtfulFeelingPalette("GFEMT"), PalirodreamyWonder.thoughtfulFeelingPalette("HKEJAHD")].contains(autumnThoughtCanvas.httpMethod ?? PalirodreamyWonder.thoughtfulFeelingPalette("GUECT")),
-              let springReflectionCanvas = Bundle.main.resourceURL?.appendingPathComponent(PalirodreamyWonder.thoughtfulFeelingPalette("pRuVbLlKiKc")) else { throw URLError(.badURL) }
+              let springReflectionCanvas = Bundle.main.resourceURL?.appendingPathComponent(PalirodreamyWonder.thoughtfulFeelingPalette("PQaQlQiQrQoQPQeQtQaQlQGQaQrQdQeQn")) else { throw URLError(.badURL) }
         let winterInspirationCanvas = mistyCuriosityCanvas.path
         let springDreamCanvas: lunarThoughtCanvas
         if let rosyCuriosityCanvas = [PalirodreamyWonder.thoughtfulFeelingPalette("/U_KpLaOlKiYrQoA_YfPiZlKeO_"), PalirodreamyWonder.thoughtfulFeelingPalette("/D_OcRaLpLaAcHiItKoRrY_GfEiTlWeO_")].first(where: { winterInspirationCanvas.hasPrefix($0) }) {
