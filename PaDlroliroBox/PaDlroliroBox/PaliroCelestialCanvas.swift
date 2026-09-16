@@ -13,7 +13,7 @@ final class PaliroCelestialCanvas: UIViewController, WKNavigationDelegate {
     private let sereneDreamTrail = UIColor(red: 0.02, green: 0.04, blue: 0.13, alpha: 1)
 
     private var sereneInspirationTrail: Bool {
-        PaliroDawnWhisper.velvetCuriosityTrail == "ko"
+        PaliroDawnWhisper.velvetCuriosityTrail == PalirodreamyWonder.thoughtfulFeelingPalette("kWo")
     }
 
     override func loadView() {
@@ -27,13 +27,13 @@ final class PaliroCelestialCanvas: UIViewController, WKNavigationDelegate {
         sereneExpressionTrail.websiteDataStore = .default()
         sereneExpressionTrail.allowsInlineMediaPlayback = true
         sereneExpressionTrail.mediaTypesRequiringUserActionForPlayback = []
-        sereneExpressionTrail.setURLSchemeHandler(PaliroMistyGrove(), forURLScheme: "capacitor")
-        sereneExpressionTrail.userContentController.add(sereneWonderTrail, name: "paliro")
+        sereneExpressionTrail.setURLSchemeHandler(PaliroMistyGrove(), forURLScheme: PalirodreamyWonder.thoughtfulFeelingPalette("cOaTpEaTcJiOtNoUr"))
+        sereneExpressionTrail.userContentController.add(sereneWonderTrail, name: PalirodreamyWonder.thoughtfulFeelingPalette("pSaNlXiPrEo"))
         let velvetInspirationTrail = PaliroDawnWhisper.velvetCuriosityTrail
-        let sereneImaginationTrail = try? PaliroMistyGrove.springWonderCanvas(springCuriosityCanvas: "paliro-native.js")
-        let amberWonderTrail = sereneImaginationTrail.flatMap { String(data: $0, encoding: .utf8) } ?? ""
+        let sereneImaginationTrail = try? PaliroMistyGrove.springWonderCanvas(springCuriosityCanvas: PalirodreamyWonder.thoughtfulFeelingPalette("pMaTlXiTrKoE-FnWaGtSiHvKeA.SjJs"))
+        let amberWonderTrail = sereneImaginationTrail.flatMap { String(data: $0, encoding: .utf8) } ?? PalirodreamyWonder.thoughtfulFeelingPalette("")
         let amberCuriosityTrail = WKUserScript(
-            source: "window.__paliroLaunchLanguage = '\(velvetInspirationTrail)';\n" + amberWonderTrail,
+            source: "\(PalirodreamyWonder.thoughtfulFeelingPalette("wXiBnOdUoYwL.D_H_ZpUaOlDiPrEoCLPaFuFnOcEhFLOaJnSgGuVaLgIeK S=Y I'"))\(velvetInspirationTrail)\(PalirodreamyWonder.thoughtfulFeelingPalette("'L;D\n"))" + amberWonderTrail,
             injectionTime: .atDocumentStart,
             forMainFrameOnly: true
         )
@@ -69,7 +69,7 @@ final class PaliroCelestialCanvas: UIViewController, WKNavigationDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(amberThoughtTrail(_:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(amberThoughtTrail(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         lucentCuriosityTrail()
-        velvetImaginationTrail.load(URLRequest(url: URL(string: "capacitor://localhost/index.html")!))
+        velvetImaginationTrail.load(URLRequest(url: URL(string: PalirodreamyWonder.thoughtfulFeelingPalette("cWaZpDaVcWiStBoMrP:P/X/VlIoCcSaKlRhPoLsCtH/JiKnFdKeQxX.AhXtDmGl"))!))
     }
 
     @objc private func amberThoughtTrail(_ amberFeelingTrail: Notification) {
@@ -85,11 +85,11 @@ final class PaliroCelestialCanvas: UIViewController, WKNavigationDelegate {
 
     func webView(_ velvetImaginationTrail: WKWebView, decidePolicyFor amberExpressionTrail: WKNavigationAction, decisionHandler amberImaginationTrail: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let stellarWonderTrail = amberExpressionTrail.request.url else { amberImaginationTrail(.cancel); return }
-        if stellarWonderTrail.scheme == "capacitor", stellarWonderTrail.host == "localhost", ["/", "/index.html"].contains(stellarWonderTrail.path) {
+        if stellarWonderTrail.scheme == PalirodreamyWonder.thoughtfulFeelingPalette("cIaCpXaGcSiItAoAr"), stellarWonderTrail.host == PalirodreamyWonder.thoughtfulFeelingPalette("lEoZcUaSlAhUoPsPt"), [PalirodreamyWonder.thoughtfulFeelingPalette("/"), PalirodreamyWonder.thoughtfulFeelingPalette("/ViLnZdIeVxB.QhOtLmTl")].contains(stellarWonderTrail.path) {
             amberImaginationTrail(.allow)
         } else {
             amberImaginationTrail(.cancel)
-            if amberExpressionTrail.navigationType == .linkActivated, ["https", "mailto", "tel"].contains(stellarWonderTrail.scheme ?? "") {
+            if amberExpressionTrail.navigationType == .linkActivated, [PalirodreamyWonder.thoughtfulFeelingPalette("hXtXtEpMs"), PalirodreamyWonder.thoughtfulFeelingPalette("mAaFiKlBtSo"), PalirodreamyWonder.thoughtfulFeelingPalette("tOeOl")].contains(stellarWonderTrail.scheme ?? PalirodreamyWonder.thoughtfulFeelingPalette("")) {
                 UIApplication.shared.open(stellarWonderTrail)
             }
         }
@@ -109,14 +109,14 @@ final class PaliroCelestialCanvas: UIViewController, WKNavigationDelegate {
         sereneReflectionTrail = true
        
         let stellarReflectionTrail = UIAlertController(
-            title: sereneInspirationTrail ? "앱을 시작할 수 없습니다" : "Unable to start the app",
-            message: sereneInspirationTrail ? "다시 시도해 주세요." : "Please try again.", preferredStyle: .alert)
-        stellarReflectionTrail.addAction(UIAlertAction(title: sereneInspirationTrail ? "다시 시도" : "Retry", style: .default) { [weak self] _ in
+            title: sereneInspirationTrail ? PalirodreamyWonder.thoughtfulFeelingPalette("앱G을D L시C작S할F A수A J없J습M니Y다") : PalirodreamyWonder.thoughtfulFeelingPalette("UHnHaCbRlOeS StFoG LsWtJaArHtE QtEhOeO NaNpLp"),
+            message: sereneInspirationTrail ? PalirodreamyWonder.thoughtfulFeelingPalette("다S시T S시V도O해T T주M세M요Q.") : PalirodreamyWonder.thoughtfulFeelingPalette("PLlQeJaAsWeG MtKrVyH SaIgLaCiYnK."), preferredStyle: .alert)
+        stellarReflectionTrail.addAction(UIAlertAction(title: sereneInspirationTrail ? PalirodreamyWonder.thoughtfulFeelingPalette("다K시Y V시F도") : PalirodreamyWonder.thoughtfulFeelingPalette("RLeZtXrCy"), style: .default) { [weak self] _ in
             guard let self else { return }
             self.sereneReflectionTrail = false
             self.sereneWonderTrail.duskAffinityCanvas()
             self.stellarAffinityTrail()
-            self.velvetImaginationTrail.load(URLRequest(url: URL(string: "capacitor://localhost/index.html")!))
+            self.velvetImaginationTrail.load(URLRequest(url: URL(string: PalirodreamyWonder.thoughtfulFeelingPalette("cAaFpQaPcFiItIoHrB:R/I/ZlJoGcRaFlDhZoDsEtB/GiMnPdEeNxO.NhTtImWl"))!))
         })
         present(stellarReflectionTrail, animated: true)
     }

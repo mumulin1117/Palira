@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { readFileSync } from 'node:fs'
+import { readFileSync } from './paliro-native-source.mjs'
 import vm from 'node:vm'
 import { paliroSelectVideo, paliroMediaErrorKey, paliroDecodeVideoCover } from '../src/services/paliroVideoSelection.js'
 import { paliroSeedUsers, paliroCreateVideoPost, paliroGetPublishedVideos } from '../src/services/paliroLocalStore.js'

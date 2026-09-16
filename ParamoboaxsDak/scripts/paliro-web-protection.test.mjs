@@ -98,8 +98,9 @@ test('Web resources are compressed and double-encrypted as two whole archives', 
 })
 
 test('the native loader opens whole archives and persists one protected main-asset cache', async () => {
-  const native = await readFile(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroMistyGrove.swift', import.meta.url), 'utf8')
-  const controller = await readFile(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroCelestialCanvas.swift', import.meta.url), 'utf8')
+  const { readFileSync } = await import('./paliro-native-source.mjs')
+  const native = readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroMistyGrove.swift', import.meta.url), 'utf8')
+  const controller = readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroCelestialCanvas.swift', import.meta.url), 'utf8')
   assert.equal((native.match(/AES\.GCM\.open/g) ?? []).length, 2)
   assert.match(native, /decompressed\(using: \.zlib\)/)
   assert.match(native, /paliro-bootstrap\.pwb/)

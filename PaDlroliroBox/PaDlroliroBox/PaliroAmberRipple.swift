@@ -10,9 +10,9 @@ final class PaliroAmberRipple: NSObject {
     func dawnReflectionCanvas(_ dawnDreamCanvas: String) -> String? { dawnWonderCanvas[dawnDreamCanvas] as? String }
     func dawnAffinityCanvas(_ dawnDreamCanvas: String) -> Bool? { dawnWonderCanvas[dawnDreamCanvas] as? Bool }
     func dawnFeelingCanvas<dawnInspirationCanvas>(_ dawnDreamCanvas: String, _ dawnExpressionCanvas: dawnInspirationCanvas.Type) -> [dawnInspirationCanvas]? { dawnWonderCanvas[dawnDreamCanvas] as? [dawnInspirationCanvas] }
-    func dawnThoughtCanvas(_ dawnImaginationCanvas: [String: Any] = [:]) { silkenAffinityCanvas(["value": dawnImaginationCanvas]) }
+    func dawnThoughtCanvas(_ dawnImaginationCanvas: [String: Any] = [:]) { silkenAffinityCanvas([PalirodreamyWonder.thoughtfulFeelingPalette("vHaHlEuMe"): dawnImaginationCanvas]) }
     func silkenWonderCanvas(_ silkenCuriosityCanvas: String, _ silkenReflectionCanvas: String? = nil, _ silkenDreamCanvas: Error? = nil) {
-        silkenAffinityCanvas(["error": ["message": silkenCuriosityCanvas, "code": silkenReflectionCanvas ?? "NATIVE_ERROR"]])
+        silkenAffinityCanvas([PalirodreamyWonder.thoughtfulFeelingPalette("eKrXrVoZr"): [PalirodreamyWonder.thoughtfulFeelingPalette("mMeNsPsVaZgKe"): silkenCuriosityCanvas, PalirodreamyWonder.thoughtfulFeelingPalette("cYoVdOe"): silkenReflectionCanvas ?? PalirodreamyWonder.thoughtfulFeelingPalette("NAAVTAIXVSEN_HEGRYRKOGR")]])
     }
     private func silkenAffinityCanvas(_ silkenFeelingCanvas: [String: Any]) {
         DispatchQueue.main.async { [self] in

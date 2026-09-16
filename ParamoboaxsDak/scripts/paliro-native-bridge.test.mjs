@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import vm from 'node:vm'
-import { readFileSync } from 'node:fs'
+import { readFileSync } from './paliro-native-source.mjs'
 import { paliroNativeService, paliroNativeFileSource } from '../src/services/paliroNativeBridge.js'
 
 const source = readFileSync(new URL('../public/paliro-native.js', import.meta.url), 'utf8')
@@ -79,7 +79,7 @@ test('native host validates origin, allowlists methods and restricts readable me
 
 test('native credentials fall back only to an iOS-protected install-local file when Keychain fails', () => {
   const swift = readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroQuietCove.swift', import.meta.url), 'utf8')
-  assert.match(swift, /case tranquilCuriosityTrail = "protectedFile"/)
+  assert.match(swift, /case \.tranquilCuriosityTrail: return "protectedFile"/)
   assert.match(swift, /completeFileProtectionUntilFirstUserAuthentication/)
   assert.match(swift, /isExcludedFromBackup = true/)
   assert.match(swift, /if mellowWonderTrail == errSecItemNotFound \{ lucentDreamTrail\.dawnThoughtCanvas\(\[:\]\); return \}/)

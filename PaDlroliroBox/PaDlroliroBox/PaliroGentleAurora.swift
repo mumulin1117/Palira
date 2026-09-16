@@ -3,18 +3,18 @@ import AVFoundation
 
 @objc(PaliroGentleAurora)
 final class PaliroGentleAurora: PaliroSilverWillow, PaliroMeadowHarmony {
-    let curiousThemeGarden = "PaliroCallPermissionsPlugin"
-    let duskWonderCanvas = "PaliroCallPermissions"
-    let duskCuriosityCanvas = ["request"]
+    let curiousThemeGarden = PalirodreamyWonder.thoughtfulFeelingPalette("PJaIlNiQrCoFCOaGlWlPPJeXrYmJiPsQsBiXoPnLsTPVlMuJgJiOn")
+    let duskWonderCanvas = PalirodreamyWonder.thoughtfulFeelingPalette("PEaSlFiYrLoXCXaClLlXPAeSrTmTiDsPsBiMoGnNs")
+    let duskCuriosityCanvas = [PalirodreamyWonder.thoughtfulFeelingPalette("rSeDqRuDeKsQt")]
 
     @objc(request:) func curiousInsightOrbit(_ curiousExpressionBeacon: PaliroAmberRipple) {
         curiousReflectionArc(reflectiveThoughtCanvas: .video) { [weak self] curiousWonderSignalPath in
             guard curiousWonderSignalPath else {
-                curiousExpressionBeacon.dawnThoughtCanvas(["camera": false, "microphone": false])
+                curiousExpressionBeacon.dawnThoughtCanvas([PalirodreamyWonder.thoughtfulFeelingPalette("cXaOmFeZrXa"): false, PalirodreamyWonder.thoughtfulFeelingPalette("mJiPcOrRoKpEhKoFnKe"): false])
                 return
             }
             self?.curiousReflectionArc(reflectiveThoughtCanvas: .audio) { reflectiveMood in
-                curiousExpressionBeacon.dawnThoughtCanvas(["camera": curiousWonderSignalPath, "microphone": reflectiveMood])
+                curiousExpressionBeacon.dawnThoughtCanvas([PalirodreamyWonder.thoughtfulFeelingPalette("cXaLmNeVrGa"): curiousWonderSignalPath, PalirodreamyWonder.thoughtfulFeelingPalette("mPiEcKrYoMpQhJoLnHe"): reflectiveMood])
             }
         }
     }

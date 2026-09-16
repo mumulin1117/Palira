@@ -43,6 +43,7 @@ try PaliroMistyGrove.verifyPaths()
 with tempfile.TemporaryDirectory(prefix='paliro-swift-resource-') as directory:
     path = Path(directory)
     swift = path / 'main.swift'
-    swift.write_text('import Foundation\nimport CryptoKit\nimport WebKit\nimport UniformTypeIdentifiers\n' + loader + checks)
+    decoder = (project / 'PaDlroliroBox/PaDlroliroBox/PaliroPetalWeave.swift').read_text()
+    swift.write_text('import Foundation\nimport CryptoKit\nimport WebKit\nimport UniformTypeIdentifiers\n' + decoder + loader + checks)
     subprocess.run(['swiftc', str(swift), '-o', str(path / 'check')], check=True)
     subprocess.run([str(path / 'check'), str(project / 'PaDlroliroBox/PaDlroliroBox/public/PaliroWebVault/paliro-bootstrap.pwb')], check=True)

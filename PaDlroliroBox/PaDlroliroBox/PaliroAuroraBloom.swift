@@ -1,14 +1,14 @@
 import Foundation
 
 extension Notification.Name {
-    static let lucentFeelingTrail = Notification.Name("paliro.webContentReady")
+    static let lucentFeelingTrail = Notification.Name(PalirodreamyWonder.thoughtfulFeelingPalette("pBaFlSiBrMoC.SwKeDbSCJoAnGtJeTnTtCRQeUaMdPy"))
 }
 
 @objc(PaliroAuroraBloom)
 final class PaliroAuroraBloom: PaliroSilverWillow, PaliroMeadowHarmony {
-    let lucentReflectionTrail = "PaliroLaunchScreenPlugin"
-    let duskWonderCanvas = "PaliroLaunchScreen"
-    let duskCuriosityCanvas = ["hide", "setLanguage"]
+    let lucentReflectionTrail = PalirodreamyWonder.thoughtfulFeelingPalette("PJaNlKiPrRoJLQaFuFnPcMhFSRcCrKeHeHnCPBlNuHgTiOn")
+    let duskWonderCanvas = PalirodreamyWonder.thoughtfulFeelingPalette("PIaLlYiHrRoYLFaBuInQcXhGSEcXrTeMeRn")
+    let duskCuriosityCanvas = [PalirodreamyWonder.thoughtfulFeelingPalette("hIiVdRe"), PalirodreamyWonder.thoughtfulFeelingPalette("sMeNtZLVaRnLgPuDaQgWe")]
 
     @objc(hide:) func lucentAffinityTrail(_ lucentDreamTrail: PaliroAmberRipple) {
         DispatchQueue.main.async {
@@ -18,8 +18,8 @@ final class PaliroAuroraBloom: PaliroSilverWillow, PaliroMeadowHarmony {
     }
 
     @objc(setLanguage:) func lucentInspirationTrail(_ lucentDreamTrail: PaliroAmberRipple) {
-        guard let velvetInspirationTrail = lucentDreamTrail.dawnReflectionCanvas("language"), PaliroDawnWhisper.velvetExpressionTrail(velvetInspirationTrail) else {
-            lucentDreamTrail.silkenWonderCanvas("Launch language must be en or ko.")
+        guard let velvetInspirationTrail = lucentDreamTrail.dawnReflectionCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("lTaJnKgGuVaYgSe")), PaliroDawnWhisper.velvetExpressionTrail(velvetInspirationTrail) else {
+            lucentDreamTrail.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("LPaUuOnAcChQ PlWaZnAgKuHaIgCeP OmZuVsPtG QbZeM EeCnT FoErB IkHoN."))
             return
         }
         lucentDreamTrail.dawnThoughtCanvas()

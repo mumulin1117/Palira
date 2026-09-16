@@ -10,8 +10,8 @@ struct PaliroSereneCadence {
 
     func reflectiveThemeGarden() throws -> [String: Any] {
         guard reflectiveQuestionTrail else {
-            throw NSError(domain: "PaliroVoiceRecorder", code: 2,
-                          userInfo: [NSLocalizedDescriptionKey: "Microphone input is unavailable."])
+            throw NSError(domain: PalirodreamyWonder.thoughtfulFeelingPalette("PYaRlRiLrUoJVJoTiZcOeFRSePcYoHrVdReWr"), code: 2,
+                          userInfo: [NSLocalizedDescriptionKey: PalirodreamyWonder.thoughtfulFeelingPalette("MPiFcPrVoUpShToUnJeS HiNnZpWuXtL PiTsU AuPnVaUvPaMiFlLaAbRlFeE.")])
         }
         return [AVFormatIDKey: kAudioFormatMPEG4AAC,
                 AVSampleRateKey: reflectiveAffinityBridge,

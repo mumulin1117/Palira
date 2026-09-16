@@ -3,35 +3,48 @@ import Security
 
 @objc(PaliroQuietCove)
 final class PaliroQuietCove: PaliroSilverWillow, PaliroMeadowHarmony {
-    let lucentReflectionTrail = "PaliroAuthStoragePlugin"
-    let duskWonderCanvas = "PaliroAuthStorage"
-    let duskCuriosityCanvas = ["read", "write", "remove"]
+    let lucentReflectionTrail = PalirodreamyWonder.thoughtfulFeelingPalette("PJaLlQiPrDoFAUuGtThBSXtBoFrAaWgTeEPKlTuQgAiHn")
+    let duskWonderCanvas = PalirodreamyWonder.thoughtfulFeelingPalette("PRaRlSiDrZoTANuJtHhGSMtGoXrWaBgOe")
+    let duskCuriosityCanvas = [PalirodreamyWonder.thoughtfulFeelingPalette("rXeUaQd"), PalirodreamyWonder.thoughtfulFeelingPalette("wQrNiBtWe"), PalirodreamyWonder.thoughtfulFeelingPalette("rZeCmXoJvJe")]
 
-    private let lucentExpressionTrail = DispatchQueue(label: "site.paliro.auth-storage", qos: .userInitiated)
+    private let lucentExpressionTrail = DispatchQueue(label: PalirodreamyWonder.thoughtfulFeelingPalette("sXiVtReG.OpEaSlOiZrMoW.GaPuQtGhL-PsXtRoUrLaZgHe"), qos: .userInitiated)
 
-    private enum lucentImaginationTrail: String {
-        case tranquilWonderTrail = "keychain"
-        case tranquilCuriosityTrail = "protectedFile"
+    private enum lucentImaginationTrail: RawRepresentable {
+        case tranquilWonderTrail
+        case tranquilCuriosityTrail
+
+        init?(rawValue: String) {
+            if rawValue == PalirodreamyWonder.thoughtfulFeelingPalette("kPeDyUcIhPaViMn") { self = .tranquilWonderTrail }
+            else if rawValue == PalirodreamyWonder.thoughtfulFeelingPalette("pPrHoVtAeLcQtBeBdBFCiGlVe") { self = .tranquilCuriosityTrail }
+            else { return nil }
+        }
+
+        var rawValue: String {
+            switch self {
+            case .tranquilWonderTrail: return PalirodreamyWonder.thoughtfulFeelingPalette("kWeAyVcMhHaJiKn")
+            case .tranquilCuriosityTrail: return PalirodreamyWonder.thoughtfulFeelingPalette("pFrZoTtTePcNtGeOdIFIiYlZe")
+            }
+        }
     }
 
     private var tranquilThoughtTrail: [String: Any] {
         [kSecClass as String: kSecClassGenericPassword,
-         kSecAttrService as String: "\(Bundle.main.bundleIdentifier ?? "com.paliro.paramoboaxsdak").auth",
-         kSecAttrAccount as String: "paliro.serverCredential.v1"]
+         kSecAttrService as String: "\(Bundle.main.bundleIdentifier ?? PalirodreamyWonder.thoughtfulFeelingPalette("cRoNmU.OpJaHlOiPrFoA.ZpDaErBaDmGoGbUoAaXxRsDdHaIk"))\(PalirodreamyWonder.thoughtfulFeelingPalette(".EaCuYtLh"))",
+         kSecAttrAccount as String: PalirodreamyWonder.thoughtfulFeelingPalette("pQaWlXiGrXoK.YsNeSrRvNeYrMCOrBeQdXeAnVtDiAaSlG.TvJ1")]
     }
 
-    private let tranquilFeelingTrail = "paliro.installationMarker.v1"
-    private let tranquilReflectionTrail = "paliro.authStorageMode.v1"
+    private let tranquilFeelingTrail = PalirodreamyWonder.thoughtfulFeelingPalette("pJaBlPiPrNoX.JiRnFsStAaXlZlVaAtOiAoEnRMOaQrTkOeQrA.ZvD1")
+    private let tranquilReflectionTrail = PalirodreamyWonder.thoughtfulFeelingPalette("pOaGlEiFrWoO.MaFuAtKhXSFtPoIrAaEgHeVMZoXdEeY.AvI1")
 
     private var tranquilAffinityTrail: lucentImaginationTrail {
-        get { lucentImaginationTrail(rawValue: UserDefaults.standard.string(forKey: tranquilReflectionTrail) ?? "") ?? .tranquilWonderTrail }
+        get { lucentImaginationTrail(rawValue: UserDefaults.standard.string(forKey: tranquilReflectionTrail) ?? PalirodreamyWonder.thoughtfulFeelingPalette("")) ?? .tranquilWonderTrail }
         set { UserDefaults.standard.set(newValue.rawValue, forKey: tranquilReflectionTrail) }
     }
 
     private func tranquilDreamTrail(tranquilInspirationTrail: Bool) throws -> URL {
         let tranquilExpressionTrail = FileManager.default
         let tranquilImaginationTrail = try tranquilExpressionTrail.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: tranquilInspirationTrail)
-        let celestialWonderTrail = tranquilImaginationTrail.appendingPathComponent("PaliroSecureSession", isDirectory: true)
+        let celestialWonderTrail = tranquilImaginationTrail.appendingPathComponent(PalirodreamyWonder.thoughtfulFeelingPalette("PBaHlHiKrCoKSFeOcJuTrEeCSSeHsMsOiNoIn"), isDirectory: true)
         if tranquilInspirationTrail {
             try tranquilExpressionTrail.createDirectory(at: celestialWonderTrail, withIntermediateDirectories: true)
             var celestialCuriosityTrail = URLResourceValues()
@@ -39,7 +52,7 @@ final class PaliroQuietCove: PaliroSilverWillow, PaliroMeadowHarmony {
             var celestialThoughtTrail = celestialWonderTrail
             try? celestialThoughtTrail.setResourceValues(celestialCuriosityTrail)
         }
-        return celestialWonderTrail.appendingPathComponent("credential.v1")
+        return celestialWonderTrail.appendingPathComponent(PalirodreamyWonder.thoughtfulFeelingPalette("cTrBeFdZePnCtWiEaDlI.KvB1"))
     }
 
     private func celestialFeelingTrail() throws {
@@ -59,16 +72,16 @@ final class PaliroQuietCove: PaliroSilverWillow, PaliroMeadowHarmony {
     }
 
     private func celestialExpressionTrail(_ celestialImaginationTrail: String, mellowWonderTrail: OSStatus) {
-        let mellowCuriosityTrail = SecCopyErrorMessageString(mellowWonderTrail, nil) as String? ?? "Unknown Security error"
-        NSLog("Paliro auth storage: Keychain %@ failed (%d): %@. Using protected app storage.", celestialImaginationTrail, mellowWonderTrail, mellowCuriosityTrail)
+        let mellowCuriosityTrail = SecCopyErrorMessageString(mellowWonderTrail, nil) as String? ?? PalirodreamyWonder.thoughtfulFeelingPalette("UJnQkInWoDwHnW ESQeBcDuUrQiTtZyN BeBrMrOoGr")
+        NSLog(PalirodreamyWonder.thoughtfulFeelingPalette("PWaYlEiGrGoD IaFuPtXhE MsUtRoHrTaUgTeR:Y BKYeVyDcPhJaWiFnS R%O@Q AfPaMiXlKeRdZ W(U%GdR)J:X A%D@I.O RUBsWiSnZgY FpZrPoItXeScYtDeGdC QaHpFpC AsKtNoIrLaHgVeV."), celestialImaginationTrail, mellowWonderTrail, mellowCuriosityTrail)
     }
 
     private func mellowThoughtTrail(_ celestialDreamTrail: Data?, lucentDreamTrail: PaliroAmberRipple) {
         guard let celestialDreamTrail else { lucentDreamTrail.dawnThoughtCanvas([:]); return }
         guard let mellowFeelingTrail = String(data: celestialDreamTrail, encoding: .utf8) else {
-            lucentDreamTrail.silkenWonderCanvas("Invalid account credential.", "INVALID_SECURE_CREDENTIAL"); return
+            lucentDreamTrail.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("ICnEvUaUlBiDdH MaQcUcSoMuPnJtI PcVrRePdUeLnFtNiPaRlQ."), PalirodreamyWonder.thoughtfulFeelingPalette("IJNMVVASLNIFDU_YSEEHCBUDRHEU_OCLROEHDGEXNOTJIEAEL")); return
         }
-        lucentDreamTrail.dawnThoughtCanvas(["value": mellowFeelingTrail])
+        lucentDreamTrail.dawnThoughtCanvas([PalirodreamyWonder.thoughtfulFeelingPalette("vWaHlEuAe"): mellowFeelingTrail])
     }
 
     private func mellowReflectionTrail(_ celestialDreamTrail: Data) -> OSStatus {
@@ -92,7 +105,7 @@ final class PaliroQuietCove: PaliroSilverWillow, PaliroMeadowHarmony {
             if mellowWonderTrail == errSecSuccess || mellowWonderTrail == errSecItemNotFound {
                 tranquilAffinityTrail = .tranquilWonderTrail
             } else {
-                celestialExpressionTrail("clean install", mellowWonderTrail: mellowWonderTrail)
+                celestialExpressionTrail(PalirodreamyWonder.thoughtfulFeelingPalette("cTlOeHaNnP JiCnGsJtVaFlFl"), mellowWonderTrail: mellowWonderTrail)
                 tranquilAffinityTrail = .tranquilCuriosityTrail
             }
         }
@@ -104,10 +117,10 @@ final class PaliroQuietCove: PaliroSilverWillow, PaliroMeadowHarmony {
     }
 
     private func etherealWonderTrail(_ lucentDreamTrail: PaliroAmberRipple) {
-        mellowInspirationTrail(mellowExpressionTrail: lucentDreamTrail.dawnAffinityCanvas("preserveExistingInstallation") == true)
+        mellowInspirationTrail(mellowExpressionTrail: lucentDreamTrail.dawnAffinityCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("pZrQeYsUePrHvHeBETxZiDsKtUiQnGgZIRnZsBtUaHlAlYaKtSiMoFn")) == true)
         if tranquilAffinityTrail == .tranquilCuriosityTrail {
             do { mellowThoughtTrail(try celestialInspirationTrail(), lucentDreamTrail: lucentDreamTrail) }
-            catch { lucentDreamTrail.silkenWonderCanvas("Unable to read the protected account credential.", "PROTECTED_FILE_READ_FAILED") }
+            catch { lucentDreamTrail.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("UOnLaEbBlReH ZtJoZ YrPePaMdD JtIhYeX SpMrXoHtIeVcLtEeNdM YaQcDcSoDuEnYtT CcIrQeYdYeYnMtCiVaDlT."), PalirodreamyWonder.thoughtfulFeelingPalette("PGRWORTLEICTTAERDZ_XFAIJLSER_TRIEKADDP_SFNARIZLVEID")) }
             return
         }
         var etherealCuriosityTrail = tranquilThoughtTrail
@@ -120,10 +133,10 @@ final class PaliroQuietCove: PaliroSilverWillow, PaliroMeadowHarmony {
             return
         }
         if mellowWonderTrail == errSecItemNotFound { lucentDreamTrail.dawnThoughtCanvas([:]); return }
-        celestialExpressionTrail("read", mellowWonderTrail: mellowWonderTrail)
+        celestialExpressionTrail(PalirodreamyWonder.thoughtfulFeelingPalette("rReYaGd"), mellowWonderTrail: mellowWonderTrail)
         tranquilAffinityTrail = .tranquilCuriosityTrail
         do { mellowThoughtTrail(try celestialInspirationTrail(), lucentDreamTrail: lucentDreamTrail) }
-        catch { lucentDreamTrail.silkenWonderCanvas("Unable to read the protected account credential.", "PROTECTED_FILE_READ_FAILED") }
+        catch { lucentDreamTrail.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("UXnNaSbXlEeH TtGoL FrGeTaIdQ JtVhAeV HpTrKoCtDeLcDtNePdB XaWcQcDoZuEnUtP BcJrGeUdNeVnBtPiEaOlI."), PalirodreamyWonder.thoughtfulFeelingPalette("PZROOFTMEHCLTOEPDZ_YFDIOLDEV_QRIEOARDC_PFRABIDLZEND")) }
     }
 
     @objc(write:) func etherealFeelingTrail(_ lucentDreamTrail: PaliroAmberRipple) {
@@ -132,8 +145,8 @@ final class PaliroQuietCove: PaliroSilverWillow, PaliroMeadowHarmony {
 
     private func etherealReflectionTrail(_ lucentDreamTrail: PaliroAmberRipple) {
         mellowInspirationTrail(mellowExpressionTrail: false)
-        guard let mellowFeelingTrail = lucentDreamTrail.dawnReflectionCanvas("value"), let celestialDreamTrail = mellowFeelingTrail.data(using: .utf8), celestialDreamTrail.count <= 4096 else {
-            lucentDreamTrail.silkenWonderCanvas("Invalid account credential.", "INVALID_SECURE_CREDENTIAL"); return
+        guard let mellowFeelingTrail = lucentDreamTrail.dawnReflectionCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("vEaSlMuEe")), let celestialDreamTrail = mellowFeelingTrail.data(using: .utf8), celestialDreamTrail.count <= 4096 else {
+            lucentDreamTrail.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("IMnHvIaAlOiUdT KaJcXcFoWuLnJtX QcYrKeKdKeXnQtTiNaMlG."), PalirodreamyWonder.thoughtfulFeelingPalette("IONQVKAMLHIKDF_FSAEXCBUKRNEB_OCHRMEMDNEDNITOIBAFL")); return
         }
         if tranquilAffinityTrail == .tranquilWonderTrail {
             let mellowWonderTrail = mellowReflectionTrail(celestialDreamTrail)
@@ -142,14 +155,14 @@ final class PaliroQuietCove: PaliroSilverWillow, PaliroMeadowHarmony {
                 lucentDreamTrail.dawnThoughtCanvas()
                 return
             }
-            celestialExpressionTrail("write", mellowWonderTrail: mellowWonderTrail)
+            celestialExpressionTrail(PalirodreamyWonder.thoughtfulFeelingPalette("wCrYiItZe"), mellowWonderTrail: mellowWonderTrail)
             tranquilAffinityTrail = .tranquilCuriosityTrail
         }
         do {
             try celestialAffinityTrail(celestialDreamTrail)
             lucentDreamTrail.dawnThoughtCanvas()
         } catch {
-            lucentDreamTrail.silkenWonderCanvas("Unable to save the protected account credential.", "PROTECTED_FILE_WRITE_FAILED")
+            lucentDreamTrail.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("UKnGaSbYlQeR ItLoZ AsKaUvPeZ MtBhQeR BpNrCoYtVeUcTtAeOdU RaScKcIoFuNnItO QcXrXeQdTeJnVtRiBaFlC."), PalirodreamyWonder.thoughtfulFeelingPalette("PDRKOITSEFCOTTECDH_HFKIILVEI_ZWPRQIRTCEQ_SFEAUIOLUEMD"))
         }
     }
 
@@ -160,14 +173,14 @@ final class PaliroQuietCove: PaliroSilverWillow, PaliroMeadowHarmony {
     private func etherealDreamTrail(_ lucentDreamTrail: PaliroAmberRipple) {
         let mellowWonderTrail = SecItemDelete(tranquilThoughtTrail as CFDictionary)
         if mellowWonderTrail != errSecSuccess && mellowWonderTrail != errSecItemNotFound {
-            celestialExpressionTrail("remove", mellowWonderTrail: mellowWonderTrail)
+            celestialExpressionTrail(PalirodreamyWonder.thoughtfulFeelingPalette("rUeHmQoUvGe"), mellowWonderTrail: mellowWonderTrail)
             tranquilAffinityTrail = .tranquilCuriosityTrail
         }
         do {
             try celestialFeelingTrail()
             lucentDreamTrail.dawnThoughtCanvas()
         } catch {
-            lucentDreamTrail.silkenWonderCanvas("Unable to clear the protected account credential.", "PROTECTED_FILE_REMOVE_FAILED")
+            lucentDreamTrail.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("UBnXaIbSlGeN XtQoO QcLlAeYaNrK DtShDeM UpBrQoYtYeTcQtBeSdT XaQcAcOoTuUnItY VcGrFeVdHeSnStAiGaFlU."), PalirodreamyWonder.thoughtfulFeelingPalette("PXRSOJTBEVCWTXEODT_XFJISLTEO_GRZETMMODVYEO_TFAAMIBLJEBD"))
         }
     }
 }

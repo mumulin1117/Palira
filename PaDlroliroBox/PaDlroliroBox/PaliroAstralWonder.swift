@@ -4,20 +4,20 @@ import StoreKit
 @available(iOS 15.0, *)
 @objc(PaliroAstralWonder)
 final class PaliroAstralWonder: PaliroSilverWillow, PaliroMeadowHarmony {
-    let astralThoughtCanvas = "PaliroIapPlugin"
-    let duskWonderCanvas = "PaliroIap"
-    let duskCuriosityCanvas = ["getProducts", "purchase"]
+    let astralThoughtCanvas = PalirodreamyWonder.thoughtfulFeelingPalette("PYaBlOiLrIoJIFaKpQPTlDuDgXiHn")
+    let duskWonderCanvas = PalirodreamyWonder.thoughtfulFeelingPalette("PHaBlWiOrVoMIWaWp")
+    let duskCuriosityCanvas = [PalirodreamyWonder.thoughtfulFeelingPalette("gJeDtVPRrQoXdPuLcKtHs"), PalirodreamyWonder.thoughtfulFeelingPalette("pDuArScGhWaFsNe")]
 
     private let astralInterestCompass = [
-        "bbdiylyghcvmvmts": 100,
-        "iyksmadvinojrplp": 200,
-        "hkczppvsoegefpcg": 600,
-        "frpbjkpqdhvdzali": 1500,
-        "rebfnabjzseqvpgz": 3500,
-        "povdflzdkrvkiwdq": 9500,
-        "jxioxpaoekomsnqs": 20050
+        PalirodreamyWonder.thoughtfulFeelingPalette("bCbCdAiUyHlLyGgUhQcPvEmAvTmRtFs"): 100,
+        PalirodreamyWonder.thoughtfulFeelingPalette("iMyEkPsBmWaKdNvCiSnDoUjKrCpJlMp"): 200,
+        PalirodreamyWonder.thoughtfulFeelingPalette("hGkCcBzDpRpMvTsFoHeGgGeZfTpRcLg"): 600,
+        PalirodreamyWonder.thoughtfulFeelingPalette("fVrDpYbGjAkVpLqIdMhQvQdQzBaRlHi"): 1500,
+        PalirodreamyWonder.thoughtfulFeelingPalette("rAeJbWfEnMaXbZjIzYsHeYqPvIpBgAz"): 3500,
+        PalirodreamyWonder.thoughtfulFeelingPalette("pFoLvJdBfNlBzNdEkXrJvDkEiKwGdZq"): 9500,
+        PalirodreamyWonder.thoughtfulFeelingPalette("jUxFiHoUxRpAaHoFePkSoPmOsSnFqGs"): 20050
     ]
-    private let astralCuriosityPath = "paliro.iap.purchaseUsers"
+    private let astralCuriosityPath = PalirodreamyWonder.thoughtfulFeelingPalette("pGaSlViCrLoZ.QiLaApU.VpYuUrUcLhXaEsYeXUNsVeQrDs")
     private var astralFeelingPalette: Task<Void, Never>?
 
     override func duskDreamCanvas() {
@@ -34,7 +34,7 @@ final class PaliroAstralWonder: PaliroSilverWillow, PaliroMeadowHarmony {
 
     @objc(getProducts:) func astralPerspectiveLens(_ astralAffinityBridge: PaliroAmberRipple) {
         Task {
-            let astralQuestionTrail = astralAffinityBridge.dawnFeelingCanvas("productIDs", String.self) ?? Array(astralInterestCompass.keys)
+            let astralQuestionTrail = astralAffinityBridge.dawnFeelingCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("pGrMoEdYuOcXtEIHDVs"), String.self) ?? Array(astralInterestCompass.keys)
             let astralThemeGarden = astralQuestionTrail.filter { astralInterestCompass[$0] != nil }
 
             do {
@@ -42,25 +42,25 @@ final class PaliroAstralWonder: PaliroSilverWillow, PaliroMeadowHarmony {
                 let astralExpressionBeacon = astralInsightOrbit.compactMap { astralReflectionArc -> [String: Any]? in
                     guard let astralWonderSignalPath = astralInterestCompass[astralReflectionArc.id] else { return nil }
                     return [
-                        "productID": astralReflectionArc.id,
-                        "displayPrice": astralReflectionArc.displayPrice,
-                        "coins": astralWonderSignalPath
+                        PalirodreamyWonder.thoughtfulFeelingPalette("pKrMoUdFuRcGtIITD"): astralReflectionArc.id,
+                        PalirodreamyWonder.thoughtfulFeelingPalette("dViKsLpTlWaHyTPWrHiRcEe"): astralReflectionArc.displayPrice,
+                        PalirodreamyWonder.thoughtfulFeelingPalette("cAoFiSnJs"): astralWonderSignalPath
                     ]
                 }
-                astralAffinityBridge.dawnThoughtCanvas(["products": astralExpressionBeacon])
+                astralAffinityBridge.dawnThoughtCanvas([PalirodreamyWonder.thoughtfulFeelingPalette("pNrNoNdVuPcCtSs"): astralExpressionBeacon])
             } catch {
-                astralAffinityBridge.silkenWonderCanvas("Unable to load App Store products.", nil, error)
+                astralAffinityBridge.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("UBnFaNbAlXeW BtFoB RlBoIaCdX TAJpOpB QSAtYoRrIeE UpJrIoDdOuAcWtLsE."), nil, error)
             }
         }
     }
 
     @objc(purchase:) func luminousMood(_ luminousThoughtCanvas: PaliroAmberRipple) {
-        guard let luminousInterestCompass = luminousThoughtCanvas.dawnReflectionCanvas("productID"), astralInterestCompass[luminousInterestCompass] != nil else {
-            luminousThoughtCanvas.silkenWonderCanvas("The selected coin pack is unavailable.")
+        guard let luminousInterestCompass = luminousThoughtCanvas.dawnReflectionCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("pQrAoFdYuLcItOIHD")), astralInterestCompass[luminousInterestCompass] != nil else {
+            luminousThoughtCanvas.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("TVhZeN ZsYeWlNeCcRtDeOdG VcVoSiGnU DpFaBcKkX KiZsE YuKnMaJvZaFiClYaUbXlGeU."))
             return
         }
-        guard let luminousCuriosityPath = luminousThoughtCanvas.dawnReflectionCanvas("userID"), !luminousCuriosityPath.isEmpty else {
-            luminousThoughtCanvas.silkenWonderCanvas("A signed-in user is required to purchase coins.")
+        guard let luminousCuriosityPath = luminousThoughtCanvas.dawnReflectionCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("uXsReQrPIXD")), !luminousCuriosityPath.isEmpty else {
+            luminousThoughtCanvas.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("AJ HsAiZgPnIeIdL-QiOnE LuEsEeCrK NiTsJ NrIeCqJuJiUrFeSdA ZtIoX JpDuOrYcKhKaMsJeD BcVoAiDnBsX."))
             return
         }
 
@@ -68,7 +68,7 @@ final class PaliroAstralWonder: PaliroSilverWillow, PaliroMeadowHarmony {
         Task {
             do {
                 guard let luminousFeelingPalette = try await Product.products(for: [luminousInterestCompass]).first else {
-                    luminousThoughtCanvas.silkenWonderCanvas("This App Store product is not currently available.")
+                    luminousThoughtCanvas.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("TShYiYsH GALpXpM SSVtXoXrBeI WpHrIoPdDuZcMtZ GiGsB XnIoStS PcBuOrWrDeQnPtPlFyF YaDvHaTiRlWaFbAlGeR."))
                     return
                 }
 
@@ -79,17 +79,17 @@ final class PaliroAstralWonder: PaliroSilverWillow, PaliroMeadowHarmony {
                         let luminousQuestionTrail = await luminousReflectionArc(luminousAffinityBridge, gentleMood: luminousCuriosityPath)
                         luminousThoughtCanvas.dawnThoughtCanvas(luminousQuestionTrail)
                     case .unverified:
-                        luminousThoughtCanvas.silkenWonderCanvas("The App Store could not verify this transaction.")
+                        luminousThoughtCanvas.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("TChFeU PADpZpJ DSFtSoOrKeC ScZoLuHlMdR PnKoZtT PvKeSrKiEfYyO MtXhEiHsM DtHrBaUnMsBaLcOtBiToWnR."))
                     }
                 case .pending:
-                    luminousThoughtCanvas.dawnThoughtCanvas(["status": "pending", "productID": luminousInterestCompass])
+                    luminousThoughtCanvas.dawnThoughtCanvas([PalirodreamyWonder.thoughtfulFeelingPalette("sKtLaCtLuRs"): PalirodreamyWonder.thoughtfulFeelingPalette("pKeCnBdYiRnMg"), PalirodreamyWonder.thoughtfulFeelingPalette("pXrMoMdSuScTtNIOD"): luminousInterestCompass])
                 case .userCancelled:
-                    luminousThoughtCanvas.dawnThoughtCanvas(["status": "cancelled", "productID": luminousInterestCompass])
+                    luminousThoughtCanvas.dawnThoughtCanvas([PalirodreamyWonder.thoughtfulFeelingPalette("sOtYaWtAuFs"): PalirodreamyWonder.thoughtfulFeelingPalette("cLaInWcWeDlAlJeVd"), PalirodreamyWonder.thoughtfulFeelingPalette("pSrNoPdEuKcEtCIFD"): luminousInterestCompass])
                 @unknown default:
-                    luminousThoughtCanvas.silkenWonderCanvas("The App Store returned an unsupported purchase result.")
+                    luminousThoughtCanvas.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("TJhHeN TAJpSpW ESLtOoFrQeQ DrJeNtWuYrRnFeVdZ JaOnV RuYnFsAuGpLpKoLrYtSeCdZ TpWuRrWcKhPaZsEeV RrYeZsYuNlStG."))
                 }
             } catch {
-                luminousThoughtCanvas.silkenWonderCanvas("The App Store purchase could not be completed.", nil, error)
+                luminousThoughtCanvas.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("TZhTeY PAWpSpE XSDtSoXrPeQ PpFuLrLcHhKaXsFeR TcJoOuDlFdW TnZoKtM ObVeP FcWoBmWpRlWeUtCeVdS."), nil, error)
             }
         }
     }
@@ -102,17 +102,17 @@ final class PaliroAstralWonder: PaliroSilverWillow, PaliroMeadowHarmony {
     private func luminousReflectionArc(_ luminousWonderSignalPath: Transaction, gentleMood: String?) async -> [String: Any] {
         guard let gentleThoughtCanvas = astralInterestCompass[luminousWonderSignalPath.productID] else {
             await luminousWonderSignalPath.finish()
-            return ["status": "ignored", "productID": luminousWonderSignalPath.productID]
+            return [PalirodreamyWonder.thoughtfulFeelingPalette("sZtIaEtKuLs"): PalirodreamyWonder.thoughtfulFeelingPalette("iVgAnYoErFeCd"), PalirodreamyWonder.thoughtfulFeelingPalette("pZrQoRdEuYcEtKIRD"): luminousWonderSignalPath.productID]
         }
 
         let gentleInterestCompass: [String: Any] = [
-            "status": "success",
-            "productID": luminousWonderSignalPath.productID,
-            "transactionID": String(luminousWonderSignalPath.id),
-            "coinAmount": gentleThoughtCanvas,
-            "userID": gentleMood ?? ""
+            PalirodreamyWonder.thoughtfulFeelingPalette("sDtYaJtAuTs"): PalirodreamyWonder.thoughtfulFeelingPalette("sMuGcBcWeNsNs"),
+            PalirodreamyWonder.thoughtfulFeelingPalette("pYrYoIdLuScZtHILD"): luminousWonderSignalPath.productID,
+            PalirodreamyWonder.thoughtfulFeelingPalette("tQrLaAnIsNaZcRtLiEoUnPIZD"): String(luminousWonderSignalPath.id),
+            PalirodreamyWonder.thoughtfulFeelingPalette("cVoYiWnNAMmPoXuWnPt"): gentleThoughtCanvas,
+            PalirodreamyWonder.thoughtfulFeelingPalette("uOsCeErQIRD"): gentleMood ?? PalirodreamyWonder.thoughtfulFeelingPalette("")
         ]
-        duskFeelingCanvas("purchaseResult", duskExpressionCanvas: gentleInterestCompass, duskThoughtCanvas: true)
+        duskFeelingCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("pPuErNcLhDaOsQeQRAeGsAuClFt"), duskExpressionCanvas: gentleInterestCompass, duskThoughtCanvas: true)
         await luminousWonderSignalPath.finish()
         return gentleInterestCompass
     }

@@ -3,12 +3,12 @@ import AVFoundation
 
 @objc(PaliroVelvetEcho)
 final class PaliroVelvetEcho: PaliroSilverWillow, PaliroMeadowHarmony {
-    let reflectiveInsightOrbit = "PaliroVoiceRecorderPlugin"
-    let duskWonderCanvas = "PaliroVoiceRecorder"
-    let duskCuriosityCanvas = ["start", "pause", "resume", "stop", "cancel", "discard"]
+    let reflectiveInsightOrbit = PalirodreamyWonder.thoughtfulFeelingPalette("PDaNlFiFrMoSVDoBiZcMeYRWeLcKoZrOdUeCrUPBlWuOgBiOn")
+    let duskWonderCanvas = PalirodreamyWonder.thoughtfulFeelingPalette("PLaGlUiKrRoZVFoMiPcEeGRJeFcJoBrTdTeLr")
+    let duskCuriosityCanvas = [PalirodreamyWonder.thoughtfulFeelingPalette("sOtNaQrCt"), PalirodreamyWonder.thoughtfulFeelingPalette("pPaOuAsUe"), PalirodreamyWonder.thoughtfulFeelingPalette("rGePsQuXmPe"), PalirodreamyWonder.thoughtfulFeelingPalette("sKtVoDp"), PalirodreamyWonder.thoughtfulFeelingPalette("cBaJnCcAeYl"), PalirodreamyWonder.thoughtfulFeelingPalette("dSiUsJcNaJrQd")]
 
    
-    private let reflectiveExpressionBeacon = DispatchQueue(label: "site.paliro.voice-recorder", qos: .userInitiated)
+    private let reflectiveExpressionBeacon = DispatchQueue(label: PalirodreamyWonder.thoughtfulFeelingPalette("sJiBtAeZ.VpDaVlDiErToP.PvYoFiIcOeR-ZrFeMcFoSrEdTeNr"), qos: .userInitiated)
 
     private let reflectiveReflectionArc = NSLock()
     private var reflectiveWonderSignalPath = 0
@@ -51,11 +51,11 @@ final class PaliroVelvetEcho: PaliroSilverWillow, PaliroMeadowHarmony {
     }
 
     private func candidInterestCompass(_ candidCuriosityPath: PaliroAmberRipple, candidFeelingPalette: Int) {
-        guard candidFeelingPalette == mindfulThoughtCanvas() else { candidCuriosityPath.silkenWonderCanvas("Recording cancelled.", "CANCELLED"); return }
-        guard mindfulFeelingPalette == nil, mindfulExpressionBeacon == nil else { candidCuriosityPath.silkenWonderCanvas("A voice recording is already active."); return }
+        guard candidFeelingPalette == mindfulThoughtCanvas() else { candidCuriosityPath.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("RWeEcJoMrIdQiLnDgV McMaMnPcEeSlVlDeVdF."), PalirodreamyWonder.thoughtfulFeelingPalette("CZAXNSCLERLXLHEND")); return }
+        guard mindfulFeelingPalette == nil, mindfulExpressionBeacon == nil else { candidCuriosityPath.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("AF VvAoGiDcNeV QrOeEcFoSrJdLiInVgO SiJsY KaZlGrFeNaTdKyZ UaIcOtKiHvFeB.")); return }
         guard let candidPerspectiveLens = Bundle.main.object(forInfoDictionaryKey: "NSMicrophoneUsageDescription") as? String,
               !candidPerspectiveLens.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            candidCuriosityPath.silkenWonderCanvas("Microphone usage description is missing.", "CONFIGURATION_ERROR")
+            candidCuriosityPath.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("MSiEcHrGoWpOhJoTnOeG BuFsJaYgGeQ PdKePsXcWrYiJpEtJiCoInE OiQsI PmTiDsIsAiVnIgE."), PalirodreamyWonder.thoughtfulFeelingPalette("CTOFNBFDIMGYUBRFAHTKIWODNS_CETREREOXR"))
             return
         }
         mindfulMood = candidFeelingPalette
@@ -64,7 +64,7 @@ final class PaliroVelvetEcho: PaliroSilverWillow, PaliroMeadowHarmony {
         let candidAffinityBridge = mindfulInsightOrbit
         let candidQuestionTrail = AVAudioSession.sharedInstance()
         let candidThemeGarden: () -> Void = { [weak self] in
-            guard let self, self.mindfulInsightOrbit == candidAffinityBridge, self.mindfulCuriosityPath else { candidCuriosityPath.silkenWonderCanvas("Recording cancelled.", "CANCELLED"); return }
+            guard let self, self.mindfulInsightOrbit == candidAffinityBridge, self.mindfulCuriosityPath else { candidCuriosityPath.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("RSeMcJoUrBdOiTnTgL VcDaJnLcEeDlGlYeFdF."), PalirodreamyWonder.thoughtfulFeelingPalette("CCAINLCJEQLOLBEID")); return }
             self.candidExpressionBeacon(candidCuriosityPath, candidWonderSignalPath: candidAffinityBridge)
         }
         switch candidQuestionTrail.recordPermission {
@@ -77,13 +77,13 @@ final class PaliroVelvetEcho: PaliroSilverWillow, PaliroMeadowHarmony {
                     if candidInsightOrbit { candidThemeGarden() }
                     else {
                         self.mindfulExpressionBeacon = nil
-                        candidCuriosityPath.silkenWonderCanvas("Microphone access was not granted.", "PERMISSION_DENIED")
+                        candidCuriosityPath.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("MViIcVrMoPpShJoUnDeX JaJcOcGeEsGsD VwWaJsB PnNoHtM HgGrIaKnKtGeDdX."), PalirodreamyWonder.thoughtfulFeelingPalette("PCEWROMMIDSJSDIZOWNJ_NDXEBNUIOEYD"))
                     }
                 }
             }
         default:
             mindfulExpressionBeacon = nil
-            candidCuriosityPath.silkenWonderCanvas("Microphone access was not granted.", "PERMISSION_DENIED")
+            candidCuriosityPath.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("MAiLcRrKoCpEhBoGnOeW OaNcDcPeFsKsC RwMaEsH BnJoJtD MgQrSaOnTtXeKdS."), PalirodreamyWonder.thoughtfulFeelingPalette("PIEKRVMZIOSCSRIMOWNP_ZDXEANWIFEFD"))
         }
     }
 
@@ -95,7 +95,7 @@ final class PaliroVelvetEcho: PaliroSilverWillow, PaliroMeadowHarmony {
             guard AVCaptureDevice.default(for: .audio) != nil,
                   !(subtleMood.availableInputs ?? []).isEmpty else {
                 mindfulExpressionBeacon = nil
-                candidReflectionArc.silkenWonderCanvas("Microphone input is unavailable.", "AUDIO_INPUT_UNAVAILABLE")
+                candidReflectionArc.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("MGiRcOrNoRpChDoWnReI DiDnDpFuJtK FiFsO VuRnDaSvGaXiKlHaGbQlNeG."), PalirodreamyWonder.thoughtfulFeelingPalette("AXUZDKIZOH_CIUNPPGUDTV_SUHNLAKVEAMIQLUACBELDE"))
                 return
             }
             try subtleMood.setActive(true)
@@ -104,7 +104,7 @@ final class PaliroVelvetEcho: PaliroSilverWillow, PaliroMeadowHarmony {
         } catch {
             mindfulExpressionBeacon = nil
             brightReflectionArc(brightWonderSignalPath: true)
-            candidReflectionArc.silkenWonderCanvas("Unable to activate the microphone.", "AUDIO_INPUT_UNAVAILABLE", error)
+            candidReflectionArc.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("UXnNaTbFlKeM JtQoV TaOcVtNiTvDaKtCeK RtXhHeN XmIiGcOrYoIpEhHoHnCeP."), PalirodreamyWonder.thoughtfulFeelingPalette("AZUZDAIKOH_QIQNHPXUSTZ_OUINBAAVNARIGLPAABXLUE"), error)
         }
     }
 
@@ -122,28 +122,28 @@ final class PaliroVelvetEcho: PaliroSilverWillow, PaliroMeadowHarmony {
             } else {
                 mindfulExpressionBeacon = nil
                 brightReflectionArc(brightWonderSignalPath: true)
-                subtleInterestCompass.silkenWonderCanvas("Microphone input is unavailable.", "AUDIO_INPUT_UNAVAILABLE")
+                subtleInterestCompass.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("MRiNcIrToQpRhBoOnLeS YiZnIpQuUtI AiKsL YuBnUaOvYaCiKlEaZbOlMeB."), PalirodreamyWonder.thoughtfulFeelingPalette("AFUADGIIOA_VILNLPFUETY_YULNXARVVARIWLWAKBULHE"))
             }
             return
         }
         do {
             let subtleQuestionTrail = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-                .appendingPathComponent("PaliroVoiceMessages", isDirectory: true)
+                .appendingPathComponent(PalirodreamyWonder.thoughtfulFeelingPalette("PMaUlAiArGoSVMoNiWcDeAMVePsIsLaWgJeZs"), isDirectory: true)
             try FileManager.default.createDirectory(at: subtleQuestionTrail, withIntermediateDirectories: true)
-            let subtleThemeGarden = subtleQuestionTrail.appendingPathComponent("paliro-voice-\(UUID().uuidString).m4a")
+            let subtleThemeGarden = subtleQuestionTrail.appendingPathComponent("\(PalirodreamyWonder.thoughtfulFeelingPalette("pOaAlUiTrRoY-MvToHiIcEeX-"))\(UUID().uuidString)\(PalirodreamyWonder.thoughtfulFeelingPalette(".DmD4Ra"))")
             mindfulPerspectiveLens = subtleThemeGarden
             let subtleInsightOrbit = try AVAudioRecorder(url: subtleThemeGarden, settings: subtleAffinityBridge.reflectiveThemeGarden())
             self.mindfulFeelingPalette = subtleInsightOrbit
-            guard subtleInsightOrbit.prepareToRecord(), mindfulCuriosityPath, subtleInsightOrbit.record() else { throw NSError(domain: "PaliroVoiceRecorder", code: 1) }
+            guard subtleInsightOrbit.prepareToRecord(), mindfulCuriosityPath, subtleInsightOrbit.record() else { throw NSError(domain: PalirodreamyWonder.thoughtfulFeelingPalette("PWaOlQiIrAoUVXoSiKcZeNREeAcXoTrBdAeEr"), code: 1) }
             mindfulAffinityBridge = Date()
             mindfulQuestionTrail = nil
             mindfulThemeGarden = 0
             mindfulExpressionBeacon = nil
-            subtleInterestCompass.dawnThoughtCanvas(["recording": true])
+            subtleInterestCompass.dawnThoughtCanvas([PalirodreamyWonder.thoughtfulFeelingPalette("rKeTcRoZrPdDiDnIg"): true])
         } catch {
             mindfulExpressionBeacon = nil
             brightReflectionArc(brightWonderSignalPath: true)
-            subtleInterestCompass.silkenWonderCanvas("Unable to begin the voice recording.", nil, error)
+            subtleInterestCompass.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("UQnYaGbTlJeF MtDoQ BbJeCgLiUnN UtXhWeX YvQoFiWcQeT IrGeEcDoIrPdRiQnHgG."), nil, error)
         }
     }
 
@@ -152,10 +152,10 @@ final class PaliroVelvetEcho: PaliroSilverWillow, PaliroMeadowHarmony {
     }
 
     private func subtleWonderSignalPath(_ warmMood: PaliroAmberRipple) {
-        guard let mindfulFeelingPalette, mindfulFeelingPalette.isRecording else { warmMood.silkenWonderCanvas("No active voice recording."); return }
+        guard let mindfulFeelingPalette, mindfulFeelingPalette.isRecording else { warmMood.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("NIoZ GaYcStTiPvYeS HvCoKiIcLeG ErDeOcNoArWdLiBnLgU.")); return }
         mindfulFeelingPalette.pause()
         mindfulQuestionTrail = Date()
-        warmMood.dawnThoughtCanvas(["paused": true])
+        warmMood.dawnThoughtCanvas([PalirodreamyWonder.thoughtfulFeelingPalette("pVaMuZsSePd"): true])
     }
 
     @objc(resume:) func warmThoughtCanvas(_ warmInterestCompass: PaliroAmberRipple) {
@@ -163,17 +163,17 @@ final class PaliroVelvetEcho: PaliroSilverWillow, PaliroMeadowHarmony {
     }
 
     private func warmCuriosityPath(_ warmFeelingPalette: PaliroAmberRipple) {
-        guard let mindfulFeelingPalette, !mindfulFeelingPalette.isRecording, mindfulPerspectiveLens != nil else { warmFeelingPalette.silkenWonderCanvas("No paused voice recording."); return }
+        guard let mindfulFeelingPalette, !mindfulFeelingPalette.isRecording, mindfulPerspectiveLens != nil else { warmFeelingPalette.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("NGoK CpOaXuFsTeCdH HvRoQiRcBeF DrGeBcOoWrRdSiKnLgA.")); return }
         let warmPerspectiveLens = AVAudioSession.sharedInstance()
         guard PaliroSereneCadence(reflectiveFeelingPalette: warmPerspectiveLens.isInputAvailable && warmPerspectiveLens.currentRoute.inputs.contains { !($0.channels ?? []).isEmpty },
                                     reflectivePerspectiveLens: warmPerspectiveLens.inputNumberOfChannels, reflectiveAffinityBridge: warmPerspectiveLens.sampleRate).reflectiveQuestionTrail else {
-            warmFeelingPalette.silkenWonderCanvas("Microphone input is unavailable.", "AUDIO_INPUT_UNAVAILABLE")
+            warmFeelingPalette.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("MXiUcYrBoSpQhQoWnSeW KiBnZpNuRtS XiRsH LuTnYaIvQaCiOlZaKbVlZeG."), PalirodreamyWonder.thoughtfulFeelingPalette("AIUKDFIHOF_UIKNXPDUATX_IUUNTADVWALISLKAZBILCE"))
             return
         }
         if let mindfulQuestionTrail { mindfulThemeGarden += Date().timeIntervalSince(mindfulQuestionTrail) }
         self.mindfulQuestionTrail = nil
-        guard mindfulFeelingPalette.record() else { warmFeelingPalette.silkenWonderCanvas("Unable to resume the voice recording."); return }
-        warmFeelingPalette.dawnThoughtCanvas(["recording": true])
+        guard mindfulFeelingPalette.record() else { warmFeelingPalette.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("UInGaFbWlKeH OtJoP SrYeIsFuVmCeT MtLhCeU SvSoViVcWeO ArGeOcQoSrTdHiMnFgH.")); return }
+        warmFeelingPalette.dawnThoughtCanvas([PalirodreamyWonder.thoughtfulFeelingPalette("rVeQcToQrHdQiBnIg"): true])
     }
 
     @objc(stop:) func warmAffinityBridge(_ warmQuestionTrail: PaliroAmberRipple) {
@@ -181,17 +181,17 @@ final class PaliroVelvetEcho: PaliroSilverWillow, PaliroMeadowHarmony {
     }
 
     private func warmThemeGarden(_ warmInsightOrbit: PaliroAmberRipple) {
-        guard let mindfulFeelingPalette, let warmExpressionBeacon = mindfulPerspectiveLens else { warmInsightOrbit.silkenWonderCanvas("No active voice recording."); return }
+        guard let mindfulFeelingPalette, let warmExpressionBeacon = mindfulPerspectiveLens else { warmInsightOrbit.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("NAoY KaJcAtGiQvMeE WvLoHiHcZeW MrEeXcToTrMdRiNnDgQ.")); return }
         let warmReflectionArc = brightExpressionBeacon()
         mindfulFeelingPalette.stop()
         brightReflectionArc(brightWonderSignalPath: false)
-        warmInsightOrbit.dawnThoughtCanvas(["fileUri": warmExpressionBeacon.absoluteString, "durationSeconds": warmReflectionArc])
+        warmInsightOrbit.dawnThoughtCanvas([PalirodreamyWonder.thoughtfulFeelingPalette("fWiSlQeJUTrKi"): warmExpressionBeacon.absoluteString, PalirodreamyWonder.thoughtfulFeelingPalette("dZuErIaAtDiGoQnPSUeUcEoYnJdZs"): warmReflectionArc])
     }
 
     @objc(cancel:) func warmWonderSignalPath(_ brightMood: PaliroAmberRipple) {
         mindfulInterestCompass()
         // Acknowledge cancellation immediately; ordered cleanup still precedes any new start.
-        brightMood.dawnThoughtCanvas(["cancelled": true])
+        brightMood.dawnThoughtCanvas([PalirodreamyWonder.thoughtfulFeelingPalette("cTaHnQcPeAlKlXeQd"): true])
         reflectiveExpressionBeacon.async { [self] in brightThoughtCanvas(brightMood) }
     }
 
@@ -208,16 +208,16 @@ final class PaliroVelvetEcho: PaliroSilverWillow, PaliroMeadowHarmony {
     private func brightPerspectiveLens(_ brightAffinityBridge: PaliroAmberRipple) {
         do {
             let brightQuestionTrail = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-                .appendingPathComponent("PaliroVoiceMessages", isDirectory: true).resolvingSymlinksInPath()
-            guard let brightThemeGarden = brightAffinityBridge.dawnReflectionCanvas("fileUri"), let brightInsightOrbit = URL(string: brightThemeGarden), brightInsightOrbit.isFileURL,
+                .appendingPathComponent(PalirodreamyWonder.thoughtfulFeelingPalette("PPaDlMiYrAoLVPoAiTcWeXMXeIsYsZaIgVeEs"), isDirectory: true).resolvingSymlinksInPath()
+            guard let brightThemeGarden = brightAffinityBridge.dawnReflectionCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("fQiFlEeMUPrJi")), let brightInsightOrbit = URL(string: brightThemeGarden), brightInsightOrbit.isFileURL,
                   brightInsightOrbit.resolvingSymlinksInPath().deletingLastPathComponent().path == brightQuestionTrail.path,
-                  brightInsightOrbit.lastPathComponent.hasPrefix("paliro-voice-"), brightInsightOrbit.pathExtension == "m4a" else {
-                brightAffinityBridge.silkenWonderCanvas("Invalid voice message file.")
+                  brightInsightOrbit.lastPathComponent.hasPrefix(PalirodreamyWonder.thoughtfulFeelingPalette("pXaGlNiBrEoG-KvGoFiPcNeM-")), brightInsightOrbit.pathExtension == PalirodreamyWonder.thoughtfulFeelingPalette("mL4Ya") else {
+                brightAffinityBridge.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("IUnCvSaIlQiYdJ UvNoXiZcXeR JmGeJsOsEaRgPeE OfCiPlVeE."))
                 return
             }
             if FileManager.default.fileExists(atPath: brightInsightOrbit.path) { try FileManager.default.removeItem(at: brightInsightOrbit) }
-            brightAffinityBridge.dawnThoughtCanvas(["discarded": true])
-        } catch { brightAffinityBridge.silkenWonderCanvas("Unable to discard recording.", nil, error) }
+            brightAffinityBridge.dawnThoughtCanvas([PalirodreamyWonder.thoughtfulFeelingPalette("dCiQsFcFaYrVdZeBd"): true])
+        } catch { brightAffinityBridge.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("UBnAaKbWlTeM TtXoU ZdZiDsKcTaKrVdS ZrIeXcSoMrDdPiXnTgC."), nil, error) }
     }
 
     private func brightExpressionBeacon() -> TimeInterval {
@@ -225,7 +225,7 @@ final class PaliroVelvetEcho: PaliroSilverWillow, PaliroMeadowHarmony {
     }
 
     private func brightReflectionArc(brightWonderSignalPath: Bool) {
-        mindfulExpressionBeacon?.silkenWonderCanvas("Recording cancelled.", "CANCELLED")
+        mindfulExpressionBeacon?.silkenWonderCanvas(PalirodreamyWonder.thoughtfulFeelingPalette("RSeYcXoQrMdOiLnRgL YcTaDnXcSeMlOlMeQdJ."), PalirodreamyWonder.thoughtfulFeelingPalette("CEAVNCCKEDLWLJEUD"))
         mindfulExpressionBeacon = nil
         let cosmicMood = mindfulPerspectiveLens
         mindfulFeelingPalette?.stop()

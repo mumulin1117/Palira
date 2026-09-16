@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync } from 'node:fs'
+import { readFileSync } from './paliro-native-source.mjs'
 import test from 'node:test'
 import vm from 'node:vm'
 

@@ -72,6 +72,7 @@ print("PASS retry, pause, resume, stop on worker queue")
 with tempfile.TemporaryDirectory(prefix='paliro-native-voice-') as directory:
     harness = Path(directory) / 'paliro-native-voice-check.swift'
     executable = Path(directory) / 'paliro-native-voice-check'
-    harness.write_text(stubs + source + tests)
+    decoder = (root / 'PaDlroliroBox/PaDlroliroBox/PaliroPetalWeave.swift').read_text()
+    harness.write_text(stubs + decoder + source + tests)
     subprocess.run(['swiftc', '-swift-version', '5', str(harness), '-o', str(executable)], check=True)
     subprocess.run([str(executable)], check=True)

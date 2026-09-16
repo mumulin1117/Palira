@@ -26,6 +26,7 @@
 		D19C00000000000000000003 /* PaliroSilverWillow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C00000000000000000004 /* PaliroSilverWillow.swift */; };
 		D19C00000000000000000005 /* PaliroAmberRipple.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C00000000000000000006 /* PaliroAmberRipple.swift */; };
 		D19C00000000000000000007 /* PaliroMistyGrove.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C00000000000000000008 /* PaliroMistyGrove.swift */; };
+		E20D00000000000000000001 /* PalirodreamyWonder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20D00000000000000000002 /* PalirodreamyWonder.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,7 +41,6 @@
 		A14F8A710000000000000007 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A14F8A710000000000000008 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A14F8A71000000000000000A /* PaliroMoonlitPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroMoonlitPath.swift; sourceTree = "<group>"; };
-		F55708A230529DD900484F80 /* PaDlroliroBox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PaDlroliroBox.entitlements; sourceTree = "<group>"; };
 		B17A00000000000000000002 /* PaliroLuminousCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroLuminousCanvas.swift; sourceTree = "<group>"; };
 		B17A00000000000000000004 /* PaliroGentleAurora.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroGentleAurora.swift; sourceTree = "<group>"; };
 		B17A00000000000000000006 /* PaliroSereneCadence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroSereneCadence.swift; sourceTree = "<group>"; };
@@ -52,6 +52,8 @@
 		D19C00000000000000000004 /* PaliroSilverWillow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroSilverWillow.swift; sourceTree = "<group>"; };
 		D19C00000000000000000006 /* PaliroAmberRipple.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroAmberRipple.swift; sourceTree = "<group>"; };
 		D19C00000000000000000008 /* PaliroMistyGrove.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroMistyGrove.swift; sourceTree = "<group>"; };
+		E20D00000000000000000002 /* PalirodreamyWonder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PalirodreamyWonder.swift; sourceTree = "<group>"; };
+		F55708A230529DD900484F80 /* PaDlroliroBox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PaDlroliroBox.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +88,7 @@
 			children = (
 				F55708A230529DD900484F80 /* PaDlroliroBox.entitlements */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
+				E20D00000000000000000002 /* PalirodreamyWonder.swift */,
 				A14F8A710000000000000002 /* PaliroAstralWonder.swift */,
 				B17A00000000000000000002 /* PaliroLuminousCanvas.swift */,
 				B17A00000000000000000004 /* PaliroGentleAurora.swift */,
@@ -184,6 +187,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
+				E20D00000000000000000001 /* PalirodreamyWonder.swift in Sources */,
 				A14F8A710000000000000001 /* PaliroAstralWonder.swift in Sources */,
 				B17A00000000000000000001 /* PaliroLuminousCanvas.swift in Sources */,
 				B17A00000000000000000003 /* PaliroGentleAurora.swift in Sources */,

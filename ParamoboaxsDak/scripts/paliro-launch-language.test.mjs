@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { readFileSync } from './paliro-native-source.mjs'
 import { runInNewContext } from 'node:vm'
 import test from 'node:test'
 import { paliroResolveLanguage, paliroLaunchArtworkForLanguage } from '../src/services/paliroLanguage.js'
