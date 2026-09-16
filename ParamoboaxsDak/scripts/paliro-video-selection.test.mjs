@@ -65,11 +65,12 @@ test('published videos keep the selected cover after rereading persisted data', 
 })
 
 test('native media plugins use instance registration, and video capture waits for audio permission', () => {
-  const bridge = readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroBridgeViewController.swift', import.meta.url), 'utf8')
-  for (const plugin of ['PaliroMediaPicker', 'PaliroVoiceRecorder', 'PaliroCallPermissions']) {
-    assert.ok(bridge.includes(`sereneWonderTrail.crystalReflectionCanvas(${plugin}Plugin())`))
+  const bridge = readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroCelestialCanvas.swift', import.meta.url), 'utf8')
+  for (const plugin of ['PaliroLuminousCanvas', 'PaliroVelvetEcho', 'PaliroGentleAurora']) {
+    assert.ok(bridge.includes(`sereneWonderTrail.crystalReflectionCanvas(${plugin}())`))
   }
-  const native = readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroIapPlugin.swift', import.meta.url), 'utf8')
+  const native = ['PaliroAstralWonder', 'PaliroLuminousCanvas', 'PaliroGentleAurora', 'PaliroVelvetEcho']
+    .map(name => readFileSync(new URL(`../../PaDlroliroBox/PaDlroliroBox/${name}.swift`, import.meta.url), 'utf8')).join('\n')
   for (const selector of ['getProducts', 'purchase', 'pick', 'request', 'start', 'pause', 'resume', 'stop', 'cancel', 'discard']) {
     assert.ok(native.includes(`@objc(${selector}:)`), `native bridge selector ${selector} must remain stable`)
   }

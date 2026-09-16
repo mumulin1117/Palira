@@ -6,7 +6,7 @@ import vm from 'node:vm'
 const entry = readFileSync(new URL('../src/PaliroEntryApp.vue', import.meta.url), 'utf8')
 const styles = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8')
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8')
-const nativeBridge = readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroBridgeViewController.swift', import.meta.url), 'utf8')
+const nativeBridge = readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroCelestialCanvas.swift', import.meta.url), 'utf8')
 const appDelegate = readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox/AppDelegate.swift', import.meta.url), 'utf8')
 
 test('native launch art is installed before loading an opaque branded WebView', () => {
@@ -16,7 +16,7 @@ test('native launch art is installed before loading an opaque branded WebView', 
   assert.match(nativeBridge, /velvetImaginationTrail\.backgroundColor = sereneDreamTrail/)
   assert.match(nativeBridge, /velvetImaginationTrail\.underPageBackgroundColor = sereneDreamTrail/)
   assert.match(appDelegate, /astralMood\.backgroundColor = UIColor\(red: 0\.02, green: 0\.04, blue: 0\.13, alpha: 1\)/)
-  assert.match(nativeBridge, /sereneWonderTrail.crystalReflectionCanvas\(PaliroLaunchScreenPlugin\(\)\)/)
+  assert.match(nativeBridge, /sereneWonderTrail.crystalReflectionCanvas\(PaliroAuroraBloom\(\)\)/)
   assert.match(nativeBridge, /UIView\.animate\(withDuration: 0\.28/)
   assert.match(entry, /paliroNativeService\('PaliroLaunchScreen'\)/)
   assert.match(entry, /window\.requestAnimationFrame\(\(\) => \{\s*window\.requestAnimationFrame/)
@@ -28,7 +28,7 @@ test('the main interface starts in code without a storyboard dependency', () => 
   const project = readFileSync(new URL('../../PaDlroliroBox/PaDlroliroBox.xcodeproj/project.pbxproj', import.meta.url), 'utf8')
   assert.match(appDelegate, /@main/)
   assert.match(appDelegate, /let astralMood = UIWindow\(frame: UIScreen\.main\.bounds\)/)
-  assert.match(appDelegate, /astralMood\.rootViewController = PaliroBridgeViewController\(nibName: nil, bundle: nil\)/)
+  assert.match(appDelegate, /astralMood\.rootViewController = PaliroCelestialCanvas\(nibName: nil, bundle: nil\)/)
   assert.match(appDelegate, /self\.window = astralMood\s+astralMood\.makeKeyAndVisible\(\)/)
   assert.doesNotMatch(plist, /UIMainStoryboardFile|UISceneStoryboardFile/)
   assert.doesNotMatch(project, /Main\.storyboard/)

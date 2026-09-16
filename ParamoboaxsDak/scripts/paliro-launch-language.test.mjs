@@ -36,7 +36,7 @@ test('saved App preference wins over native/browser language, native wins over W
   assert.equal(artwork(['en-US'], 'ko').document.documentElement.lang, 'ko')
   assert.doesNotMatch(artwork(['en-US'], 'ko').src, /-ko@2x/)
   assert.doesNotMatch(artwork(['ko-KR'], 'en').src, /-ko@2x/)
-  const native = read('../../PaDlroliroBox/PaDlroliroBox/PaliroBridgeViewController.swift')
+  const native = read('../../PaDlroliroBox/PaDlroliroBox/PaliroCelestialCanvas.swift') + read('../../PaDlroliroBox/PaDlroliroBox/PaliroDawnWhisper.swift')
   assert.match(native, /Locale.preferredLanguages/)
   assert.match(native, /let velvetInspirationTrail = velvetDreamTrail == "ko" \? "ko" : "en"/)
   assert.match(native, /injectionTime: .atDocumentStart/)

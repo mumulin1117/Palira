@@ -98,8 +98,8 @@ test('Web resources are compressed and double-encrypted as two whole archives', 
 })
 
 test('the native loader opens whole archives and persists one protected main-asset cache', async () => {
-  const native = await readFile(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroNativeBridge.swift', import.meta.url), 'utf8')
-  const controller = await readFile(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroBridgeViewController.swift', import.meta.url), 'utf8')
+  const native = await readFile(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroMistyGrove.swift', import.meta.url), 'utf8')
+  const controller = await readFile(new URL('../../PaDlroliroBox/PaDlroliroBox/PaliroCelestialCanvas.swift', import.meta.url), 'utf8')
   assert.equal((native.match(/AES\.GCM\.open/g) ?? []).length, 2)
   assert.match(native, /decompressed\(using: \.zlib\)/)
   assert.match(native, /paliro-bootstrap\.pwb/)
@@ -108,5 +108,5 @@ test('the native loader opens whole archives and persists one protected main-ass
   assert.match(native, /completeUntilFirstUserAuthentication/)
   assert.match(native, /isExcludedFromBackup = true/)
   assert.match(native, /FileHandle\(forReadingFrom:/)
-  assert.match(controller, /PaliroLocalResources\.springWonderCanvas\(springCuriosityCanvas: "paliro-native\.js"\)/)
+  assert.match(controller, /PaliroMistyGrove\.springWonderCanvas\(springCuriosityCanvas: "paliro-native\.js"\)/)
 })

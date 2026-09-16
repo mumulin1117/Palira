@@ -11,10 +11,21 @@
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* PaliroLaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* PaliroLaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
-		A14F8A710000000000000001 /* PaliroIapPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14F8A710000000000000002 /* PaliroIapPlugin.swift */; };
-		A14F8A710000000000000003 /* PaliroBridgeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14F8A710000000000000004 /* PaliroBridgeViewController.swift */; };
+		A14F8A710000000000000001 /* PaliroAstralWonder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14F8A710000000000000002 /* PaliroAstralWonder.swift */; };
+		A14F8A710000000000000003 /* PaliroCelestialCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14F8A710000000000000004 /* PaliroCelestialCanvas.swift */; };
 		A14F8A710000000000000005 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A14F8A710000000000000006 /* InfoPlist.strings */; };
-		A14F8A710000000000000009 /* PaliroNativeBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14F8A71000000000000000A /* PaliroNativeBridge.swift */; };
+		A14F8A710000000000000009 /* PaliroMoonlitPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14F8A71000000000000000A /* PaliroMoonlitPath.swift */; };
+		B17A00000000000000000001 /* PaliroLuminousCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17A00000000000000000002 /* PaliroLuminousCanvas.swift */; };
+		B17A00000000000000000003 /* PaliroGentleAurora.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17A00000000000000000004 /* PaliroGentleAurora.swift */; };
+		B17A00000000000000000005 /* PaliroSereneCadence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17A00000000000000000006 /* PaliroSereneCadence.swift */; };
+		B17A00000000000000000007 /* PaliroVelvetEcho.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17A00000000000000000008 /* PaliroVelvetEcho.swift */; };
+		C18B00000000000000000001 /* PaliroDawnWhisper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18B00000000000000000002 /* PaliroDawnWhisper.swift */; };
+		C18B00000000000000000003 /* PaliroAuroraBloom.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18B00000000000000000004 /* PaliroAuroraBloom.swift */; };
+		C18B00000000000000000005 /* PaliroQuietCove.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18B00000000000000000006 /* PaliroQuietCove.swift */; };
+		D19C00000000000000000001 /* PaliroMeadowHarmony.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C00000000000000000002 /* PaliroMeadowHarmony.swift */; };
+		D19C00000000000000000003 /* PaliroSilverWillow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C00000000000000000004 /* PaliroSilverWillow.swift */; };
+		D19C00000000000000000005 /* PaliroAmberRipple.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C00000000000000000006 /* PaliroAmberRipple.swift */; };
+		D19C00000000000000000007 /* PaliroMistyGrove.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C00000000000000000008 /* PaliroMistyGrove.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,12 +35,23 @@
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/PaliroLaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
-		A14F8A710000000000000002 /* PaliroIapPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroIapPlugin.swift; sourceTree = "<group>"; };
-		A14F8A710000000000000004 /* PaliroBridgeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroBridgeViewController.swift; sourceTree = "<group>"; };
+		A14F8A710000000000000002 /* PaliroAstralWonder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroAstralWonder.swift; sourceTree = "<group>"; };
+		A14F8A710000000000000004 /* PaliroCelestialCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroCelestialCanvas.swift; sourceTree = "<group>"; };
 		A14F8A710000000000000007 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A14F8A710000000000000008 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A14F8A71000000000000000A /* PaliroNativeBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroNativeBridge.swift; sourceTree = "<group>"; };
+		A14F8A71000000000000000A /* PaliroMoonlitPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroMoonlitPath.swift; sourceTree = "<group>"; };
 		F55708A230529DD900484F80 /* PaDlroliroBox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PaDlroliroBox.entitlements; sourceTree = "<group>"; };
+		B17A00000000000000000002 /* PaliroLuminousCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroLuminousCanvas.swift; sourceTree = "<group>"; };
+		B17A00000000000000000004 /* PaliroGentleAurora.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroGentleAurora.swift; sourceTree = "<group>"; };
+		B17A00000000000000000006 /* PaliroSereneCadence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroSereneCadence.swift; sourceTree = "<group>"; };
+		B17A00000000000000000008 /* PaliroVelvetEcho.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroVelvetEcho.swift; sourceTree = "<group>"; };
+		C18B00000000000000000002 /* PaliroDawnWhisper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroDawnWhisper.swift; sourceTree = "<group>"; };
+		C18B00000000000000000004 /* PaliroAuroraBloom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroAuroraBloom.swift; sourceTree = "<group>"; };
+		C18B00000000000000000006 /* PaliroQuietCove.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroQuietCove.swift; sourceTree = "<group>"; };
+		D19C00000000000000000002 /* PaliroMeadowHarmony.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroMeadowHarmony.swift; sourceTree = "<group>"; };
+		D19C00000000000000000004 /* PaliroSilverWillow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroSilverWillow.swift; sourceTree = "<group>"; };
+		D19C00000000000000000006 /* PaliroAmberRipple.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroAmberRipple.swift; sourceTree = "<group>"; };
+		D19C00000000000000000008 /* PaliroMistyGrove.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroMistyGrove.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,9 +86,20 @@
 			children = (
 				F55708A230529DD900484F80 /* PaDlroliroBox.entitlements */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
-				A14F8A710000000000000002 /* PaliroIapPlugin.swift */,
-				A14F8A710000000000000004 /* PaliroBridgeViewController.swift */,
-				A14F8A71000000000000000A /* PaliroNativeBridge.swift */,
+				A14F8A710000000000000002 /* PaliroAstralWonder.swift */,
+				B17A00000000000000000002 /* PaliroLuminousCanvas.swift */,
+				B17A00000000000000000004 /* PaliroGentleAurora.swift */,
+				B17A00000000000000000006 /* PaliroSereneCadence.swift */,
+				B17A00000000000000000008 /* PaliroVelvetEcho.swift */,
+				A14F8A710000000000000004 /* PaliroCelestialCanvas.swift */,
+				C18B00000000000000000002 /* PaliroDawnWhisper.swift */,
+				C18B00000000000000000004 /* PaliroAuroraBloom.swift */,
+				C18B00000000000000000006 /* PaliroQuietCove.swift */,
+				A14F8A71000000000000000A /* PaliroMoonlitPath.swift */,
+				D19C00000000000000000002 /* PaliroMeadowHarmony.swift */,
+				D19C00000000000000000004 /* PaliroSilverWillow.swift */,
+				D19C00000000000000000006 /* PaliroAmberRipple.swift */,
+				D19C00000000000000000008 /* PaliroMistyGrove.swift */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
 				504EC3101FED79650016851F /* PaliroLaunchScreen.storyboard */,
 				504EC3131FED79650016851F /* Info.plist */,
@@ -151,9 +184,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
-				A14F8A710000000000000001 /* PaliroIapPlugin.swift in Sources */,
-				A14F8A710000000000000003 /* PaliroBridgeViewController.swift in Sources */,
-				A14F8A710000000000000009 /* PaliroNativeBridge.swift in Sources */,
+				A14F8A710000000000000001 /* PaliroAstralWonder.swift in Sources */,
+				B17A00000000000000000001 /* PaliroLuminousCanvas.swift in Sources */,
+				B17A00000000000000000003 /* PaliroGentleAurora.swift in Sources */,
+				B17A00000000000000000005 /* PaliroSereneCadence.swift in Sources */,
+				B17A00000000000000000007 /* PaliroVelvetEcho.swift in Sources */,
+				A14F8A710000000000000003 /* PaliroCelestialCanvas.swift in Sources */,
+				C18B00000000000000000001 /* PaliroDawnWhisper.swift in Sources */,
+				C18B00000000000000000003 /* PaliroAuroraBloom.swift in Sources */,
+				C18B00000000000000000005 /* PaliroQuietCove.swift in Sources */,
+				A14F8A710000000000000009 /* PaliroMoonlitPath.swift in Sources */,
+				D19C00000000000000000001 /* PaliroMeadowHarmony.swift in Sources */,
+				D19C00000000000000000003 /* PaliroSilverWillow.swift in Sources */,
+				D19C00000000000000000005 /* PaliroAmberRipple.swift in Sources */,
+				D19C00000000000000000007 /* PaliroMistyGrove.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

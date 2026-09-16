@@ -4,10 +4,10 @@ import subprocess
 import tempfile
 
 project = Path(__file__).resolve().parents[2]
-source = (project / 'PaDlroliroBox/PaDlroliroBox/PaliroNativeBridge.swift').read_text()
-loader = source[source.index('final class PaliroLocalResources:'):]
+source = (project / 'PaDlroliroBox/PaDlroliroBox/PaliroMistyGrove.swift').read_text()
+loader = source[source.index('final class PaliroMistyGrove:'):]
 checks = r'''
-extension PaliroLocalResources {
+extension PaliroMistyGrove {
     static func verifyPaths() throws {
         let fm = FileManager.default
         let base = fm.temporaryDirectory.appendingPathComponent("paliro-resource-test-\(UUID().uuidString)")
@@ -38,7 +38,7 @@ extension PaliroLocalResources {
         print("PASS cache survives pruning through symlink; archived index through symlink, plain asset, traversal/absolute/symlink escapes")
     }
 }
-try PaliroLocalResources.verifyPaths()
+try PaliroMistyGrove.verifyPaths()
 '''
 with tempfile.TemporaryDirectory(prefix='paliro-swift-resource-') as directory:
     path = Path(directory)
