@@ -18,9 +18,7 @@ jobs:
       LC_ALL: en_US.UTF-8
       LANG: en_US.UTF-8
 
-      # Fastfile 会自动识别唯一的 App 工程、Target、共享 Scheme 和同级 Workspace。
-      # 只有仓库包含多个候选项时，才在 CircleCI 环境变量中设置：
-      # XCODE_PROJECT_PATH、XCODE_WORKSPACE_PATH、APP_TARGET、XCODE_SCHEME
+      # 主工程与旧 ios/App 工程同时存在，必须明确指定主工程。
 
       # 以下敏感变量不要写在 config.yml 中。
       # 请在 CircleCI -> Project Settings -> Environment Variables 中配置：
@@ -79,6 +77,10 @@ jobs:
       - run:
           name: Run Fastlane
           command: |
+            export XCODE_PROJECT_PATH="PaDlroliroBox/PaDlroliroBox.xcodeproj"
+            export XCODE_WORKSPACE_PATH="PaDlroliroBox/PaDlroliroBox.xcworkspace"
+            export APP_TARGET="PaDlroliroBox"
+            export XCODE_SCHEME="PaDlroliroBox"
             bundle exec fastlane ios release
 
       - store_artifacts:

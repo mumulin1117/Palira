@@ -51,32 +51,8 @@ platform :ios do
     end
 
     project_path = ENV["XCODE_PROJECT_PATH"].to_s.strip
+    project_path = "PaDlroliroBox/PaDlroliroBox.xcodeproj" if project_path.empty?
     project_path = File.expand_path(project_path, project_root) unless project_path.empty?
-    if project_path.empty?
-      ignored_path_segments = ["/Pods/", "/Carthage/", "/vendor/", "/build/", "/DerivedData/", "/.build/"]
-      project_paths = Dir[File.join(project_root, "**", "*.xcodeproj")].select do |path|
-        File.directory?(path) && ignored_path_segments.none? { |segment| path.include?(segment) }
-      end.sort
-      app_project_paths = project_paths.select do |candidate|
-        begin
-          Xcodeproj::Project.open(candidate).targets.any? do |target|
-            target.product_type == "com.apple.product-type.application"
-          end
-        rescue StandardError => error
-          UI.verbose "Skipping unreadable Xcode project #{candidate}: #{error.message}"
-          false
-        end
-      end
-
-      if app_project_paths.one?
-        project_path = app_project_paths.first
-      elsif app_project_paths.empty?
-        UI.user_error!("No Xcode project containing an application target was found under #{project_root}")
-      else
-        relative_paths = app_project_paths.map { |path| path.delete_prefix("#{project_root}/") }
-        UI.user_error!("Multiple application projects found: #{relative_paths.join(', ')}. Set XCODE_PROJECT_PATH.")
-      end
-    end
     unless File.directory?(project_path)
       UI.user_error!("Set XCODE_PROJECT_PATH to the app's .xcodeproj (repository root: #{project_root})")
     end

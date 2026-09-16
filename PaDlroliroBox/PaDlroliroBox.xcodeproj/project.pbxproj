@@ -10,8 +10,6 @@
 		504EC3081FED79650016851F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504EC3071FED79650016851F /* AppDelegate.swift */; };
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* PaliroLaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* PaliroLaunchScreen.storyboard */; };
-		50B271D11FEDC1A000F3C39B /* PaliroBloomMedia in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D41FEDC1A000F3C39B /* PaliroBloomMedia */; };
-		50B271D21FEDC1A000F3C39B /* PaliroDewArchive in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D51FEDC1A000F3C39B /* PaliroDewArchive */; };
 		A14F8A710000000000000001 /* PaliroAstralWonder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14F8A710000000000000002 /* PaliroAstralWonder.swift */; };
 		A14F8A710000000000000003 /* PaliroCelestialCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14F8A710000000000000004 /* PaliroCelestialCanvas.swift */; };
 		A14F8A710000000000000005 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A14F8A710000000000000006 /* InfoPlist.strings */; };
@@ -128,6 +126,7 @@
 				504EC3001FED79650016851F /* Sources */,
 				504EC3011FED79650016851F /* Frameworks */,
 				504EC3021FED79650016851F /* Resources */,
+				50B271D71FEDC1A000F3C39B /* Copy Paliro resources */,
 			);
 			buildRules = (
 			);
@@ -178,14 +177,33 @@
 			buildActionMask = 2147483647;
 			files = (
 				504EC3121FED79650016851F /* PaliroLaunchScreen.storyboard in Resources */,
-				50B271D11FEDC1A000F3C39B /* PaliroBloomMedia in Resources */,
-				50B271D21FEDC1A000F3C39B /* PaliroDewArchive in Resources */,
 				504EC30F1FED79650016851F /* Assets.xcassets in Resources */,
 				A14F8A710000000000000005 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		50B271D71FEDC1A000F3C39B /* Copy Paliro resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = ();
+			inputPaths = (
+				"$(SRCROOT)/PaDlroliroBox/PaliroBloomMedia",
+				"$(SRCROOT)/PaDlroliroBox/PaliroDewArchive",
+			);
+			name = "Copy Paliro resources";
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/PaliroBloomMedia",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/PaliroDewArchive",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -eu\nfor directory in PaliroBloomMedia PaliroDewArchive; do\n  source=\"${SRCROOT}/PaDlroliroBox/${directory}\"\n  destination=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/${directory}\"\n  test -d \"${source}\"\n  mkdir -p \"${destination}\"\n  /usr/bin/rsync -a --delete \"${source}/\" \"${destination}/\"\ndone\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		504EC3001FED79650016851F /* Sources */ = {
