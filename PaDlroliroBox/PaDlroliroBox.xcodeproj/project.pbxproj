@@ -3,14 +3,15 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 48;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		504EC3081FED79650016851F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504EC3071FED79650016851F /* AppDelegate.swift */; };
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* PaliroLaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* PaliroLaunchScreen.storyboard */; };
-		50B271D11FEDC1A000F3C39B /* PaliroPetalGarden in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* PaliroPetalGarden */; };
+		50B271D11FEDC1A000F3C39B /* PaliroBloomMedia in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D41FEDC1A000F3C39B /* PaliroBloomMedia */; };
+		50B271D21FEDC1A000F3C39B /* PaliroDewArchive in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D51FEDC1A000F3C39B /* PaliroDewArchive */; };
 		A14F8A710000000000000001 /* PaliroAstralWonder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14F8A710000000000000002 /* PaliroAstralWonder.swift */; };
 		A14F8A710000000000000003 /* PaliroCelestialCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = A14F8A710000000000000004 /* PaliroCelestialCanvas.swift */; };
 		A14F8A710000000000000005 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A14F8A710000000000000006 /* InfoPlist.strings */; };
@@ -35,7 +36,6 @@
 		504EC30E1FED79650016851F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/PaliroLaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		50B271D01FEDC1A000F3C39B /* PaliroPetalGarden */ = {isa = PBXFileReference; lastKnownFileType = folder; path = PaliroPetalGarden; sourceTree = "<group>"; };
 		A14F8A710000000000000002 /* PaliroAstralWonder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroAstralWonder.swift; sourceTree = "<group>"; };
 		A14F8A710000000000000004 /* PaliroCelestialCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroCelestialCanvas.swift; sourceTree = "<group>"; };
 		A14F8A710000000000000007 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -55,6 +55,11 @@
 		E20D00000000000000000002 /* PalirodreamyWonder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PalirodreamyWonder.swift; sourceTree = "<group>"; };
 		F55708A230529DD900484F80 /* PaDlroliroBox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PaDlroliroBox.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		50B271D41FEDC1A000F3C39B /* PaliroBloomMedia */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = PaliroBloomMedia; sourceTree = "<group>"; };
+		50B271D51FEDC1A000F3C39B /* PaliroDewArchive */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = PaliroDewArchive; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		504EC3011FED79650016851F /* Frameworks */ = {
@@ -107,7 +112,8 @@
 				504EC3101FED79650016851F /* PaliroLaunchScreen.storyboard */,
 				504EC3131FED79650016851F /* Info.plist */,
 				A14F8A710000000000000006 /* InfoPlist.strings */,
-				50B271D01FEDC1A000F3C39B /* PaliroPetalGarden */,
+				50B271D41FEDC1A000F3C39B /* PaliroBloomMedia */,
+				50B271D51FEDC1A000F3C39B /* PaliroDewArchive */,
 			);
 			path = PaDlroliroBox;
 			sourceTree = "<group>";
@@ -173,7 +179,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				504EC3121FED79650016851F /* PaliroLaunchScreen.storyboard in Resources */,
-				50B271D11FEDC1A000F3C39B /* PaliroPetalGarden in Resources */,
+				50B271D11FEDC1A000F3C39B /* PaliroBloomMedia in Resources */,
+				50B271D21FEDC1A000F3C39B /* PaliroDewArchive in Resources */,
 				504EC30F1FED79650016851F /* Assets.xcassets in Resources */,
 				A14F8A710000000000000005 /* InfoPlist.strings in Resources */,
 			);
@@ -330,7 +337,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -349,7 +357,10 @@
 				INFOPLIST_FILE = PaDlroliroBox/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Paliro;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.myfy.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -379,7 +390,10 @@
 				INFOPLIST_FILE = PaDlroliroBox/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Paliro;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.myfy.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -14,11 +14,11 @@ extension PaliroMistyGrove {
         let fm = FileManager.default
         let base = fm.temporaryDirectory.appendingPathComponent("paliro-resource-test-\(UUID().uuidString)")
         defer { try? fm.removeItem(at: base) }
-        let real = base.appendingPathComponent("real/PaliroPetalGarden")
+        let real = base.appendingPathComponent("real")
         try fm.createDirectory(at: real.appendingPathComponent("PaliroDewArchive"), withIntermediateDirectories: true)
         try fm.copyItem(at: URL(fileURLWithPath: CommandLine.arguments[1]), to: real.appendingPathComponent("PaliroDewArchive/PaliroFirstBloom.pwb"))
         try fm.createSymbolicLink(at: base.appendingPathComponent("alias"), withDestinationURL: base.appendingPathComponent("real"))
-        let root = base.appendingPathComponent("alias/PaliroPetalGarden")
+        let root = base.appendingPathComponent("alias")
         guard case .lunarImaginationCanvas(let html, _) = try springDreamCanvas(springCuriosityCanvas: "index.html", springReflectionCanvas: root),
               String(data: html, encoding: .utf8)?.contains("<html") == true else { fatalError("Archive index did not load") }
         precondition(petalResourcePath("plain.txt") == CommandLine.arguments[2])
@@ -62,7 +62,7 @@ with tempfile.TemporaryDirectory(prefix='paliro-swift-resource-') as directory:
     swift.write_text('import Foundation\nimport CryptoKit\nimport WebKit\nimport UniformTypeIdentifiers\n' + decoder + loader + checks)
     subprocess.run(['swiftc', str(swift), '-o', str(path / 'check')], check=True)
     expected = 'PaliroBloomMedia/PaliroPetal' + hashlib.sha256(b'plain.txt').hexdigest() + '.txt'
-    bundle = project / 'PaDlroliroBox/PaDlroliroBox/PaliroPetalGarden'
+    bundle = project / 'PaDlroliroBox/PaDlroliroBox'
     web_source = project / 'ParamoboaxsDak/public'
     manifest = []
     matched = set()

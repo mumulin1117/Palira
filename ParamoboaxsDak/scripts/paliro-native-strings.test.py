@@ -17,7 +17,7 @@ def swift_value(literal):
                   lambda match: chr(int(match[1], 16)) if match[1] else escapes[match[2]], literal[1:-1])
 
 for file in native.glob('*.swift'):
-    for literal in re.findall(r'PaliroPetalWeave\.gentleUnfold\(("(?:\\.|[^"\\])*")\)', file.read_text()):
+    for literal in re.findall(r'PalirodreamyWonder\.thoughtfulFeelingPalette\(("(?:\\.|[^"\\])*")\)', file.read_text()):
         encoded = swift_value(literal)
         fixtures.append({'plain': encoded[::2], 'encoded': encoded})
 if len(sys.argv) > 1:
@@ -31,7 +31,7 @@ checks = r'''
 struct Pair: Decodable { let plain: String; let encoded: String }
 let pairs = try JSONDecoder().decode([Pair].self, from: Data(contentsOf: URL(fileURLWithPath: CommandLine.arguments[1])))
 for pair in pairs {
-    precondition(Array(PaliroPetalWeave.gentleUnfold(pair.encoded).utf8) == Array(pair.plain.utf8))
+    precondition(Array(PalirodreamyWonder.thoughtfulFeelingPalette(pair.encoded).utf8) == Array(pair.plain.utf8))
 }
 for key in ["keychain", "protectedFile"] {
     precondition(lucentImaginationTrail(rawValue: key)?.rawValue == key)
@@ -55,5 +55,5 @@ with tempfile.TemporaryDirectory(prefix='paliro-strings-') as directory:
     data = directory / 'pairs.json'
     data.write_text(json.dumps(fixtures, ensure_ascii=False))
     binary = directory / 'check'
-    subprocess.run(['swiftc', str(native / 'PaliroPetalWeave.swift'), str(native / 'PaliroDawnWhisper.swift'), str(main), '-o', str(binary)], check=True)
+    subprocess.run(['swiftc', str(native / 'PalirodreamyWonder.swift'), str(native / 'PaliroDawnWhisper.swift'), str(main), '-o', str(binary)], check=True)
     subprocess.run([str(binary), str(data)], check=True)

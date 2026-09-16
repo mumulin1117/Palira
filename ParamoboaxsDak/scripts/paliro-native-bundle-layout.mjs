@@ -2,7 +2,6 @@ import { createHash } from 'node:crypto'
 import { mkdir, readdir, rename, rmdir } from 'node:fs/promises'
 import { dirname, extname, join } from 'node:path'
 
-export const PALIRO_BUNDLE_DIRECTORY = 'PaliroPetalGarden'
 export const PALIRO_PLAIN_DIRECTORY = 'PaliroBloomMedia'
 
 export function paliroPhysicalResourcePath(logicalPath) {

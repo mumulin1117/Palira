@@ -75,7 +75,7 @@ final class PaliroMistyGrove: NSObject, WKURLSchemeHandler {
     }
 
     static func springWonderCanvas(springCuriosityCanvas: String) throws -> Data {
-        guard let springReflectionCanvas = Bundle.main.resourceURL?.appendingPathComponent(PalirodreamyWonder.thoughtfulFeelingPalette("PQaQlQiQrQoQPQeQtQaQlQGQaQrQdQeQn")) else { throw URLError(.badURL) }
+        guard let springReflectionCanvas = Bundle.main.resourceURL else { throw URLError(.badURL) }
         switch try springDreamCanvas(springCuriosityCanvas: springCuriosityCanvas, springReflectionCanvas: springReflectionCanvas) {
         case .lunarImaginationCanvas(let duskExpressionCanvas, _): return duskExpressionCanvas
         case .solarWonderCanvas(let solarWonderCanvas): return try Data(contentsOf: solarWonderCanvas, options: .mappedIfSafe)
@@ -212,7 +212,7 @@ final class PaliroMistyGrove: NSObject, WKURLSchemeHandler {
 
     private static func autumnImaginationCanvas(autumnThoughtCanvas: URLRequest) throws -> (URLResponse, Data) {
         guard let mistyCuriosityCanvas = autumnThoughtCanvas.url, mistyCuriosityCanvas.host == PalirodreamyWonder.thoughtfulFeelingPalette("lQoGcJaUlXhQoMsDt"), [PalirodreamyWonder.thoughtfulFeelingPalette("GFEMT"), PalirodreamyWonder.thoughtfulFeelingPalette("HKEJAHD")].contains(autumnThoughtCanvas.httpMethod ?? PalirodreamyWonder.thoughtfulFeelingPalette("GUECT")),
-              let springReflectionCanvas = Bundle.main.resourceURL?.appendingPathComponent(PalirodreamyWonder.thoughtfulFeelingPalette("PQaQlQiQrQoQPQeQtQaQlQGQaQrQdQeQn")) else { throw URLError(.badURL) }
+              let springReflectionCanvas = Bundle.main.resourceURL else { throw URLError(.badURL) }
         let winterInspirationCanvas = mistyCuriosityCanvas.path
         let springDreamCanvas: lunarThoughtCanvas
         if let rosyCuriosityCanvas = [PalirodreamyWonder.thoughtfulFeelingPalette("/U_KpLaOlKiYrQoA_YfPiZlKeO_"), PalirodreamyWonder.thoughtfulFeelingPalette("/D_OcRaLpLaAcHiItKoRrY_GfEiTlWeO_")].first(where: { winterInspirationCanvas.hasPrefix($0) }) {
