@@ -3037,7 +3037,7 @@ function finishTopicTest() {
             <strong>{{ profile.interests.length }}/20 {{ t('selected') }}</strong>
           </div>
           <div class="paliro-chip-grid paliro-interest-grid">
-            <button v-for="interest in interests" :key="interest" :class="['paliro-choice-chip', { 'is-selected': profile.interests.includes(interest) }]" type="button" @click="toggleInterest(interest)">{{ interest }}</button>
+            <button v-for="interest in interests" :key="interest" :class="['paliro-choice-chip', { 'is-selected': profile.interests.includes(interest) }]" type="button" @click="toggleInterest(interest)">{{ t(`interest${interest}`) }}</button>
           </div>
         </div>
         <p v-if="errorMessage" class="paliro-error paliro-setup-error" role="alert">{{ errorMessage }}</p>
