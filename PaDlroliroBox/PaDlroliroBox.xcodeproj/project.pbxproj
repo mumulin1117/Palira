@@ -26,6 +26,17 @@
 		D19C00000000000000000005 /* PaliroAmberRipple.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C00000000000000000006 /* PaliroAmberRipple.swift */; };
 		D19C00000000000000000007 /* PaliroMistyGrove.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C00000000000000000008 /* PaliroMistyGrove.swift */; };
 		E20D00000000000000000001 /* PalirodreamyWonder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20D00000000000000000002 /* PalirodreamyWonder.swift */; };
+		F5A39F0A308B2DF7009C49ED /* CosmicReflectionArc.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A39EFF308B2DF7009C49ED /* CosmicReflectionArc.swift */; };
+		F5A39F0B308B2DF7009C49ED /* ReflectiveFeelingPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A39F03308B2DF7009C49ED /* ReflectiveFeelingPalette.swift */; };
+		F5A39F0C308B2DF7009C49ED /* SereneDreamTrail.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A39F05308B2DF7009C49ED /* SereneDreamTrail.swift */; };
+		F5A39F0D308B2DF7009C49ED /* LucentImaginationTrail.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A39F01308B2DF7009C49ED /* LucentImaginationTrail.swift */; };
+		F5A39F0E308B2DF7009C49ED /* lunarFeelingCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A39F02308B2DF7009C49ED /* lunarFeelingCanvas.swift */; };
+		F5A39F0F308B2DF7009C49ED /* VandidFeelingPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A39F08308B2DF7009C49ED /* VandidFeelingPalette.swift */; };
+		F5A39F10308B2DF7009C49ED /* GentleInsightOrbit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A39F00308B2DF7009C49ED /* GentleInsightOrbit.swift */; };
+		F5A39F11308B2DF7009C49ED /* AuroraPetalRibbon.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A39EFE308B2DF7009C49ED /* AuroraPetalRibbon.swift */; };
+		F5A39F12308B2DF7009C49ED /* SereneExpressionTrail.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A39F06308B2DF7009C49ED /* SereneExpressionTrail.swift */; };
+		F5A39F13308B2DF7009C49ED /* SolarReflectionCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A39F07308B2DF7009C49ED /* SolarReflectionCanvas.swift */; };
+		F5A39F14308B2DF7009C49ED /* ReflectivePerspectiveLens.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A39F04308B2DF7009C49ED /* ReflectivePerspectiveLens.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,6 +63,17 @@
 		D19C00000000000000000008 /* PaliroMistyGrove.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaliroMistyGrove.swift; sourceTree = "<group>"; };
 		E20D00000000000000000002 /* PalirodreamyWonder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PalirodreamyWonder.swift; sourceTree = "<group>"; };
 		F55708A230529DD900484F80 /* PaDlroliroBox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PaDlroliroBox.entitlements; sourceTree = "<group>"; };
+		F5A39EFE308B2DF7009C49ED /* AuroraPetalRibbon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuroraPetalRibbon.swift; sourceTree = "<group>"; };
+		F5A39EFF308B2DF7009C49ED /* CosmicReflectionArc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CosmicReflectionArc.swift; sourceTree = "<group>"; };
+		F5A39F00308B2DF7009C49ED /* GentleInsightOrbit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GentleInsightOrbit.swift; sourceTree = "<group>"; };
+		F5A39F01308B2DF7009C49ED /* LucentImaginationTrail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LucentImaginationTrail.swift; sourceTree = "<group>"; };
+		F5A39F02308B2DF7009C49ED /* lunarFeelingCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lunarFeelingCanvas.swift; sourceTree = "<group>"; };
+		F5A39F03308B2DF7009C49ED /* ReflectiveFeelingPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReflectiveFeelingPalette.swift; sourceTree = "<group>"; };
+		F5A39F04308B2DF7009C49ED /* ReflectivePerspectiveLens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReflectivePerspectiveLens.swift; sourceTree = "<group>"; };
+		F5A39F05308B2DF7009C49ED /* SereneDreamTrail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SereneDreamTrail.swift; sourceTree = "<group>"; };
+		F5A39F06308B2DF7009C49ED /* SereneExpressionTrail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SereneExpressionTrail.swift; sourceTree = "<group>"; };
+		F5A39F07308B2DF7009C49ED /* SolarReflectionCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolarReflectionCanvas.swift; sourceTree = "<group>"; };
+		F5A39F08308B2DF7009C49ED /* VandidFeelingPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VandidFeelingPalette.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -89,6 +111,7 @@
 		504EC3061FED79650016851F /* PaDlroliroBox */ = {
 			isa = PBXGroup;
 			children = (
+				F5A39F09308B2DF7009C49ED /* Paliro */,
 				F55708A230529DD900484F80 /* PaDlroliroBox.entitlements */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
 				E20D00000000000000000002 /* PalirodreamyWonder.swift */,
@@ -114,6 +137,24 @@
 				50B271D51FEDC1A000F3C39B /* PaliroDewArchive */,
 			);
 			path = PaDlroliroBox;
+			sourceTree = "<group>";
+		};
+		F5A39F09308B2DF7009C49ED /* Paliro */ = {
+			isa = PBXGroup;
+			children = (
+				F5A39EFE308B2DF7009C49ED /* AuroraPetalRibbon.swift */,
+				F5A39EFF308B2DF7009C49ED /* CosmicReflectionArc.swift */,
+				F5A39F00308B2DF7009C49ED /* GentleInsightOrbit.swift */,
+				F5A39F01308B2DF7009C49ED /* LucentImaginationTrail.swift */,
+				F5A39F02308B2DF7009C49ED /* lunarFeelingCanvas.swift */,
+				F5A39F03308B2DF7009C49ED /* ReflectiveFeelingPalette.swift */,
+				F5A39F04308B2DF7009C49ED /* ReflectivePerspectiveLens.swift */,
+				F5A39F05308B2DF7009C49ED /* SereneDreamTrail.swift */,
+				F5A39F06308B2DF7009C49ED /* SereneExpressionTrail.swift */,
+				F5A39F07308B2DF7009C49ED /* SolarReflectionCanvas.swift */,
+				F5A39F08308B2DF7009C49ED /* VandidFeelingPalette.swift */,
+			);
+			path = Paliro;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -220,6 +261,17 @@
 				B17A00000000000000000007 /* PaliroVelvetEcho.swift in Sources */,
 				A14F8A710000000000000003 /* PaliroCelestialCanvas.swift in Sources */,
 				C18B00000000000000000001 /* PaliroDawnWhisper.swift in Sources */,
+				F5A39F0A308B2DF7009C49ED /* CosmicReflectionArc.swift in Sources */,
+				F5A39F0B308B2DF7009C49ED /* ReflectiveFeelingPalette.swift in Sources */,
+				F5A39F0C308B2DF7009C49ED /* SereneDreamTrail.swift in Sources */,
+				F5A39F0D308B2DF7009C49ED /* LucentImaginationTrail.swift in Sources */,
+				F5A39F0E308B2DF7009C49ED /* lunarFeelingCanvas.swift in Sources */,
+				F5A39F0F308B2DF7009C49ED /* VandidFeelingPalette.swift in Sources */,
+				F5A39F10308B2DF7009C49ED /* GentleInsightOrbit.swift in Sources */,
+				F5A39F11308B2DF7009C49ED /* AuroraPetalRibbon.swift in Sources */,
+				F5A39F12308B2DF7009C49ED /* SereneExpressionTrail.swift in Sources */,
+				F5A39F13308B2DF7009C49ED /* SolarReflectionCanvas.swift in Sources */,
+				F5A39F14308B2DF7009C49ED /* ReflectivePerspectiveLens.swift in Sources */,
 				C18B00000000000000000003 /* PaliroAuroraBloom.swift in Sources */,
 				C18B00000000000000000005 /* PaliroQuietCove.swift in Sources */,
 				A14F8A710000000000000009 /* PaliroMoonlitPath.swift in Sources */,
@@ -377,7 +429,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.magipolcbox.paliro;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -407,7 +459,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.magipolcbox.paliro;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
