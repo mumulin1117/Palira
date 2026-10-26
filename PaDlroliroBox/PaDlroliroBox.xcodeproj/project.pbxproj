@@ -35,7 +35,6 @@
 		F5A39F10308B2DF7009C49ED /* GentleInsightOrbit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A39F00308B2DF7009C49ED /* GentleInsightOrbit.swift */; };
 		F5A39F11308B2DF7009C49ED /* AuroraPetalRibbon.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A39EFE308B2DF7009C49ED /* AuroraPetalRibbon.swift */; };
 		F5A39F12308B2DF7009C49ED /* SereneExpressionTrail.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A39F06308B2DF7009C49ED /* SereneExpressionTrail.swift */; };
-		F5A39F13308B2DF7009C49ED /* SolarReflectionCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A39F07308B2DF7009C49ED /* SolarReflectionCanvas.swift */; };
 		F5A39F14308B2DF7009C49ED /* ReflectivePerspectiveLens.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A39F04308B2DF7009C49ED /* ReflectivePerspectiveLens.swift */; };
 /* End PBXBuildFile section */
 
@@ -72,7 +71,6 @@
 		F5A39F04308B2DF7009C49ED /* ReflectivePerspectiveLens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReflectivePerspectiveLens.swift; sourceTree = "<group>"; };
 		F5A39F05308B2DF7009C49ED /* SereneDreamTrail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SereneDreamTrail.swift; sourceTree = "<group>"; };
 		F5A39F06308B2DF7009C49ED /* SereneExpressionTrail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SereneExpressionTrail.swift; sourceTree = "<group>"; };
-		F5A39F07308B2DF7009C49ED /* SolarReflectionCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolarReflectionCanvas.swift; sourceTree = "<group>"; };
 		F5A39F08308B2DF7009C49ED /* VandidFeelingPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VandidFeelingPalette.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -111,9 +109,18 @@
 		504EC3061FED79650016851F /* PaDlroliroBox */ = {
 			isa = PBXGroup;
 			children = (
-				F5A39F09308B2DF7009C49ED /* Paliro */,
 				F55708A230529DD900484F80 /* PaDlroliroBox.entitlements */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
+				F5A39EFE308B2DF7009C49ED /* AuroraPetalRibbon.swift */,
+				F5A39EFF308B2DF7009C49ED /* CosmicReflectionArc.swift */,
+				F5A39F00308B2DF7009C49ED /* GentleInsightOrbit.swift */,
+				F5A39F01308B2DF7009C49ED /* LucentImaginationTrail.swift */,
+				F5A39F02308B2DF7009C49ED /* lunarFeelingCanvas.swift */,
+				F5A39F03308B2DF7009C49ED /* ReflectiveFeelingPalette.swift */,
+				F5A39F04308B2DF7009C49ED /* ReflectivePerspectiveLens.swift */,
+				F5A39F05308B2DF7009C49ED /* SereneDreamTrail.swift */,
+				F5A39F06308B2DF7009C49ED /* SereneExpressionTrail.swift */,
+				F5A39F08308B2DF7009C49ED /* VandidFeelingPalette.swift */,
 				E20D00000000000000000002 /* PalirodreamyWonder.swift */,
 				A14F8A710000000000000002 /* PaliroAstralWonder.swift */,
 				B17A00000000000000000002 /* PaliroLuminousCanvas.swift */,
@@ -137,24 +144,6 @@
 				50B271D51FEDC1A000F3C39B /* PaliroDewArchive */,
 			);
 			path = PaDlroliroBox;
-			sourceTree = "<group>";
-		};
-		F5A39F09308B2DF7009C49ED /* Paliro */ = {
-			isa = PBXGroup;
-			children = (
-				F5A39EFE308B2DF7009C49ED /* AuroraPetalRibbon.swift */,
-				F5A39EFF308B2DF7009C49ED /* CosmicReflectionArc.swift */,
-				F5A39F00308B2DF7009C49ED /* GentleInsightOrbit.swift */,
-				F5A39F01308B2DF7009C49ED /* LucentImaginationTrail.swift */,
-				F5A39F02308B2DF7009C49ED /* lunarFeelingCanvas.swift */,
-				F5A39F03308B2DF7009C49ED /* ReflectiveFeelingPalette.swift */,
-				F5A39F04308B2DF7009C49ED /* ReflectivePerspectiveLens.swift */,
-				F5A39F05308B2DF7009C49ED /* SereneDreamTrail.swift */,
-				F5A39F06308B2DF7009C49ED /* SereneExpressionTrail.swift */,
-				F5A39F07308B2DF7009C49ED /* SolarReflectionCanvas.swift */,
-				F5A39F08308B2DF7009C49ED /* VandidFeelingPalette.swift */,
-			);
-			path = Paliro;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -270,7 +259,6 @@
 				F5A39F10308B2DF7009C49ED /* GentleInsightOrbit.swift in Sources */,
 				F5A39F11308B2DF7009C49ED /* AuroraPetalRibbon.swift in Sources */,
 				F5A39F12308B2DF7009C49ED /* SereneExpressionTrail.swift in Sources */,
-				F5A39F13308B2DF7009C49ED /* SolarReflectionCanvas.swift in Sources */,
 				F5A39F14308B2DF7009C49ED /* ReflectivePerspectiveLens.swift in Sources */,
 				C18B00000000000000000003 /* PaliroAuroraBloom.swift in Sources */,
 				C18B00000000000000000005 /* PaliroQuietCove.swift in Sources */,

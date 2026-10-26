@@ -10,7 +10,6 @@ import UIKit
 import Foundation
 
 
-let roastShelfPreview = true
 
 extension AppDelegate:UNUserNotificationCenterDelegate {
     
@@ -18,13 +17,13 @@ extension AppDelegate:UNUserNotificationCenterDelegate {
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
-        lunarFeelingCanvas.moodGalleryCanvas.firstSipUpdate(
-            firstSipRecord: deviceToken
+        lunarFeelingCanvas.velvetWonderTrail.velvetThoughtTrail(
+            velvetFeelingTrail: deviceToken
         )
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        lunarFeelingCanvas.moodGalleryCanvas.firstSipTrigger()
+        lunarFeelingCanvas.velvetWonderTrail.velvetExpressionTrail()
     }
 
     func application(
@@ -32,8 +31,8 @@ extension AppDelegate:UNUserNotificationCenterDelegate {
         didReceiveRemoteNotification userInfo: [AnyHashable: Any],
         fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
     ) {
-        lunarFeelingCanvas.moodGalleryCanvas.firstSipRoute(
-            firstSipAction: completionHandler
+        lunarFeelingCanvas.velvetWonderTrail.velvetDreamTrail(
+            velvetReflectionTrail: completionHandler
         )
     }
     

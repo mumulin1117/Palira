@@ -48,9 +48,7 @@ final class PaliroCelestialCanvas: UIViewController, WKNavigationDelegate {
         velvetImaginationTrail.scrollView.bounces = false
         velvetImaginationTrail.scrollView.keyboardDismissMode = .interactive
         velvetImaginationTrail.underPageBackgroundColor = sereneDreamTrail
-        #if DEBUG
-        if #available(iOS 16.4, *) { velvetImaginationTrail.isInspectable = true }
-        #endif
+       
         view.addSubview(velvetImaginationTrail)
         sereneCuriosityTrail = velvetImaginationTrail.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         NSLayoutConstraint.activate([
